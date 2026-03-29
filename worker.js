@@ -22,6 +22,10 @@ if(url.pathname === "/telefone"){
 return consultaTelefone(request,url,ctx)
 }
 
+if(url.pathname === "/placa"){
+return consultaPlaca(request,url,ctx)
+}
+
 return new Response(JSON.stringify({
 status:false,
 msg:"Endpoint não encontrado"
@@ -538,6 +542,231 @@ consulta:telefone,
 total_resultados:pessoas.length,
 
 dados:pessoas
+
+}
+
+response = new Response(
+JSON.stringify(finalResponse,null,2),
+{
+headers:{
+"Content-Type":"application/json"
+}
+}
+)
+
+ctx.waitUntil(cache.put(cacheKey,response.clone()))
+
+return response
+
+}
+
+/*
+|--------------------------------------------------------------------------
+| PLACA
+|--------------------------------------------------------------------------
+*/
+
+async function consultaPlaca(request,url,ctx){
+
+if(request.method !== "GET"){
+return jsonErro("REQ_000","Método inválido")
+}
+
+const token = url.searchParams.get("token")
+const placa = (url.searchParams.get("placa") || "").toUpperCase().replace(/[^A-Z0-9]/g,'')
+
+if(!token || !placa){
+return jsonErro("REQ_001","Parâmetros incompletos")
+}
+
+if(!validarToken(token)){
+return jsonErro("AUTH_001","Token inválido")
+}
+
+/*
+|--------------------------------------------------------------------------
+| CACHE
+|--------------------------------------------------------------------------
+*/
+
+const cacheKey = new Request(request.url,{method:"GET"})
+const cache = caches.default
+
+let response = await cache.match(cacheKey)
+
+if(response){
+return response
+}
+
+/*
+|--------------------------------------------------------------------------
+| CONSULTA API
+|--------------------------------------------------------------------------
+*/
+
+let api
+
+try{
+
+const res = await fetch(`https://api.blackaut.shop/api/dados-pessoais/placa?placa=${placa}&apikey=EbmScZ0ntHf61KJz3H`)
+
+if(!res.ok){
+return jsonErro("API_002","API offline")
+}
+
+api = await res.json()
+
+}catch(e){
+
+return jsonErro("API_001","Erro na conexão",e.toString())
+
+}
+
+if(!api?.resultado){
+return jsonErro("DATA_001","Sem dados")
+}
+
+/*
+|--------------------------------------------------------------------------
+| PARSE DO TEXTO
+|--------------------------------------------------------------------------
+*/
+
+const texto = api.resultado.resultado || ""
+
+function extrair(campo){
+
+const regex = new RegExp(`• ${campo}: (.*)`)
+const match = texto.match(regex)
+
+return match ? match[1].trim() : null
+
+}
+
+/*
+|--------------------------------------------------------------------------
+| DADOS VEICULO
+|--------------------------------------------------------------------------
+*/
+
+const veiculo = {
+
+placa:extrair("PLACA"),
+situacao:extrair("SITUAÇÃO"),
+
+marca_modelo:extrair("MARCA/MODELO"),
+cor:extrair("COR"),
+
+ano_fabricacao:extrair("ANO - FABRICAÇÃO"),
+ano_modelo:extrair("ANO - MODELO"),
+
+municipio:extrair("MUNICIPIO"),
+estado:extrair("ESTADO"),
+
+chassi:extrair("CHASSI"),
+renavam:extrair("RENAVAM"),
+
+combustivel:extrair("COMBUSTIVEL"),
+potencia:extrair("POTENCIA"),
+
+tipo_veiculo:extrair("TIPO DE VEICULO"),
+especie:extrair("ESPECIE"),
+
+passageiros:extrair("QUANTIDADE DE PASSAGEIROS")
+
+}
+
+/*
+|--------------------------------------------------------------------------
+| PROPRIETARIO
+|--------------------------------------------------------------------------
+*/
+
+const docProprietario = extrair("CPF/CNPJ")
+const nomeProprietario = extrair("NOME")
+
+let proprietario = {
+
+documento:docProprietario,
+nome:nomeProprietario
+
+}
+
+/*
+|--------------------------------------------------------------------------
+| ENRIQUECER COM API CPF
+|--------------------------------------------------------------------------
+*/
+
+if(docProprietario && docProprietario.length === 11){
+
+try{
+
+const cpfRes = await fetch(`https://sara-api.xyz/consulta/cpf?cpf=${docProprietario}`)
+const cpfJson = await cpfRes.json()
+
+if(cpfJson?.resultado?.body){
+
+const body = cpfJson.resultado.body
+
+proprietario = {
+
+cpf:body.cpf ?? null,
+cpf_formatado:body.cpf_masked ?? null,
+
+nome:body.name ?? null,
+sexo:body.gender ?? null,
+nascimento:body.birth_date ?? null,
+
+filiacao:{
+mae:body.mother_name ?? null,
+pai:body.father_name ?? null
+},
+
+contato:{
+emails:body?.serasa_completo?.emails ?? [],
+telefones:body?.phones ?? []
+},
+
+enderecos:{
+principal:body.address ?? {},
+historico:body.all_addresses ?? []
+},
+
+veiculos:body?.vehicles?.list ?? []
+
+}
+
+}
+
+}catch(e){}
+
+}
+
+/*
+|--------------------------------------------------------------------------
+| FINAL
+|--------------------------------------------------------------------------
+*/
+
+const finalResponse = {
+
+status:true,
+
+meta:{
+sistema:"Astro Search",
+empresa:"Astro Company",
+criador:"@puxardados5",
+endpoint:"placa",
+timestamp:new Date().toISOString()
+},
+
+consulta:placa,
+
+dados:{
+veiculo:veiculo,
+proprietario:proprietario
+}
 
 }
 
