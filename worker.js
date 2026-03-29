@@ -216,6 +216,140 @@ return response
 
 }
 
+if(url.pathname === "/nome"){
+
+const token = url.searchParams.get("token")
+const nome = url.searchParams.get("nome")
+const i = url.searchParams.get("i") || 1
+
+if(!token || !nome){
+return jsonErro("REQ_001","Parâmetros incompletos")
+}
+
+/*
+|--------------------------------------------------------------------------
+| 🔐 TOKENS
+|--------------------------------------------------------------------------
+*/
+
+const TOKENS = [
+"IFNastro",
+"token2"
+]
+
+const UNLIMITED = [
+"vip_token"
+]
+
+if(!TOKENS.includes(token) && !UNLIMITED.includes(token)){
+return jsonErro("AUTH_001","Token inválido")
+}
+
+/*
+|--------------------------------------------------------------------------
+| ⚡ CACHE
+|--------------------------------------------------------------------------
+*/
+
+const cacheKey = new Request(request.url,{method:"GET"})
+const cache = caches.default
+
+let response = await cache.match(cacheKey)
+
+if(response){
+return response
+}
+
+/*
+|--------------------------------------------------------------------------
+| 🔌 API
+|--------------------------------------------------------------------------
+*/
+
+let api
+
+try{
+
+const res = await fetch(`https://astrosearch.rf.gd/api/nome.php?token=boca&nome=${encodeURIComponent(nome)}&i=${i}`)
+
+if(!res.ok){
+return jsonErro("API_002","API offline")
+}
+
+api = await res.json()
+
+}catch(e){
+
+return jsonErro("API_001","Erro na conexão",e.toString())
+
+}
+
+if(!api?.dados){
+return jsonErro("DATA_001","Sem dados")
+}
+
+/*
+|--------------------------------------------------------------------------
+| 📊 ESTRUTURA
+|--------------------------------------------------------------------------
+*/
+
+const resultados = api.dados.map(pessoa => ({
+
+identificacao:{
+
+cpf:pessoa.cpf ?? null,
+nome:pessoa.nome ?? null,
+sexo:pessoa.sexo ?? null,
+nascimento:pessoa.nascimento ?? null,
+idade:pessoa.idade ?? null,
+signo:pessoa.signo ?? null
+
+}
+
+}))
+
+/*
+|--------------------------------------------------------------------------
+| 🎯 FINAL
+|--------------------------------------------------------------------------
+*/
+
+const finalResponse = {
+
+status:true,
+
+meta:{
+sistema:"Astro Search",
+empresa:"Astro Company",
+criador:"@puxardados5",
+endpoint:"nome",
+timestamp:new Date().toISOString()
+},
+
+consulta:nome,
+
+total_resultados:resultados.length,
+
+dados:resultados
+
+}
+
+response = new Response(
+JSON.stringify(finalResponse,null,2),
+{
+headers:{
+"Content-Type":"application/json"
+}
+}
+)
+
+ctx.waitUntil(cache.put(cacheKey,response.clone()))
+
+return response
+
+}
+
 function jsonErro(code,msg,extra=null){
 
 return new Response(
