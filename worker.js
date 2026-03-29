@@ -219,7 +219,7 @@ return response
 if(url.pathname === "/nome"){
 
 const token = url.searchParams.get("token")
-const nome = url.searchParams.get("nome")
+const nome = (url.searchParams.get("nome") || "").trim()
 const i = url.searchParams.get("i") || 1
 
 if(!token || !nome){
