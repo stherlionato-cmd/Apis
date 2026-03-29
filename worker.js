@@ -18,6 +18,10 @@ if(url.pathname === "/nome"){
 return consultaNome(request,url,ctx)
 }
 
+if(url.pathname === "/telefone"){
+return consultaTelefone(request,url,ctx)
+}
+
 return new Response(JSON.stringify({
 status:false,
 msg:"Endpoint não encontrado"
@@ -351,6 +355,189 @@ consulta:nome,
 total_resultados:resultados.length,
 
 dados:resultados
+
+}
+
+response = new Response(
+JSON.stringify(finalResponse,null,2),
+{
+headers:{
+"Content-Type":"application/json"
+}
+}
+)
+
+ctx.waitUntil(cache.put(cacheKey,response.clone()))
+
+return response
+
+}
+
+/*
+|--------------------------------------------------------------------------
+| TELEFONE
+|--------------------------------------------------------------------------
+*/
+
+async function consultaTelefone(request,url,ctx){
+
+if(request.method !== "GET"){
+return jsonErro("REQ_000","Método inválido")
+}
+
+const token = url.searchParams.get("token")
+const telefone = (url.searchParams.get("telefone") || "").replace(/\D/g,'')
+
+if(!token || !telefone){
+return jsonErro("REQ_001","Parâmetros incompletos")
+}
+
+if(telefone.length < 10){
+return jsonErro("REQ_002","Telefone inválido")
+}
+
+if(!validarToken(token)){
+return jsonErro("AUTH_001","Token inválido")
+}
+
+/*
+|--------------------------------------------------------------------------
+| CACHE
+|--------------------------------------------------------------------------
+*/
+
+const cacheKey = new Request(request.url,{method:"GET"})
+const cache = caches.default
+
+let response = await cache.match(cacheKey)
+
+if(response){
+return response
+}
+
+/*
+|--------------------------------------------------------------------------
+| CONSULTA TELEFONE
+|--------------------------------------------------------------------------
+*/
+
+let api
+
+try{
+
+const res = await fetch(`https://sara-api.xyz/consulta/telefone?telefone=${telefone}`)
+
+if(!res.ok){
+return jsonErro("API_002","API offline")
+}
+
+api = await res.json()
+
+}catch(e){
+
+return jsonErro("API_001","Erro na conexão",e.toString())
+
+}
+
+if(!api?.resultado?.body){
+return jsonErro("DATA_001","Sem resultados")
+}
+
+const registros = api.resultado.body
+
+/*
+|--------------------------------------------------------------------------
+| BUSCAR DADOS COMPLETOS PELO CPF
+|--------------------------------------------------------------------------
+*/
+
+const pessoas = []
+
+for(const item of registros){
+
+const cpf = item.cpf?.replace(/\D/g,'')
+
+if(!cpf) continue
+
+try{
+
+const cpfRes = await fetch(`https://sara-api.xyz/consulta/cpf?cpf=${cpf}`)
+const cpfJson = await cpfRes.json()
+
+if(!cpfJson?.resultado?.body) continue
+
+const body = cpfJson.resultado.body
+
+pessoas.push({
+
+telefone_consultado:telefone,
+
+identificacao:{
+cpf:body.cpf ?? null,
+cpf_formatado:body.cpf_masked ?? null,
+nome:body.name ?? null,
+sexo:body.gender ?? null,
+nascimento:body.birth_date ?? null
+},
+
+localizacao:{
+cidade:item.city ?? null,
+estado:item.state ?? null
+},
+
+contato:{
+email:item.email ?? null,
+emails:body?.serasa_completo?.emails ?? [],
+telefones:body?.phones ?? []
+},
+
+filiacao:{
+mae:body.mother_name ?? null,
+pai:body.father_name ?? null
+},
+
+enderecos:{
+principal:body.address ?? {},
+historico:body.all_addresses ?? []
+},
+
+familia:{
+parentes:body?.serasa_completo?.parentes ?? []
+},
+
+veiculos:body?.vehicles?.list ?? []
+
+})
+
+}catch(e){
+continue
+}
+
+}
+
+/*
+|--------------------------------------------------------------------------
+| FINAL
+|--------------------------------------------------------------------------
+*/
+
+const finalResponse = {
+
+status:true,
+
+meta:{
+sistema:"Astro Search",
+empresa:"Astro Company",
+criador:"@puxardados5",
+endpoint:"telefone",
+timestamp:new Date().toISOString()
+},
+
+consulta:telefone,
+
+total_resultados:pessoas.length,
+
+dados:pessoas
 
 }
 
