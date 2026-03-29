@@ -4,19 +4,32 @@ async fetch(request, env, ctx) {
 
 const url = new URL(request.url)
 
-if(request.method !== "GET"){
-return jsonErro("REQ_000","Método inválido")
+/*
+|--------------------------------------------------------------------------
+| ROUTER
+|--------------------------------------------------------------------------
+*/
+
+if(url.pathname === "/cpf"){
+return consultaCPF(request,url,ctx)
 }
 
-const token = url.searchParams.get("token")
-const cpf = (url.searchParams.get("cpf") || "").replace(/\D/g,'')
-
-if(!token || !cpf){
-return jsonErro("REQ_001","Parâmetros incompletos")
+if(url.pathname === "/nome"){
+return consultaNome(request,url,ctx)
 }
 
-if(cpf.length !== 11){
-return jsonErro("REQ_002","CPF inválido")
+return new Response(JSON.stringify({
+status:false,
+msg:"Endpoint não encontrado"
+}),{
+headers:{
+"Content-Type":"application/json"
+},
+status:404
+})
+
+}
+
 }
 
 /*
@@ -34,13 +47,46 @@ const UNLIMITED = [
 "vip_token"
 ]
 
+function validarToken(token){
+
 if(!TOKENS.includes(token) && !UNLIMITED.includes(token)){
+return false
+}
+
+return true
+
+}
+
+/*
+|--------------------------------------------------------------------------
+| CPF
+|--------------------------------------------------------------------------
+*/
+
+async function consultaCPF(request,url,ctx){
+
+if(request.method !== "GET"){
+return jsonErro("REQ_000","Método inválido")
+}
+
+const token = url.searchParams.get("token")
+const cpf = (url.searchParams.get("cpf") || "").replace(/\D/g,'')
+
+if(!token || !cpf){
+return jsonErro("REQ_001","Parâmetros incompletos")
+}
+
+if(cpf.length !== 11){
+return jsonErro("REQ_002","CPF inválido")
+}
+
+if(!validarToken(token)){
 return jsonErro("AUTH_001","Token inválido")
 }
 
 /*
 |--------------------------------------------------------------------------
-| ⚡ CACHE
+| CACHE
 |--------------------------------------------------------------------------
 */
 
@@ -55,7 +101,7 @@ return response
 
 /*
 |--------------------------------------------------------------------------
-| 🔌 API SARA
+| API
 |--------------------------------------------------------------------------
 */
 
@@ -85,14 +131,13 @@ const body = api.resultado.body
 
 /*
 |--------------------------------------------------------------------------
-| 📊 ESTRUTURA
+| RESULTADO
 |--------------------------------------------------------------------------
 */
 
 const resultado = {
 
 identificacao:{
-
 cpf:body.cpf ?? null,
 cpf_formatado:body.cpf_masked ?? null,
 nome:body.name ?? null,
@@ -102,71 +147,54 @@ sexo:body.gender ?? null,
 nascimento:body.birth_date ?? null,
 obito:body.death_flag ?? null,
 data_obito:body.death_date ?? null
-
 },
 
 filiacao:{
-
 mae:body.mother_name ?? null,
 pai:body.father_name ?? null
-
 },
 
 documentos:{
-
 rg:body.rg ?? null,
 rg_orgao:body.rg_issuer ?? null,
 rg_estado:body.rg_state ?? null,
 titulo_eleitor:body.voter_id ?? null,
 pis:body?.serasa_completo?.pis ?? null
-
 },
 
 financeiro:{
-
 renda:body.income ?? null,
 faixa_renda:body.income_bracket ?? null,
 score:body?.score?.value ?? null,
 classe_social:body?.social_class?.social_class ?? null,
 subclasse:body?.social_class?.sub_social_class ?? null
-
 },
 
 poder_aquisitivo:{
-
 nivel:body?.poder_aquisitivo?.PODER_AQUISITIVO ?? null,
 renda_estimada:body?.poder_aquisitivo?.RENDA_PODER_AQUISITIVO ?? null,
 faixa:body?.poder_aquisitivo?.FX_PODER_AQUISITIVO ?? null
-
 },
 
 profissional:{
-
 profissao:body.occupation ?? null,
 cbo:body.cbo ?? null
-
 },
 
 contato:{
-
 emails:body?.serasa_completo?.emails ?? [],
 telefones:body?.phones ?? []
-
 },
 
 enderecos:{
-
 principal:body.address ?? {},
 historico:body.all_addresses ?? []
-
 },
 
 veiculos:body?.vehicles?.list ?? [],
 
 familia:{
-
 parentes:body?.serasa_completo?.parentes ?? []
-
 },
 
 status_receita:body.federal_status ?? null,
@@ -177,7 +205,7 @@ qualidade_dados:body.data_quality ?? {}
 
 /*
 |--------------------------------------------------------------------------
-| 🎯 FINAL
+| FINAL
 |--------------------------------------------------------------------------
 */
 
@@ -214,9 +242,17 @@ return response
 
 }
 
-}
+/*
+|--------------------------------------------------------------------------
+| NOME
+|--------------------------------------------------------------------------
+*/
 
-if(url.pathname === "/nome"){
+async function consultaNome(request,url,ctx){
+
+if(request.method !== "GET"){
+return jsonErro("REQ_000","Método inválido")
+}
 
 const token = url.searchParams.get("token")
 const nome = (url.searchParams.get("nome") || "").trim()
@@ -226,28 +262,13 @@ if(!token || !nome){
 return jsonErro("REQ_001","Parâmetros incompletos")
 }
 
-/*
-|--------------------------------------------------------------------------
-| 🔐 TOKENS
-|--------------------------------------------------------------------------
-*/
-
-const TOKENS = [
-"IFNastro",
-"token2"
-]
-
-const UNLIMITED = [
-"vip_token"
-]
-
-if(!TOKENS.includes(token) && !UNLIMITED.includes(token)){
+if(!validarToken(token)){
 return jsonErro("AUTH_001","Token inválido")
 }
 
 /*
 |--------------------------------------------------------------------------
-| ⚡ CACHE
+| CACHE
 |--------------------------------------------------------------------------
 */
 
@@ -262,7 +283,7 @@ return response
 
 /*
 |--------------------------------------------------------------------------
-| 🔌 API
+| API
 |--------------------------------------------------------------------------
 */
 
@@ -290,28 +311,26 @@ return jsonErro("DATA_001","Sem dados")
 
 /*
 |--------------------------------------------------------------------------
-| 📊 ESTRUTURA
+| RESULTADOS
 |--------------------------------------------------------------------------
 */
 
 const resultados = api.dados.map(pessoa => ({
 
 identificacao:{
-
 cpf:pessoa.cpf ?? null,
 nome:pessoa.nome ?? null,
 sexo:pessoa.sexo ?? null,
 nascimento:pessoa.nascimento ?? null,
 idade:pessoa.idade ?? null,
 signo:pessoa.signo ?? null
-
 }
 
 }))
 
 /*
 |--------------------------------------------------------------------------
-| 🎯 FINAL
+| FINAL
 |--------------------------------------------------------------------------
 */
 
@@ -350,6 +369,12 @@ return response
 
 }
 
+/*
+|--------------------------------------------------------------------------
+| ERROS
+|--------------------------------------------------------------------------
+*/
+
 function jsonErro(code,msg,extra=null){
 
 return new Response(
@@ -365,4 +390,5 @@ headers:{
 },
 status:400
 })
+
 }
