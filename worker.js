@@ -26,7 +26,7 @@ return jsonErro("REQ_002","CPF inválido")
 */
 
 const TOKENS = [
-"token1",
+"IFNastro",
 "token2"
 ]
 
