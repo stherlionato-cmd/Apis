@@ -272,7 +272,6 @@ return jsonErro("REQ_000","Método inválido")
 
 const token = url.searchParams.get("token")
 const nome = (url.searchParams.get("nome") || "").trim()
-const i = url.searchParams.get("i") || 1
 
 if(!token || !nome){
 return jsonErro("REQ_001","Parâmetros incompletos")
@@ -307,7 +306,7 @@ let api
 
 try{
 
-const res = await fetch(`https://astrosearch.rf.gd/api/nome.php?token=boca&nome=${encodeURIComponent(nome)}&i=${i}`)
+const res = await fetch(`https://sara-api.xyz/consulta/nome?nome=${encodeURIComponent(nome)}`)
 
 if(!res.ok){
 return jsonErro("API_002","API offline")
@@ -321,9 +320,11 @@ return jsonErro("API_001","Erro na conexão",e.toString())
 
 }
 
-if(!api?.dados){
-return jsonErro("DATA_001","Sem dados")
+if(!api?.resultado?.body){
+return jsonErro("DATA_001","Sem resultados")
 }
+
+const lista = api.resultado.body
 
 /*
 |--------------------------------------------------------------------------
@@ -331,15 +332,18 @@ return jsonErro("DATA_001","Sem dados")
 |--------------------------------------------------------------------------
 */
 
-const resultados = api.dados.map(pessoa => ({
+const resultados = lista.map(pessoa => ({
 
 identificacao:{
 cpf:pessoa.cpf ?? null,
-nome:pessoa.nome ?? null,
-sexo:pessoa.sexo ?? null,
-nascimento:pessoa.nascimento ?? null,
-idade:pessoa.idade ?? null,
-signo:pessoa.signo ?? null
+nome:pessoa.name ?? null,
+sexo:pessoa.gender ?? null,
+nascimento:pessoa.birth_date ?? null,
+rg:pessoa.rg ?? null
+},
+
+filiacao:{
+mae:pessoa.mother_name?.trim() ?? null
 }
 
 }))
@@ -364,7 +368,7 @@ timestamp:new Date().toISOString()
 
 consulta:nome,
 
-total_resultados:resultados.length,
+total_resultados:api.resultado.total_results ?? resultados.length,
 
 dados:resultados
 
