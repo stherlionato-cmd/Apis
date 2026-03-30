@@ -14,6 +14,14 @@ if(url.pathname === "/cpf"){
 return consultaCPF(request,url,ctx)
 }
 
+if(url.pathname === "/foto"){
+return consultaFoto(request,url,ctx)
+}
+
+if(url.pathname === "/email"){
+return consultaEmail(request,url,ctx)
+}
+
 if(url.pathname === "/nome"){
 return consultaNome(request,url,ctx)
 }
@@ -47,7 +55,7 @@ status:404
 */
 
 const TOKENS = [
-"IFNastro",
+"dragon",
 "token2"
 ]
 
@@ -782,6 +790,166 @@ headers:{
 ctx.waitUntil(cache.put(cacheKey,response.clone()))
 
 return response
+
+}
+
+/*
+|--------------------------------------------------------------------------
+| FOTO
+|--------------------------------------------------------------------------
+*/
+
+async function consultaFoto(request,url,ctx){
+
+if(request.method !== "GET"){
+return jsonErro("REQ_000","Método inválido")
+}
+
+const token = url.searchParams.get("token")
+const cpf = (url.searchParams.get("cpf") || "").replace(/\D/g,'')
+
+if(!token || !cpf){
+return jsonErro("REQ_001","Parâmetros incompletos")
+}
+
+if(cpf.length !== 11){
+return jsonErro("REQ_002","CPF inválido")
+}
+
+if(!validarToken(token)){
+return jsonErro("AUTH_001","Token inválido")
+}
+
+let api
+
+try{
+
+const res = await fetch(`https://sara-api.xyz/consulta/foto-all?cpf=${cpf}`)
+
+if(!res.ok){
+return jsonErro("API_002","API offline")
+}
+
+api = await res.json()
+
+}catch(e){
+
+return jsonErro("API_001","Erro na conexão",e.toString())
+
+}
+
+if(!api?.resultado?.fotos){
+return jsonErro("DATA_001","Sem fotos")
+}
+
+const fotos = api.resultado.fotos.map(f => ({
+estado:f.estado,
+foto_base64:f.foto
+}))
+
+return new Response(JSON.stringify({
+
+status:true,
+
+meta:{
+sistema:"Astro Search",
+empresa:"Astro Company",
+criador:"@puxardados5",
+endpoint:"foto",
+timestamp:new Date().toISOString()
+},
+
+consulta:cpf,
+
+total_fotos:fotos.length,
+
+fotos:fotos
+
+},null,2),{
+headers:{
+"Content-Type":"application/json"
+}
+})
+
+}
+
+/*
+|--------------------------------------------------------------------------
+| EMAIL
+|--------------------------------------------------------------------------
+*/
+
+async function consultaEmail(request,url,ctx){
+
+if(request.method !== "GET"){
+return jsonErro("REQ_000","Método inválido")
+}
+
+const token = url.searchParams.get("token")
+const email = (url.searchParams.get("email") || "").trim()
+
+if(!token || !email){
+return jsonErro("REQ_001","Parâmetros incompletos")
+}
+
+if(!validarToken(token)){
+return jsonErro("AUTH_001","Token inválido")
+}
+
+let api
+
+try{
+
+const res = await fetch(`https://sara-api.xyz/consulta/email?email=${encodeURIComponent(email)}`)
+
+if(!res.ok){
+return jsonErro("API_002","API offline")
+}
+
+api = await res.json()
+
+}catch(e){
+
+return jsonErro("API_001","Erro na conexão",e.toString())
+
+}
+
+if(!api?.resultado?.data){
+return jsonErro("DATA_001","Sem resultados")
+}
+
+const dados = api.resultado.data.map(p => ({
+
+cpf:p.cpf ?? null,
+nome:p.nome ?? null,
+nascimento:p.nascimento ?? null,
+email:p.email ?? null
+
+}))
+
+return new Response(JSON.stringify({
+
+status:true,
+
+meta:{
+sistema:"Astro Search",
+empresa:"Astro Company",
+criador:"@puxardados5",
+endpoint:"email",
+timestamp:new Date().toISOString()
+},
+
+consulta:email,
+
+total_resultados:dados.length,
+
+dados:dados
+
+},null,2),{
+headers:{
+"Content-Type":"application/json"
+}
+})
 
 }
 
