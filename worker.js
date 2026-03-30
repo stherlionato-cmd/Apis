@@ -56,7 +56,7 @@ status:404
 
 const TOKENS = [
 "dragon",
-"token2"
+"IFNastro"
 ]
 
 const UNLIMITED = [
