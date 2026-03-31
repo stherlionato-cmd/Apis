@@ -2143,7 +2143,6 @@ let url = `${API}/${api.path}?${api.param}=${encodeURIComponent(valor)}&token=${
 document.getElementById("url-"+api.path).textContent = url
 
 })
-
 })
 
 /* CONSULTA */
@@ -2152,54 +2151,47 @@ async function consultar(path,param,btn){
 
 const div = btn.closest(".endpoint")
 const input = div.querySelector("input")
-const valor = input.value
-const token = document.getElementById("token").value
+const result = document.getElementById("result-"+path)
 
-if(!valor || !token){
-alert("Preencha token e valor")
+let token = document.getElementById("token").value
+let valor = input.value
+
+if(!token || !valor){
+alert("Preencha o token e o campo")
 return
 }
 
-const resultBox = document.getElementById("result-"+path)
-const urlBox = document.getElementById("url-"+path)
-
 const url = `${API}/${path}?${param}=${encodeURIComponent(valor)}&token=${token}`
 
-urlBox.textContent = url
-
-btn.disabled = true
 btn.innerHTML = 'Consultando <span class="loader"></span>'
 
 try{
 
 const res = await fetch(url)
-const json = await res.json()
+const data = await res.json()
 
-resultBox.textContent = JSON.stringify(json,null,2)
+result.textContent = JSON.stringify(data,null,2)
 
 }catch(e){
 
-resultBox.textContent = "Erro na consulta"
+result.textContent = "Erro na consulta"
 
 }
 
-btn.disabled = false
 btn.innerText = "Consultar"
 
 }
 
-/* COPIAR URL */
-
 function copiarUrl(path){
 
-const texto = document.getElementById("url-"+path).textContent
+const url = document.getElementById("url-"+path).textContent
 
-if(!texto){
-alert("Gere a URL primeiro")
+if(!url){
+alert("Digite um valor primeiro")
 return
 }
 
-navigator.clipboard.writeText(texto)
+navigator.clipboard.writeText(url)
 
 alert("URL copiada")
 
