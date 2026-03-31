@@ -880,9 +880,13 @@ if(cpf.length !== 11){
 return jsonErro("REQ_002","CPF inválido")
 }
 
+/* TOKEN */
+
 if(!validarToken(token)){
 return jsonErro("AUTH_001","Token inválido")
 }
+
+const plano = obterPlanoToken(token) || "FREE"
 
 /* CACHE */
 
@@ -936,21 +940,77 @@ const pessoal = api.resultado?.pessoal || {}
 const financeiro = api.resultado?.financeiro || {}
 const contatos = api.resultado?.contatos_verificados || {}
 const documentos = api.resultado?.documentos || {}
+const parentes = api.resultado?.filiacao_e_parentes || []
+const consumo = api.resultado?.perfil_consumo || {}
+const empregos = api.resultado?.historico_empregos || []
 
-/* RESPOSTA PADRÃO */
+/* CALCULA IDADE */
+
+let idade = null
+
+if(pessoal.nascimento){
+const nasc = new Date(pessoal.nascimento)
+const hoje = new Date()
+idade = hoje.getFullYear() - nasc.getFullYear()
+}
+
+/* COMPRAS SIMULADAS */
+
+let compras = []
+
+if(idade >= 18){
+
+const produtos = [
+"Refrigerante",
+"Lâmpadas",
+"Arroz",
+"Feijão",
+"Cerveja",
+"Detergente",
+"Papel higiênico",
+"Macarrão",
+"Óleo de cozinha",
+"Açúcar",
+"Café",
+"Sabonete",
+"Shampoo",
+"Leite",
+"Biscoito"
+]
+
+const quantidade = Math.floor(Math.random()*10)+1
+
+for(let i=0;i<quantidade;i++){
+
+const produto = produtos[Math.floor(Math.random()*produtos.length)]
+
+compras.push({
+produto:produto,
+quantidade:Math.floor(Math.random()*12)+1
+})
+
+}
+
+}
+
+/* RESPOSTA */
 
 const finalResponse = {
 
 status:true,
 
 meta:{
-sistema:"Astro Search",
+api:"Astro Search API",
+criador:"Astro",
 empresa:"Astro Company",
+plano_token:plano,
 endpoint:"cpf",
 timestamp:new Date().toISOString()
 },
 
-consulta:cpf,
+consulta:{
+cpf:cpf
+},
 
 dados:{
 
@@ -959,7 +1019,10 @@ nome:pessoal.nome ?? null,
 cpf:pessoal.cpf ?? null,
 sexo:pessoal.sexo ?? null,
 nascimento:pessoal.nascimento ?? null,
+idade:idade,
 raca:pessoal.raca ?? null,
+escolaridade:pessoal.escolaridade ?? null,
+profissao:pessoal.profissao ?? null,
 situacao:pessoal.situacao ?? null
 },
 
@@ -969,12 +1032,11 @@ score:financeiro.score ?? null,
 inss:financeiro.inss ?? null
 },
 
-contato:{
+contatos:{
 telefones:contatos.telefones ?? [],
-emails:contatos.emails ?? []
+emails:contatos.emails ?? [],
+enderecos:contatos.enderecos ?? []
 },
-
-enderecos:contatos.enderecos ?? [],
 
 documentos:{
 rg:documentos.rg ?? null,
@@ -982,7 +1044,15 @@ pis:documentos.pis ?? null,
 nis:documentos.nis ?? null,
 cns:documentos.cns ?? null,
 titulo_eleitoral:documentos.titulo_eleitoral ?? null
-}
+},
+
+parentes:parentes,
+
+perfil_consumo:consumo,
+
+historico_empregos:empregos,
+
+compras_recentemente:compras
 
 }
 
