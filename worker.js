@@ -331,62 +331,195 @@ const base = new URL(request.url).origin
 return new Response(`
 
 <!DOCTYPE html>
-<html>
+<html lang="pt-BR">
+
 <head>
 
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
 <title>Astro Search API</title>
 
 <style>
 
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:system-ui;
+}
+
 body{
-font-family:Arial;
-background:#0b1f3a;
+
+background:radial-gradient(circle at top,#0d1f3d,#020617);
 color:white;
+min-height:100vh;
+overflow-x:hidden;
+
+}
+
+/* PARTICLES */
+
+canvas{
+position:fixed;
+top:0;
+left:0;
+z-index:-1;
+}
+
+/* HEADER */
+
+header{
+text-align:center;
+padding:30px 20px;
+}
+
+header h1{
+font-size:28px;
+background:linear-gradient(90deg,#4facfe,#00f2fe);
+-webkit-background-clip:text;
+-webkit-text-fill-color:transparent;
+}
+
+header p{
+opacity:.7;
+margin-top:8px;
+}
+
+/* CONTAINER */
+
+.container{
+max-width:900px;
+margin:auto;
 padding:20px;
 }
 
-h1{
-text-align:center;
-color:#4da3ff;
-}
+/* CARD */
 
 .card{
-background:#132c52;
+
+background:rgba(255,255,255,0.05);
+backdrop-filter:blur(15px);
+border:1px solid rgba(255,255,255,0.08);
+
+border-radius:16px;
+
 padding:20px;
-border-radius:10px;
-margin-top:20px;
+margin-bottom:20px;
+
+transition:.3s;
+
 }
+
+.card:hover{
+transform:translateY(-3px);
+border-color:#4facfe;
+}
+
+/* INPUTS */
 
 input,select{
+
 width:100%;
-padding:12px;
+padding:14px;
+
 margin-top:10px;
-border-radius:8px;
+
+border-radius:10px;
 border:none;
+
+background:#0b162c;
+color:white;
+
+outline:none;
+
 }
+
+/* BUTTON */
 
 button{
+
 width:100%;
-padding:12px;
-margin-top:10px;
-background:#4da3ff;
+
+padding:14px;
+
+margin-top:14px;
+
+border-radius:10px;
 border:none;
-border-radius:8px;
-color:white;
+
 font-weight:bold;
+
+cursor:pointer;
+
+background:linear-gradient(90deg,#4facfe,#00f2fe);
+
+transition:.2s;
+
 }
 
-pre{
-background:#000;
-padding:15px;
-border-radius:10px;
-overflow:auto;
+button:hover{
+transform:scale(1.02);
 }
+
+/* COPY */
 
 .copy{
-background:#28c76f;
+
+background:linear-gradient(90deg,#00ffb3,#00c8ff);
+
+}
+
+/* CODE */
+
+pre{
+
+background:#020617;
+
+padding:16px;
+
+border-radius:10px;
+
+overflow:auto;
+
+font-size:13px;
+
+margin-top:10px;
+
+}
+
+/* LOADING */
+
+.loading{
+
+width:40px;
+height:40px;
+
+border-radius:50%;
+
+border:4px solid rgba(255,255,255,.1);
+border-top:4px solid #4facfe;
+
+animation:spin 1s linear infinite;
+
+margin:auto;
+
+}
+
+@keyframes spin{
+
+to{transform:rotate(360deg)}
+
+}
+
+footer{
+
+text-align:center;
+padding:30px;
+
+opacity:.6;
+font-size:13px;
+
 }
 
 </style>
@@ -395,49 +528,117 @@ background:#28c76f;
 
 <body>
 
+<canvas id="particles"></canvas>
+
+<header>
+
 <h1>🚀 Astro Search API</h1>
+<p>Painel interativo para testar endpoints</p>
+
+</header>
+
+<div class="container">
 
 <div class="card">
 
-Token
+<label>Token</label>
+<input id="token" placeholder="Digite seu token">
 
-<input id="token" placeholder="seu token">
-
-Endpoint
-
+<label>Endpoint</label>
 <select id="endpoint">
 ${Object.keys(ENDPOINTS).map(e=>`<option>${e}</option>`).join("")}
 </select>
 
-Valor
+<label>Valor da consulta</label>
+<input id="valor" placeholder="CPF / Nome / Telefone / etc">
 
-<input id="valor" placeholder="valor da consulta">
-
-<button onclick="consultar()">CONSULTAR</button>
+<button onclick="consultar()">Consultar</button>
 
 </div>
 
 <div class="card">
 
-URL
+<h3>URL</h3>
 
 <pre id="url"></pre>
 
-<button class="copy" onclick="copiar('url')">COPIAR URL</button>
+<button class="copy" onclick="copiar('url')">Copiar URL</button>
 
 </div>
 
 <div class="card">
 
-RESPOSTA
+<h3>Resposta</h3>
+
+<div id="loading" style="display:none" class="loading"></div>
 
 <pre id="resposta"></pre>
 
-<button class="copy" onclick="copiar('resposta')">COPIAR RESPOSTA</button>
+<button class="copy" onclick="copiar('resposta')">Copiar resposta</button>
 
 </div>
 
+</div>
+
+<footer>
+
+Astro Search API • Interface de Testes
+
+</footer>
+
 <script>
+
+/* PARTICLES */
+
+const canvas=document.getElementById("particles")
+
+const ctx=canvas.getContext("2d")
+
+canvas.width=innerWidth
+canvas.height=innerHeight
+
+let particles=[]
+
+for(let i=0;i<80;i++){
+
+particles.push({
+
+x:Math.random()*canvas.width,
+y:Math.random()*canvas.height,
+r:Math.random()*2,
+vx:(Math.random()-.5)*.5,
+vy:(Math.random()-.5)*.5
+
+})
+
+}
+
+function draw(){
+
+ctx.clearRect(0,0,canvas.width,canvas.height)
+
+particles.forEach(p=>{
+
+p.x+=p.vx
+p.y+=p.vy
+
+if(p.x<0||p.x>canvas.width)p.vx*=-1
+if(p.y<0||p.y>canvas.height)p.vy*=-1
+
+ctx.beginPath()
+ctx.arc(p.x,p.y,p.r,0,Math.PI*2)
+ctx.fillStyle="#4facfe"
+ctx.fill()
+
+})
+
+requestAnimationFrame(draw)
+
+}
+
+draw()
+
+/* CONSULTA */
 
 async function consultar(){
 
@@ -445,24 +646,41 @@ const token=document.getElementById("token").value
 const endpoint=document.getElementById("endpoint").value
 const valor=document.getElementById("valor").value
 
-const url="${base}/"+endpoint+"?token="+token+"&"+endpoint.replace(/[0-9]/g,'')+"="+valor
+const param=endpoint.replace(/[0-9]/g,'')
+
+const url="${base}/"+endpoint+"?token="+token+"&"+param+"="+encodeURIComponent(valor)
 
 document.getElementById("url").innerText=url
 
+document.getElementById("resposta").innerText=""
+
+document.getElementById("loading").style.display="block"
+
+try{
+
 const r=await fetch(url)
+
 const j=await r.json()
 
 document.getElementById("resposta").innerText=JSON.stringify(j,null,2)
 
+}catch{
+
+document.getElementById("resposta").innerText="Erro ao consultar API"
+
 }
+
+document.getElementById("loading").style.display="none"
+
+}
+
+/* COPY */
 
 function copiar(id){
 
 const text=document.getElementById(id).innerText
 
 navigator.clipboard.writeText(text)
-
-alert("Copiado!")
 
 }
 
@@ -474,40 +692,7 @@ alert("Copiado!")
 `,{
 
 headers:{
-"content-type":"text/html"
-}
-
-})
-
-}
-
-/*
-|--------------------------------------------------------------------------
-| ERROS
-|--------------------------------------------------------------------------
-*/
-
-function jsonErro(code,msg,extra=null){
-
-return new Response(JSON.stringify({
-
-status:false,
-
-erro:{
-codigo:code,
-mensagem:msg
-},
-
-suporte:"@puxardados5",
-
-extra:extra
-
-},null,2),{
-
-status:400,
-
-headers:{
-"Content-Type":"application/json"
+"content-type":"text/html;charset=UTF-8"
 }
 
 })
