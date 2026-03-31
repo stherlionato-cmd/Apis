@@ -2121,79 +2121,72 @@ const input = div.querySelector("input")
 /* ENTER faz consulta */
 
 input.addEventListener("keypress",(e)=>{
-if(e.key==="Enter"){
-consultar(api.path,api.param,div.querySelector("button"))
+if(e.key === "Enter"){
+consultar(api.path,api.param,input)
 }
 })
 
-/* MOSTRAR URL AUTOMÁTICA */
+})
 
-input.addEventListener("input",()=>{
+function consultar(path,param,el){
 
-let token = document.getElementById("token").value
-let valor = input.value
+const token = document.getElementById("token").value.trim()
 
-if(!token || !valor){
-document.getElementById("url-"+api.path).textContent=""
+if(!token){
+alert("Digite seu token primeiro")
 return
 }
 
-let url = `${API}/${api.path}?${api.param}=${encodeURIComponent(valor)}&token=${token}`
+let input
 
-document.getElementById("url-"+api.path).textContent = url
+if(el.tagName === "INPUT"){
+input = el.value
+}else{
+input = el.parentElement.parentElement.querySelector("input").value
+}
 
-})
-})
-
-/* CONSULTA */
-
-async function consultar(path,param,btn){
-
-const div = btn.closest(".endpoint")
-const input = div.querySelector("input")
-const result = document.getElementById("result-"+path)
-
-let token = document.getElementById("token").value
-let valor = input.value
-
-if(!token || !valor){
-alert("Preencha o token e o campo")
+if(!input){
+alert("Digite o valor da consulta")
 return
 }
 
-const url = `${API}/${path}?${param}=${encodeURIComponent(valor)}&token=${token}`
+const url = API + "/" + path + "?token=" + token + "&" + param + "=" + encodeURIComponent(input)
 
-btn.innerHTML = 'Consultando <span class="loader"></span>'
+document.getElementById("url-"+path).innerText = url
 
-try{
+const resultBox = document.getElementById("result-"+path)
 
-const res = await fetch(url)
-const data = await res.json()
+resultBox.innerHTML = '<span class="loader"></span> consultando...'
 
-result.textContent = JSON.stringify(data,null,2)
+fetch(url)
+.then(r=>r.json())
+.then(d=>{
 
-}catch(e){
+resultBox.textContent = JSON.stringify(d,null,2)
 
-result.textContent = "Erro na consulta"
+})
+.catch(()=>{
 
-}
+resultBox.textContent = "Erro na consulta"
 
-btn.innerText = "Consultar"
+})
 
 }
 
 function copiarUrl(path){
 
-const url = document.getElementById("url-"+path).textContent
+const token = document.getElementById("token").value.trim()
 
-if(!url){
-alert("Digite um valor primeiro")
+if(!token){
+alert("Digite o token primeiro")
 return
 }
 
+const url = API + "/" + path + "?token=" + token
+
 navigator.clipboard.writeText(url)
 
-alert("URL copiada")
+alert("URL copiada!")
 
 }
 
