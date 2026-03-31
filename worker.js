@@ -857,7 +857,13 @@ headers:{
 |--------------------------------------------------------------------------
 */
 
-async function consultaCPF(request,url,ctx){
+const res = await fetch(`https://knowsapi.shop/api/consulta/cpf-v5?code=${cpf}&apikey=bigmouth`,{
+method:"GET",
+headers:{
+"User-Agent":"AstroAPI/1.0",
+"Accept":"application/json"
+}
+})
 
 if(request.method !== "GET"){
 return jsonErro("REQ_000","Método inválido")
@@ -906,7 +912,7 @@ try{
 const res = await fetch(`https://knowsapi.shop/api/consulta/cpf-v5?code=${cpf}&apikey=bigmouth`)
 
 if(!res.ok){
-return jsonErro("API_002","API offline")
+return jsonErro("API_002","API erro",res.status)
 }
 
 api = await res.json()
