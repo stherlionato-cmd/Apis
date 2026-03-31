@@ -717,6 +717,10 @@ ${Object.keys(ENDPOINTS).map(e=>`<option>${e}</option>`).join("")}
 </div>
 
 <script>
+document.getElementById("modal").classList.add("show")
+</script>
+
+<script>
 
 async function consultar(){
 
@@ -734,12 +738,9 @@ const resBox = document.getElementById("resBox")
 resBox.innerHTML = '<div class="loader"></div>'
 
 try{
-
 const r = await fetch(url)
 const j = await r.json()
-
 resBox.innerHTML = "<pre id='resposta'>"+JSON.stringify(j,null,2)+"</pre>"
-
 }catch{
 resBox.innerHTML = "<pre>Erro ao consultar</pre>"
 }
@@ -747,13 +748,9 @@ resBox.innerHTML = "<pre>Erro ao consultar</pre>"
 }
 
 function copiar(id){
-
 const text = document.getElementById(id).innerText
-
 navigator.clipboard.writeText(text)
-
 toast()
-
 }
 
 function toast(){
@@ -762,75 +759,53 @@ t.classList.add("show")
 setTimeout(()=>t.classList.remove("show"),2000)
 }
 
+/* ===== NOVO SISTEMA TOKEN ===== */
+
 function getPlano(token){
   if(!token) return "FREE"
-
   if(token === "dragon" || token === "IFNastro") return "VIP"
   if(token === "astropro") return "PRO"
-
   return "FREE"
 }
 
 function renderBadge(plano){
-
   const el = document.getElementById("badgeContainer")
   if(!el) return
-
-  const classe = plano.toLowerCase()
-
-  el.innerHTML = `
-    <div class="badge ${classe}">
-      ${plano}
-    </div>
-  `
+  el.innerHTML = `<div class="badge ${plano.toLowerCase()}">${plano}</div>`
 }
 
-/* SALVAR TOKEN */
 function salvarToken(){
-
-  const token = document.getElementById("tokenInput").value.trim()
+  const input = document.getElementById("tokenInput")
+  const token = input.value.trim()
 
   if(!token){
-    document.getElementById("tokenInput").style.border = "1px solid red"
+    input.style.border = "1px solid red"
     return
   }
 
-  localStorage.setItem("astro_token",token)
-
-  fecharModal()
-
-  iniciar()
-}
-
-/* FECHAR MODAL */
-function fecharModal(){
+  localStorage.setItem("astro_token", token)
+  aplicarToken(token)
   document.getElementById("modal").classList.remove("show")
 }
 
-/* ABRIR MODAL */
-function abrirModal(){
-  document.getElementById("modal").classList.add("show")
+function aplicarToken(token){
+  document.getElementById("token").value = token
+  renderBadge(getPlano(token))
 }
 
-/* INICIAR */
-function iniciar(){
-
+/* EXECUTA NA HORA (SEM BUG) */
+(function(){
   const token = localStorage.getItem("astro_token")
 
-  if(!token){
-    abrirModal()
-    return
+  if(token){
+    aplicarToken(token)
+    document.getElementById("modal").classList.remove("show")
+  }else{
+    document.getElementById("modal").classList.add("show")
   }
+})()
 
-  const input = document.getElementById("token")
-  if(input) input.value = token
-
-  const plano = getPlano(token)
-
-  renderBadge(plano)
-}
-
-/* ENTER NO INPUT */
+/* ENTER FUNCIONA */
 document.addEventListener("keydown",e=>{
   if(e.key === "Enter"){
     const modal = document.getElementById("modal")
@@ -840,10 +815,12 @@ document.addEventListener("keydown",e=>{
   }
 })
 
-/* LOAD GARANTIDO */
-window.addEventListener("load", ()=>{
-  setTimeout(iniciar,100) // evita bug de render
-})
+/* CLICK NOS PLANOS (BONUS) */
+const planos = document.querySelectorAll(".plan")
+
+if(planos[0]) planos[0].onclick = ()=> document.getElementById("tokenInput").value = "astrofree"
+if(planos[1]) planos[1].onclick = ()=> document.getElementById("tokenInput").value = "astropro"
+if(planos[2]) planos[2].onclick = ()=> document.getElementById("tokenInput").value = "dragon"
 
 </script>
 
