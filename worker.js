@@ -124,6 +124,71 @@ limite:1000
 
 }
 
+function limparRespostaAPI(data){
+
+if(!data || typeof data !== "object") return data
+
+/* remove campos comuns de metadados */
+
+const blacklist = [
+"status",
+"creator",
+"api",
+"credits",
+"creditos",
+"mensagem",
+"message"
+]
+
+for(const campo of blacklist){
+if(campo in data){
+delete data[campo]
+}
+}
+
+/* se existir resultado usa ele */
+
+if(data.resultado){
+return data.resultado
+}
+
+return data
+
+}
+
+function normalizarDados(data){
+
+if(data === null || data === undefined) return null
+
+if(Array.isArray(data)){
+return data.map(normalizarDados)
+}
+
+if(typeof data === "object"){
+
+const novo = {}
+
+for(const k in data){
+novo[k] = normalizarDados(data[k])
+}
+
+return novo
+}
+
+if(typeof data === "string"){
+
+try{
+return decodeURIComponent(escape(data))
+}catch{
+return data
+}
+
+}
+
+return data
+
+}
+
 function corrigirTexto(valor){
 
 if(typeof valor !== "string") return valor
@@ -970,16 +1035,17 @@ let api
 
 try{
 
-const res = await fetch(`https://knowsapi.shop/api/consulta/cpf-v5?code=${cpf}&apikey=bigmouth`,{
+const res = await fetch(
+`https://knowsapi.shop/api/consulta/cpf-v5?code=${cpf}&apikey=bigmouth`,
+{
 method:"GET",
 headers:{
 "User-Agent":"Mozilla/5.0",
 "Accept":"application/json"
 },
-cf:{
-cacheTtl:0
+cf:{cacheTtl:0}
 }
-})
+)
 
 const text = await res.text()
 
@@ -990,75 +1056,18 @@ return jsonErro("API_003","Resposta inválida da API",text)
 }
 
 }catch(e){
-
 return jsonErro("API_001","Erro na conexão",e.toString())
-
 }
 
-/* VERIFICA DADOS */
+/* LIMPA METADADOS DA API */
 
-if(!api || api.status !== true){
-return jsonErro("DATA_001","Sem dados")
-}
+let dados = limparRespostaAPI(api)
 
-const pessoal = corrigirObjeto(api.resultado?.pessoal || {})
-const financeiro = corrigirObjeto(api.resultado?.financeiro || {})
-const contatos = corrigirObjeto(api.resultado?.contatos_verificados || {})
-const documentos = corrigirObjeto(api.resultado?.documentos || {})
-const parentes = corrigirObjeto(api.resultado?.filiacao_e_parentes || [])
-const consumo = corrigirObjeto(api.resultado?.perfil_consumo || {})
-const empregos = corrigirObjeto(api.resultado?.historico_empregos || [])
+/* NORMALIZA DADOS */
 
-/* CALCULA IDADE */
+dados = normalizarDados(dados)
 
-let idade = null
-
-if(pessoal.nascimento){
-const nasc = new Date(pessoal.nascimento)
-const hoje = new Date()
-idade = hoje.getFullYear() - nasc.getFullYear()
-}
-
-/* COMPRAS SIMULADAS */
-
-let compras = []
-
-if(idade >= 18){
-
-const produtos = [
-"Refrigerante",
-"Lâmpadas",
-"Arroz",
-"Feijão",
-"Cerveja",
-"Detergente",
-"Papel higiênico",
-"Macarrão",
-"Óleo de cozinha",
-"Açúcar",
-"Café",
-"Sabonete",
-"Shampoo",
-"Leite",
-"Biscoito"
-]
-
-const quantidade = Math.floor(Math.random()*10)+1
-
-for(let i=0;i<quantidade;i++){
-
-const produto = produtos[Math.floor(Math.random()*produtos.length)]
-
-compras.push({
-produto:produto,
-quantidade:Math.floor(Math.random()*12)+1
-})
-
-}
-
-}
-
-/* RESPOSTA */
+/* RESPOSTA PADRÃO */
 
 const finalResponse = {
 
@@ -1077,49 +1086,7 @@ consulta:{
 cpf:cpf
 },
 
-dados:{
-
-identificacao:{
-nome:pessoal.nome ?? null,
-cpf:pessoal.cpf ?? null,
-sexo:pessoal.sexo ?? null,
-nascimento:pessoal.nascimento ?? null,
-idade:idade,
-raca:pessoal.raca ?? null,
-escolaridade:pessoal.escolaridade ?? null,
-profissao:pessoal.profissao ?? null,
-situacao:pessoal.situacao ?? null
-},
-
-financeiro:{
-renda:financeiro.renda ?? null,
-score:financeiro.score ?? null,
-inss:financeiro.inss ?? null
-},
-
-contatos:{
-telefones:contatos.telefones ?? [],
-emails:contatos.emails ?? [],
-enderecos:contatos.enderecos ?? []
-},
-
-documentos:{
-rg:documentos.rg ?? null,
-pis:documentos.pis ?? null,
-nis:documentos.nis ?? null,
-cns:documentos.cns ?? null,
-titulo_eleitoral:documentos.titulo_eleitoral ?? null
-},
-
-parentes:parentes,
-
-perfil_consumo:consumo,
-
-historico_empregos:empregos,
-
-compras_recentemente:compras
-
-}
+dados:dados
 
 }
 
