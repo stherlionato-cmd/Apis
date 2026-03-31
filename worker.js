@@ -619,6 +619,20 @@ pre{
  to{transform:translateY(40px)}
 }
 
+@keyframes shake{
+  0%{transform:translateX(0)}
+  25%{transform:translateX(-5px)}
+  50%{transform:translateX(5px)}
+  75%{transform:translateX(-5px)}
+  100%{transform:translateX(0)}
+}
+
+#bg{
+ position:fixed;
+ inset:0;
+ z-index:-1;
+}
+
 </style>
 
 </head>
@@ -649,7 +663,7 @@ ${Object.keys(ENDPOINTS).map(e=>`<option>${e}</option>`).join("")}
 <input id="valor" placeholder="valor da consulta">
 </div>
 
-<button onclick="consultar()">Consultar</button>
+<button id="btnConsultar" onclick="consultar()">Consultar</button>
 
 </div>
 
@@ -683,7 +697,7 @@ ${Object.keys(ENDPOINTS).map(e=>`<option>${e}</option>`).join("")}
 
     <input id="tokenInput" placeholder="Digite seu token">
 
-    <button onclick="salvarToken()">Entrar</button>
+<button onclick="salvarTokenModal()">Entrar</button>
 
     <div style="margin-top:15px;font-size:12px;opacity:.6;">
       Planos disponíveis:
@@ -716,20 +730,41 @@ ${Object.keys(ENDPOINTS).map(e=>`<option>${e}</option>`).join("")}
   </div>
 </div>
 
-<script>
-document.getElementById("modal").classList.add("show")
-</script>
+<canvas id="bg"></canvas>
 
 <script>
 
+const TOKENS = {
+  dragon:"VIP",
+  IFNastro:"VIP",
+  astrofree:"FREE",
+  astropro:"PRO"
+}
+
+/* CONSULTAR */
 async function consultar(){
 
-const token = document.getElementById("token").value
+const token = document.getElementById("token").value.trim()
 const endpoint = document.getElementById("endpoint").value
 const valor = document.getElementById("valor").value
 
-const param = endpoint.replace(/[0-9]/g,'')
+if(!token){
+  abrirModal()
+  return
+}
 
+/* VALIDAÇÃO FRONT */
+if(!TOKENS[token]){
+  abrirModal()
+  efeitoErro()
+  return
+}
+
+/* TOKEN VÁLIDO */
+salvarToken(token)
+efeitoPremium(token)
+
+const param = endpoint.replace(/[0-9]/g,'')
 const url = "${base}/"+endpoint+"?token="+token+"&"+param+"="+valor
 
 document.getElementById("url").innerText = url
@@ -747,80 +782,134 @@ resBox.innerHTML = "<pre>Erro ao consultar</pre>"
 
 }
 
-function copiar(id){
-const text = document.getElementById(id).innerText
-navigator.clipboard.writeText(text)
-toast()
+/* ===== TOKEN ===== */
+
+function salvarToken(token){
+  localStorage.setItem("astro_token", token)
+  renderBadge(TOKENS[token])
 }
 
-function toast(){
-const t = document.getElementById("toast")
-t.classList.add("show")
-setTimeout(()=>t.classList.remove("show"),2000)
-}
-
-/* ===== NOVO SISTEMA TOKEN ===== */
-
-function getPlano(token){
-  if(!token) return "FREE"
-  if(token === "dragon" || token === "IFNastro") return "VIP"
-  if(token === "astropro") return "PRO"
-  return "FREE"
-}
-
+/* BADGE */
 function renderBadge(plano){
   const el = document.getElementById("badgeContainer")
-  if(!el) return
   el.innerHTML = `<div class="badge ${plano.toLowerCase()}">${plano}</div>`
 }
 
-function salvarToken(){
+/* ===== EFEITOS ===== */
+
+/* VIP / FREE ANIMAÇÃO */
+function efeitoPremium(token){
+
+  const plano = TOKENS[token]
+
+  const body = document.body
+
+  if(plano === "VIP"){
+    body.style.boxShadow = "inset 0 0 120px rgba(168,85,247,.3)"
+  }
+
+  if(plano === "FREE"){
+    body.style.boxShadow = "inset 0 0 80px rgba(34,197,94,.2)"
+  }
+
+}
+
+/* ERRO SHAKE */
+function efeitoErro(){
+  const input = document.getElementById("token")
+  input.style.animation = "shake .3s"
+
+  setTimeout(()=>{
+    input.style.animation = ""
+  },300)
+}
+
+/* ===== MODAL ===== */
+
+function abrirModal(){
+  document.getElementById("modal").classList.add("show")
+}
+
+function fecharModal(){
+  document.getElementById("modal").classList.remove("show")
+}
+
+/* SALVAR PELO MODAL */
+function salvarTokenModal(){
+
   const input = document.getElementById("tokenInput")
   const token = input.value.trim()
 
-  if(!token){
+  if(!TOKENS[token]){
     input.style.border = "1px solid red"
     return
   }
 
-  localStorage.setItem("astro_token", token)
-  aplicarToken(token)
-  document.getElementById("modal").classList.remove("show")
-}
-
-function aplicarToken(token){
   document.getElementById("token").value = token
-  renderBadge(getPlano(token))
+  salvarToken(token)
+  efeitoPremium(token)
+  fecharModal()
 }
 
-/* EXECUTA NA HORA (SEM BUG) */
-(function(){
+/* ===== AUTO LOAD ===== */
+
+window.addEventListener("load", ()=>{
   const token = localStorage.getItem("astro_token")
 
-  if(token){
-    aplicarToken(token)
-    document.getElementById("modal").classList.remove("show")
-  }else{
-    document.getElementById("modal").classList.add("show")
-  }
-})()
-
-/* ENTER FUNCIONA */
-document.addEventListener("keydown",e=>{
-  if(e.key === "Enter"){
-    const modal = document.getElementById("modal")
-    if(modal.classList.contains("show")){
-      salvarToken()
-    }
+  if(token && TOKENS[token]){
+    document.getElementById("token").value = token
+    renderBadge(TOKENS[token])
+    efeitoPremium(token)
   }
 })
 
-/* CLICK NOS PLANOS (BONUS) */
-const planos = document.querySelectorAll(".plan")
+const canvas = document.getElementById("bg")
+const ctx = canvas.getContext("2d")
 
-if(planos[0]) planos[0].onclick = ()=> document.getElementById("tokenInput").value = "astrofree"
-if(planos[1]) planos[1].onclick = ()=> document.getElementById("tokenInput").value = "astropro"
-if(planos[2]) planos[2].onclick = ()=> document.getElementById("tokenInput").value = "dragon"
+let particles = []
+
+function resize(){
+ canvas.width = window.innerWidth
+ canvas.height = window.innerHeight
+}
+
+window.addEventListener("resize", resize)
+resize()
+
+function createParticles(qtd=60){
+ particles = []
+ for(let i=0;i<qtd;i++){
+  particles.push({
+   x:Math.random()*canvas.width,
+   y:Math.random()*canvas.height,
+   r:Math.random()*1.5,
+   speed:Math.random()*0.5 + 0.2
+  })
+ }
+}
+
+function draw(){
+ ctx.clearRect(0,0,canvas.width,canvas.height)
+
+ particles.forEach(p=>{
+  p.y += p.speed
+
+  if(p.y > canvas.height){
+   p.y = 0
+   p.x = Math.random()*canvas.width
+  }
+
+  ctx.beginPath()
+  ctx.arc(p.x,p.y,p.r,0,Math.PI*2)
+  ctx.fillStyle="rgba(255,255,255,0.6)"
+  ctx.fill()
+ })
+
+ requestAnimationFrame(draw)
+}
+
+createParticles()
+draw()
 
 </script>
 
