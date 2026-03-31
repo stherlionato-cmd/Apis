@@ -1051,7 +1051,7 @@ let api
 
 try{
 
-const res = await fetch(`https://sara-api.xyz/consulta/nome?nome=${encodeURIComponent(nome)}`)
+const res = await fetch(`https://knowsapi.shop/api/consulta/nome-v1?nome=${encodeURIComponent(nome)}&apikey=bigmouth`)
 
 if(!res.ok){
 return jsonErro("API_002","API offline")
@@ -1065,11 +1065,11 @@ return jsonErro("API_001","Erro na conexão",e.toString())
 
 }
 
-if(!api?.resultado?.body){
+if(!api?.resultados){
 return jsonErro("DATA_001","Sem resultados")
 }
 
-const lista = api.resultado.body
+const lista = api.resultados
 
 /*
 |--------------------------------------------------------------------------
@@ -1081,14 +1081,14 @@ const resultados = lista.map(pessoa => ({
 
 identificacao:{
 cpf:pessoa.cpf ?? null,
-nome:pessoa.name ?? null,
-sexo:pessoa.gender ?? null,
-nascimento:pessoa.birth_date ?? null,
-rg:pessoa.rg ?? null
+nome:pessoa.nome ?? null,
+sexo:pessoa.sexo ?? null,
+nascimento:pessoa.nascimento ?? null,
+rg:null
 },
 
 filiacao:{
-mae:pessoa.mother_name?.trim() ?? null
+mae:null
 }
 
 }))
@@ -1113,7 +1113,7 @@ timestamp:new Date().toISOString()
 
 consulta:nome,
 
-total_resultados:api.resultado.total_results ?? resultados.length,
+total_resultados:api.total_encontrados ?? resultados.length,
 
 dados:resultados
 
