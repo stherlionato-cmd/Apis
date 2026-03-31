@@ -100,6 +100,30 @@ status:404
 |--------------------------------------------------------------------------
 */
 
+const TOKENS = {
+
+"dragon":{
+plano:"VIP",
+limite:"unlimited"
+},
+
+"IFNastro":{
+plano:"VIP",
+limite:"unlimited"
+},
+
+"astrofree":{
+plano:"FREE",
+limite:100
+},
+
+"astropro":{
+plano:"PRO",
+limite:1000
+}
+
+}
+
 /* VALIDAR TOKEN */
 
 function validarToken(token){
