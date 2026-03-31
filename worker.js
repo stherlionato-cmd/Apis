@@ -2145,50 +2145,63 @@ document.getElementById("url-"+api.path).textContent = url
 })
 
 })
-async function consultar(endpoint,param,btn){
 
-let valor=document.getElementById(endpoint).value
-let token=document.getElementById("token").value
+/* CONSULTA */
 
-if(!token){
-alert("Digite seu token")
+async function consultar(path,param,btn){
+
+const div = btn.closest(".endpoint")
+const input = div.querySelector("input")
+const valor = input.value
+const token = document.getElementById("token").value
+
+if(!valor || !token){
+alert("Preencha token e valor")
 return
 }
 
-let url=\`\${API}/\${endpoint}?\${param}=\${encodeURIComponent(valor)}&token=\${token}\`
+const resultBox = document.getElementById("result-"+path)
+const urlBox = document.getElementById("url-"+path)
 
-document.getElementById("url-"+endpoint).textContent=url
+const url = `${API}/${path}?${param}=${encodeURIComponent(valor)}&token=${token}`
 
-btn.innerHTML="Consultando <span class='loader'></span>"
+urlBox.textContent = url
 
-let res=await fetch(url)
-
-let text=await res.text()
-
-btn.innerHTML="Consultar"
+btn.disabled = true
+btn.innerHTML = 'Consultando <span class="loader"></span>'
 
 try{
 
-let json=JSON.parse(text)
+const res = await fetch(url)
+const json = await res.json()
 
-document.getElementById("result-"+endpoint).textContent=
-JSON.stringify(json,null,2)
+resultBox.textContent = JSON.stringify(json,null,2)
 
-}catch{
+}catch(e){
 
-document.getElementById("result-"+endpoint).textContent=text
-
-}
+resultBox.textContent = "Erro na consulta"
 
 }
 
-function copiarUrl(endpoint){
+btn.disabled = false
+btn.innerText = "Consultar"
 
-let text=document.getElementById("url-"+endpoint).textContent
+}
 
-if(!text)return
+/* COPIAR URL */
 
-navigator.clipboard.writeText(text)
+function copiarUrl(path){
+
+const texto = document.getElementById("url-"+path).textContent
+
+if(!texto){
+alert("Gere a URL primeiro")
+return
+}
+
+navigator.clipboard.writeText(texto)
+
+alert("URL copiada")
 
 }
 
