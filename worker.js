@@ -2049,7 +2049,8 @@ const container=document.getElementById("endpoints")
 endpoints.forEach(api=>{
 
 const div=document.createElement("div")
-div.className="endpoint"div.innerHTML = `
+div.className = "endpoint";
+div.innerHTML = `
 <span class="method">GET</span>
 <b>/${api.path}</b>
 
