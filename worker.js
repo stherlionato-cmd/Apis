@@ -1026,11 +1026,7 @@ if(!validarToken(token)){
 return jsonErro("AUTH_001","Token inválido")
 }
 
-/*
-|--------------------------------------------------------------------------
-| CACHE
-|--------------------------------------------------------------------------
-*/
+/* CACHE */
 
 const cacheKey = new Request(request.url,{method:"GET"})
 const cache = caches.default
@@ -1041,11 +1037,7 @@ if(response){
 return response
 }
 
-/*
-|--------------------------------------------------------------------------
-| API
-|--------------------------------------------------------------------------
-*/
+/* API */
 
 let api
 
@@ -1072,11 +1064,16 @@ api = await res.json()
 return jsonErro("API_001","Erro na conexão",e.toString())
 
 }
-/*
-|--------------------------------------------------------------------------
-| RESULTADOS
-|--------------------------------------------------------------------------
-*/
+
+/* VERIFICA RESULTADOS */
+
+if(!api?.status || !api?.resultados){
+return jsonErro("DATA_001","Sem resultados")
+}
+
+const lista = api.resultados
+
+/* RESULTADOS */
 
 const resultados = lista.map(pessoa => ({
 
@@ -1094,11 +1091,7 @@ mae:null
 
 }))
 
-/*
-|--------------------------------------------------------------------------
-| FINAL
-|--------------------------------------------------------------------------
-*/
+/* FINAL */
 
 const finalResponse = {
 
