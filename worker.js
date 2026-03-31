@@ -343,8 +343,6 @@ return new Response(`
 
 <style>
 
-/* BASE */
-
 :root{--blue:#3b82f6;}
 
 *{
@@ -357,29 +355,26 @@ font-family:'Inter',sans-serif;
 body{
 background: radial-gradient(circle at 20% 20%, #0a0f2a, #02030a);
 color:#e2e8f0;
+overflow-x:hidden;
 }
 
 /* HEADER */
-
 .header{
 padding:25px;
 text-align:center;
 font-size:22px;
 font-weight:800;
 }
-
 .header span{color:var(--blue);}
 
 /* CONTAINER */
-
 .container{
 max-width:900px;
 margin:auto;
 padding:15px;
 }
 
-/* CARD (SEU PADRÃO) */
-
+/* CARD */
 .card{
 margin-top:12px;
 padding:16px;
@@ -408,16 +403,13 @@ box-shadow:0 10px 40px rgba(59,130,246,.25);
 }
 
 /* INPUT */
-
 .input-group{
 margin-top:10px;
 }
-
 .input-label{
 font-size:11px;
 opacity:.6;
 }
-
 .input{
 width:100%;
 padding:12px;
@@ -429,7 +421,6 @@ color:#fff;
 }
 
 /* BUTTON */
-
 .btn{
 margin-top:12px;
 width:100%;
@@ -442,13 +433,11 @@ color:#fff;
 cursor:pointer;
 transition:.2s;
 }
-
 .btn:hover{
 background:rgba(59,130,246,0.3);
 }
 
 /* MODAL */
-
 .modal{
 position:fixed;
 inset:0;
@@ -477,7 +466,6 @@ to{opacity:1}
 }
 
 /* ROUTE */
-
 .route-box{
 margin-top:10px;
 background:#020617;
@@ -486,14 +474,15 @@ border-radius:10px;
 font-size:11px;
 display:flex;
 justify-content:space-between;
+align-items:center;
 }
 
 /* RESULT */
-
 .result-box{
 margin-top:12px;
 }
 
+/* ITEM */
 .item{
 font-size:12px;
 display:flex;
@@ -504,8 +493,16 @@ margin-top:6px;
 background:rgba(255,255,255,0.02);
 }
 
-/* LOADING */
+/* SECTION */
+.section{
+margin-top:10px;
+background:rgba(255,255,255,0.015);
+padding:10px;
+border-radius:12px;
+border:1px solid rgba(255,255,255,0.05);
+}
 
+/* LOADING */
 .loader{
 margin-top:10px;
 height:40px;
@@ -514,14 +511,12 @@ background:linear-gradient(90deg,#111,#1a1a1a,#111);
 background-size:200%;
 animation:load 1s infinite;
 }
-
 @keyframes load{
 0%{background-position:200%}
 100%{background-position:-200%}
 }
 
 /* SCAN */
-
 .scan{
 position:absolute;
 inset:0;
@@ -529,14 +524,12 @@ background:linear-gradient(transparent,rgba(59,130,246,.15),transparent);
 animation:scan 1.4s infinite;
 border-radius:20px;
 }
-
 @keyframes scan{
 0%{transform:translateY(-100%)}
 100%{transform:translateY(100%)}
 }
 
 /* TOAST */
-
 #toast{
 position:fixed;
 bottom:20px;
@@ -549,7 +542,6 @@ font-size:12px;
 opacity:0;
 transition:.3s;
 }
-
 #toast.show{
 transform:translateX(-50%) translateY(0);
 opacity:1;
@@ -575,7 +567,6 @@ ${Object.keys(ENDPOINTS).map(e=>`
 </div>
 
 <!-- MODAL -->
-
 <div class="modal" id="modal">
 <div class="modal-box">
 
@@ -665,16 +656,19 @@ const data=await r.json()
 
 loading.innerHTML=""
 
-for(let k in data){
+if(!data.status){
+resposta.innerHTML="<div class='item'>Erro: "+(data.message||"Falha")+"</div>"
+return
+}
 
-let div=document.createElement("div")
-div.className="item"
-div.innerHTML="<span>"+k+"</span><span>"+data[k]+"</span>"
+const res = data.dados || data
 
-await new Promise(r=>setTimeout(r,80))
+const temp = document.createElement("div")
+temp.innerHTML = render(res)
 
-resposta.appendChild(div)
-
+for(let el of temp.children){
+await new Promise(r=>setTimeout(r,50))
+resposta.appendChild(el)
 }
 
 }catch{
@@ -684,6 +678,44 @@ resposta.innerHTML="<div class='item'>Erro na API</div>"
 
 }
 
+}
+
+/* 🔥 RENDER DECENTE */
+function render(obj){
+
+let html=""
+
+for(let key in obj){
+
+let value = obj[key]
+
+if(value === null || value === undefined){
+html += `<div class="item"><span>${key}</span><span>null</span></div>`
+continue
+}
+
+if(Array.isArray(value)){
+html += `<div class="section"><strong>${key}</strong>`
+value.forEach(v=>{
+if(typeof v === "object"){
+html += render(v)
+}else{
+html += `<div class="item">${v}</div>`
+}
+})
+html += `</div>`
+continue
+}
+
+if(typeof value === "object"){
+html += `<div class="section"><strong>${key}</strong>${render(value)}</div>`
+continue
+}
+
+html += `<div class="item"><span>${key}</span><span>${value}</span></div>`
+}
+
+return html
 }
 
 function copy(){
