@@ -340,18 +340,20 @@ return new Response(`
 
 <title>Astro Search API</title>
 
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+
 <style>
 
 *{
 margin:0;
 padding:0;
 box-sizing:border-box;
-font-family:system-ui;
+font-family:Inter,system-ui;
 }
 
 body{
 
-background:radial-gradient(circle at top,#0d1f3d,#020617);
+background:#030712;
 color:white;
 min-height:100vh;
 overflow-x:hidden;
@@ -371,19 +373,21 @@ z-index:-1;
 
 header{
 text-align:center;
-padding:30px 20px;
+padding:60px 20px 30px;
 }
 
 header h1{
-font-size:28px;
+font-size:34px;
+font-weight:600;
 background:linear-gradient(90deg,#4facfe,#00f2fe);
 -webkit-background-clip:text;
 -webkit-text-fill-color:transparent;
 }
 
 header p{
-opacity:.7;
-margin-top:8px;
+opacity:.6;
+margin-top:10px;
+font-size:14px;
 }
 
 /* CONTAINER */
@@ -398,22 +402,32 @@ padding:20px;
 
 .card{
 
-background:rgba(255,255,255,0.05);
-backdrop-filter:blur(15px);
-border:1px solid rgba(255,255,255,0.08);
+background:rgba(255,255,255,0.03);
 
-border-radius:16px;
+backdrop-filter:blur(20px);
 
-padding:20px;
-margin-bottom:20px;
+border:1px solid rgba(255,255,255,0.05);
 
-transition:.3s;
+border-radius:18px;
+
+padding:22px;
+
+margin-bottom:18px;
+
+transition:.25s;
 
 }
 
 .card:hover{
-transform:translateY(-3px);
 border-color:#4facfe;
+transform:translateY(-2px);
+}
+
+/* LABEL */
+
+label{
+font-size:13px;
+opacity:.7;
 }
 
 /* INPUTS */
@@ -423,15 +437,27 @@ input,select{
 width:100%;
 padding:14px;
 
-margin-top:10px;
+margin-top:8px;
+margin-bottom:14px;
 
 border-radius:10px;
-border:none;
 
-background:#0b162c;
+border:1px solid rgba(255,255,255,0.05);
+
+background:#020617;
+
 color:white;
 
 outline:none;
+
+transition:.2s;
+
+}
+
+input:focus,select:focus{
+
+border-color:#4facfe;
+box-shadow:0 0 0 1px #4facfe55;
 
 }
 
@@ -443,12 +469,11 @@ width:100%;
 
 padding:14px;
 
-margin-top:14px;
-
 border-radius:10px;
+
 border:none;
 
-font-weight:bold;
+font-weight:600;
 
 cursor:pointer;
 
@@ -459,14 +484,16 @@ transition:.2s;
 }
 
 button:hover{
-transform:scale(1.02);
+transform:scale(1.03);
 }
 
-/* COPY */
+/* COPY BUTTON */
 
 .copy{
 
-background:linear-gradient(90deg,#00ffb3,#00c8ff);
+margin-top:12px;
+
+background:linear-gradient(90deg,#00ffa6,#00c3ff);
 
 }
 
@@ -484,13 +511,67 @@ overflow:auto;
 
 font-size:13px;
 
-margin-top:10px;
+margin-top:12px;
+
+border:1px solid rgba(255,255,255,0.05);
 
 }
 
-/* LOADING */
+/* MODAL */
 
-.loading{
+.modal{
+
+position:fixed;
+
+top:0;
+left:0;
+
+width:100%;
+height:100%;
+
+background:rgba(0,0,0,.6);
+
+display:none;
+
+align-items:center;
+justify-content:center;
+
+}
+
+.modal-content{
+
+background:#020617;
+
+border:1px solid rgba(255,255,255,0.08);
+
+padding:24px;
+
+border-radius:16px;
+
+width:90%;
+max-width:700px;
+
+animation:modal .3s ease;
+
+}
+
+@keyframes modal{
+
+from{
+opacity:0;
+transform:translateY(20px);
+}
+
+to{
+opacity:1;
+transform:translateY(0);
+}
+
+}
+
+/* LOADER */
+
+.loader{
 
 width:40px;
 height:40px;
@@ -507,18 +588,49 @@ margin:auto;
 }
 
 @keyframes spin{
-
 to{transform:rotate(360deg)}
+}
+
+/* TOAST */
+
+.toast{
+
+position:fixed;
+
+bottom:30px;
+left:50%;
+
+transform:translateX(-50%);
+
+background:#020617;
+
+padding:12px 20px;
+
+border-radius:8px;
+
+border:1px solid rgba(255,255,255,0.1);
+
+opacity:0;
+
+transition:.3s;
 
 }
+
+.toast.show{
+opacity:1;
+}
+
+/* FOOTER */
 
 footer{
 
 text-align:center;
-padding:30px;
 
-opacity:.6;
+padding:40px;
+
 font-size:13px;
+
+opacity:.5;
 
 }
 
@@ -532,8 +644,9 @@ font-size:13px;
 
 <header>
 
-<h1>🚀 Astro Search API</h1>
-<p>Painel interativo para testar endpoints</p>
+<h1>Astro Search API</h1>
+
+<p>Painel interativo de testes da API</p>
 
 </header>
 
@@ -550,15 +663,15 @@ ${Object.keys(ENDPOINTS).map(e=>`<option>${e}</option>`).join("")}
 </select>
 
 <label>Valor da consulta</label>
-<input id="valor" placeholder="CPF / Nome / Telefone / etc">
+<input id="valor" placeholder="CPF, nome ou telefone">
 
-<button onclick="consultar()">Consultar</button>
+<button onclick="consultar()">Consultar API</button>
 
 </div>
 
 <div class="card">
 
-<h3>URL</h3>
+<h3>URL gerada</h3>
 
 <pre id="url"></pre>
 
@@ -566,11 +679,15 @@ ${Object.keys(ENDPOINTS).map(e=>`<option>${e}</option>`).join("")}
 
 </div>
 
-<div class="card">
+</div>
 
-<h3>Resposta</h3>
+<div class="modal" id="modal">
 
-<div id="loading" style="display:none" class="loading"></div>
+<div class="modal-content">
+
+<h3>Resposta da API</h3>
+
+<div id="loading" class="loader" style="display:none"></div>
 
 <pre id="resposta"></pre>
 
@@ -580,15 +697,17 @@ ${Object.keys(ENDPOINTS).map(e=>`<option>${e}</option>`).join("")}
 
 </div>
 
+<div class="toast" id="toast">Copiado!</div>
+
 <footer>
 
-Astro Search API • Interface de Testes
+Astro Search API • Interface Premium
 
 </footer>
 
 <script>
 
-/* PARTICLES */
+/* PARTICLES CONSTELATION */
 
 const canvas=document.getElementById("particles")
 
@@ -599,15 +718,14 @@ canvas.height=innerHeight
 
 let particles=[]
 
-for(let i=0;i<80;i++){
+for(let i=0;i<100;i++){
 
 particles.push({
 
 x:Math.random()*canvas.width,
 y:Math.random()*canvas.height,
-r:Math.random()*2,
-vx:(Math.random()-.5)*.5,
-vy:(Math.random()-.5)*.5
+vx:(Math.random()-.5)*0.4,
+vy:(Math.random()-.5)*0.4
 
 })
 
@@ -626,9 +744,27 @@ if(p.x<0||p.x>canvas.width)p.vx*=-1
 if(p.y<0||p.y>canvas.height)p.vy*=-1
 
 ctx.beginPath()
-ctx.arc(p.x,p.y,p.r,0,Math.PI*2)
+ctx.arc(p.x,p.y,1.8,0,Math.PI*2)
 ctx.fillStyle="#4facfe"
 ctx.fill()
+
+particles.forEach(p2=>{
+
+const dist=Math.hypot(p.x-p2.x,p.y-p2.y)
+
+if(dist<100){
+
+ctx.beginPath()
+
+ctx.moveTo(p.x,p.y)
+ctx.lineTo(p2.x,p2.y)
+
+ctx.strokeStyle="rgba(79,172,254,.08)"
+ctx.stroke()
+
+}
+
+})
 
 })
 
@@ -652,9 +788,11 @@ const url="${base}/"+endpoint+"?token="+token+"&"+param+"="+encodeURIComponent(v
 
 document.getElementById("url").innerText=url
 
-document.getElementById("resposta").innerText=""
+document.getElementById("modal").style.display="flex"
 
 document.getElementById("loading").style.display="block"
+
+document.getElementById("resposta").innerText=""
 
 try{
 
@@ -682,6 +820,20 @@ const text=document.getElementById(id).innerText
 
 navigator.clipboard.writeText(text)
 
+const toast=document.getElementById("toast")
+
+toast.classList.add("show")
+
+setTimeout(()=>toast.classList.remove("show"),2000)
+
+}
+
+/* FECHAR MODAL */
+
+window.onclick=e=>{
+if(e.target.id==="modal"){
+document.getElementById("modal").style.display="none"
+}
 }
 
 </script>
@@ -690,11 +842,9 @@ navigator.clipboard.writeText(text)
 </html>
 
 `,{
-
 headers:{
 "content-type":"text/html;charset=UTF-8"
 }
-
 })
 
 }
