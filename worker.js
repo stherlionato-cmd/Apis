@@ -857,13 +857,13 @@ headers:{
 |--------------------------------------------------------------------------
 */
 
-const res = await fetch(`https://knowsapi.shop/api/consulta/cpf-v5?code=${cpf}&apikey=bigmouth`,{
-method:"GET",
-headers:{
-"User-Agent":"AstroAPI/1.0",
-"Accept":"application/json"
-}
-})
+/*
+|--------------------------------------------------------------------------
+| CPF
+|--------------------------------------------------------------------------
+*/
+
+async function consultaCPF(request,url,ctx){
 
 if(request.method !== "GET"){
 return jsonErro("REQ_000","Método inválido")
@@ -909,7 +909,13 @@ let api
 
 try{
 
-const res = await fetch(`https://knowsapi.shop/api/consulta/cpf-v5?code=${cpf}&apikey=bigmouth`)
+const res = await fetch(`https://knowsapi.shop/api/consulta/cpf-v5?code=${cpf}&apikey=bigmouth`,{
+method:"GET",
+headers:{
+"User-Agent":"AstroAPI/1.0",
+"Accept":"application/json"
+}
+})
 
 if(!res.ok){
 return jsonErro("API_002","API erro",res.status)
@@ -929,13 +935,13 @@ return jsonErro("API_001","Erro na conexão",e.toString())
 |--------------------------------------------------------------------------
 */
 
-if(!api || !api.resultado){
+if(!api){
 return jsonErro("DATA_001","Nenhum dado encontrado")
 }
 
 /*
 |--------------------------------------------------------------------------
-| REMOVE CRÉDITOS DA API
+| REMOVE CREDITOS
 |--------------------------------------------------------------------------
 */
 
@@ -964,7 +970,7 @@ timestamp:new Date().toISOString()
 
 consulta:cpf,
 
-resultado:api.resultado
+dados:api
 
 }
 
