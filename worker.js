@@ -6,9 +6,39 @@ const url = new URL(request.url)
 
 /*
 |--------------------------------------------------------------------------
+| HOME
+|--------------------------------------------------------------------------
+*/
+
+if(url.pathname === "/"){
+return home()
+}
+
+/*
+|--------------------------------------------------------------------------
 | ROUTER
 |--------------------------------------------------------------------------
 */
+
+if(url.pathname === "/telefone-full"){
+return consultaTelefoneFull(request,url,ctx)
+}
+
+if(url.pathname === "/telefone-cpf"){
+return consultaTelefoneCPF(request,url,ctx)
+}
+
+if(url.pathname === "/ddd"){
+return consultaDDD(request,url,ctx)
+}
+
+if(url.pathname === "/operadora"){
+return consultaOperadora(request,url,ctx)
+}
+
+if(url.pathname === "/rg"){
+return consultaRG(request,url,ctx)
+}
 
 if(url.pathname === "/cpf"){
 return consultaCPF(request,url,ctx)
@@ -28,6 +58,22 @@ return consultaNome(request,url,ctx)
 
 if(url.pathname === "/telefone"){
 return consultaTelefone(request,url,ctx)
+}
+
+if(url.pathname === "/titulo"){
+return consultaTitulo(request,url,ctx)
+}
+
+if(url.pathname === "/pis"){
+return consultaPIS(request,url,ctx)
+}
+
+if(url.pathname === "/nis"){
+return consultaNIS(request,url,ctx)
+}
+
+if(url.pathname === "/parentes"){
+return consultaParentes(request,url,ctx)
 }
 
 if(url.pathname === "/placa"){
@@ -70,6 +116,738 @@ return false
 }
 
 return true
+
+}
+
+async function consultaTelefoneFull(request,url,ctx){
+
+if(request.method !== "GET"){
+return jsonErro("REQ_000","Método inválido")
+}
+
+const token = url.searchParams.get("token")
+const telefone = (url.searchParams.get("telefone") || "").replace(/\D/g,'')
+
+if(!token || !telefone){
+return jsonErro("REQ_001","Parâmetros incompletos")
+}
+
+if(!validarToken(token)){
+return jsonErro("AUTH_001","Token inválido")
+}
+
+const cacheKey = new Request(request.url,{method:"GET"})
+const cache = caches.default
+
+let response = await cache.match(cacheKey)
+
+if(response){
+return response
+}
+
+let api
+
+try{
+
+const res = await fetch(`https://sara-api.xyz/consulta/telefone-full?phone=${telefone}`)
+
+if(!res.ok){
+return jsonErro("API_002","API offline")
+}
+
+api = await res.json()
+
+}catch(e){
+return jsonErro("API_001","Erro na conexão",e.toString())
+}
+
+if(!api?.resultado?.data){
+return jsonErro("DATA_001","Sem resultados")
+}
+
+const dados = api.resultado.data.map(p => ({
+
+cpf:p.cpf ?? null,
+nome:p.nome ?? null,
+telefone:p.telefone ?? null,
+
+localizacao:{
+cidade:p.cidade ?? null,
+uf:p.uf ?? null
+},
+
+fonte:p.fonte ?? null
+
+}))
+
+const finalResponse = {
+
+status:true,
+
+meta:{
+sistema:"Astro Search",
+empresa:"Astro Company",
+endpoint:"telefone-full",
+timestamp:new Date().toISOString()
+},
+
+consulta:telefone,
+
+total_resultados:dados.length,
+
+dados:dados
+
+}
+
+response = new Response(JSON.stringify(finalResponse,null,2),{
+headers:{
+"Content-Type":"application/json"
+}
+})
+
+ctx.waitUntil(cache.put(cacheKey,response.clone()))
+
+return response
+
+}
+
+async function consultaTitulo(request,url,ctx){
+
+if(request.method !== "GET"){
+return jsonErro("REQ_000","Método inválido")
+}
+
+const token = url.searchParams.get("token")
+const titulo = (url.searchParams.get("titulo") || "").replace(/\D/g,'')
+
+if(!token || !titulo){
+return jsonErro("REQ_001","Parâmetros incompletos")
+}
+
+if(!validarToken(token)){
+return jsonErro("AUTH_001","Token inválido")
+}
+
+let api
+
+try{
+
+const res = await fetch(`https://sara-api.xyz/consulta/titulo?titulo=${titulo}`)
+
+if(!res.ok){
+return jsonErro("API_002","API offline")
+}
+
+api = await res.json()
+
+}catch(e){
+return jsonErro("API_001","Erro na conexão",e.toString())
+}
+
+if(!api?.resultado?.data){
+return jsonErro("DATA_001","Sem dados")
+}
+
+const p = api.resultado.data
+
+return new Response(JSON.stringify({
+
+status:true,
+
+meta:{
+sistema:"Astro Search",
+empresa:"Astro Company",
+endpoint:"titulo",
+timestamp:new Date().toISOString()
+},
+
+consulta:titulo,
+
+dados:{
+cpf:p.cpf ?? null,
+nome:p.nome ?? null,
+sexo:p.sexo ?? null,
+nascimento:p.nascimento ?? null,
+
+filiacao:{
+mae:p.nome_mae ?? null
+},
+
+documentos:{
+titulo_eleitor:p.titulo_eleitor ?? null
+}
+
+}
+
+},null,2),{
+headers:{
+"Content-Type":"application/json"
+}
+})
+
+}
+
+async function consultaPIS(request,url,ctx){
+
+if(request.method !== "GET"){
+return jsonErro("REQ_000","Método inválido")
+}
+
+const token = url.searchParams.get("token")
+const pis = (url.searchParams.get("pis") || "").replace(/\D/g,'')
+
+if(!token || !pis){
+return jsonErro("REQ_001","Parâmetros incompletos")
+}
+
+if(!validarToken(token)){
+return jsonErro("AUTH_001","Token inválido")
+}
+
+let api
+
+try{
+
+const res = await fetch(`https://sara-api.xyz/consulta/pis?pis=${pis}`)
+
+if(!res.ok){
+return jsonErro("API_002","API offline")
+}
+
+api = await res.json()
+
+}catch(e){
+return jsonErro("API_001","Erro na conexão",e.toString())
+}
+
+if(!api?.resultado?.data){
+return jsonErro("DATA_001","Sem dados")
+}
+
+const d = api.resultado.data
+
+return new Response(JSON.stringify({
+
+status:true,
+
+meta:{
+sistema:"Astro Search",
+empresa:"Astro Company",
+endpoint:"pis",
+timestamp:new Date().toISOString()
+},
+
+consulta:pis,
+
+dados:{
+cpf:d.cpf ?? null,
+pis:d.pis ?? null
+}
+
+},null,2),{
+headers:{
+"Content-Type":"application/json"
+}
+})
+
+}
+
+async function consultaNIS(request,url,ctx){
+
+if(request.method !== "GET"){
+return jsonErro("REQ_000","Método inválido")
+}
+
+const token = url.searchParams.get("token")
+const nis = (url.searchParams.get("nis") || "").replace(/\D/g,'')
+
+if(!token || !nis){
+return jsonErro("REQ_001","Parâmetros incompletos")
+}
+
+if(!validarToken(token)){
+return jsonErro("AUTH_001","Token inválido")
+}
+
+let api
+
+try{
+
+const res = await fetch(`https://sara-api.xyz/consulta/nis?nis=${nis}`)
+
+if(!res.ok){
+return jsonErro("API_002","API offline")
+}
+
+api = await res.json()
+
+}catch(e){
+return jsonErro("API_001","Erro na conexão",e.toString())
+}
+
+if(!api?.resultado?.data){
+return jsonErro("DATA_001","Sem dados")
+}
+
+const d = api.resultado.data
+
+return new Response(JSON.stringify({
+
+status:true,
+
+meta:{
+sistema:"Astro Search",
+empresa:"Astro Company",
+endpoint:"nis",
+timestamp:new Date().toISOString()
+},
+
+consulta:nis,
+
+dados:{
+cpf:d.cpf ?? null,
+nis:d.pis ?? null
+}
+
+},null,2),{
+headers:{
+"Content-Type":"application/json"
+}
+})
+
+}
+
+async function consultaParentes(request,url,ctx){
+
+if(request.method !== "GET"){
+return jsonErro("REQ_000","Método inválido")
+}
+
+const token = url.searchParams.get("token")
+const cpf = (url.searchParams.get("cpf") || "").replace(/\D/g,'')
+
+if(!token || !cpf){
+return jsonErro("REQ_001","Parâmetros incompletos")
+}
+
+if(!validarToken(token)){
+return jsonErro("AUTH_001","Token inválido")
+}
+
+let api
+
+try{
+
+const res = await fetch(`https://sara-api.xyz/consulta/parentes?cpf=${cpf}`)
+
+if(!res.ok){
+return jsonErro("API_002","API offline")
+}
+
+api = await res.json()
+
+}catch(e){
+return jsonErro("API_001","Erro na conexão",e.toString())
+}
+
+if(!api?.resultado?.data){
+return jsonErro("DATA_001","Sem dados")
+}
+
+const lista = api.resultado.data
+
+const parentes = lista.map(p => ({
+
+cpf:p.cpf ?? null,
+nome:p.nome ?? null,
+vinculo:p.vinculo ?? null
+
+}))
+
+return new Response(JSON.stringify({
+
+status:true,
+
+meta:{
+sistema:"Astro Search",
+empresa:"Astro Company",
+endpoint:"parentes",
+timestamp:new Date().toISOString()
+},
+
+consulta:cpf,
+
+pessoa:api.resultado.pessoa ?? null,
+
+total_resultados:parentes.length,
+
+dados:parentes
+
+},null,2),{
+headers:{
+"Content-Type":"application/json"
+}
+})
+
+}
+
+async function consultaTelefoneCPF(request,url,ctx){
+
+if(request.method !== "GET"){
+return jsonErro("REQ_000","Método inválido")
+}
+
+const token = url.searchParams.get("token")
+const cpf = (url.searchParams.get("cpf") || "").replace(/\D/g,'')
+
+if(!token || !cpf){
+return jsonErro("REQ_001","Parâmetros incompletos")
+}
+
+if(cpf.length !== 11){
+return jsonErro("REQ_002","CPF inválido")
+}
+
+if(!validarToken(token)){
+return jsonErro("AUTH_001","Token inválido")
+}
+
+const cacheKey = new Request(request.url,{method:"GET"})
+const cache = caches.default
+
+let response = await cache.match(cacheKey)
+
+if(response){
+return response
+}
+
+let api
+
+try{
+
+const res = await fetch(`https://sara-api.xyz/consulta/telefone-cpf?cpf=${cpf}`)
+
+if(!res.ok){
+return jsonErro("API_002","API offline")
+}
+
+api = await res.json()
+
+}catch(e){
+return jsonErro("API_001","Erro na conexão",e.toString())
+}
+
+if(!api?.resultado?.data){
+return jsonErro("DATA_001","Sem resultados")
+}
+
+const dados = api.resultado.data.map(p => ({
+
+telefone:p.telefone ?? null,
+
+ddd:p.ddd ?? null,
+numero:p.numero ?? null,
+
+nome:p.nome ?? null,
+
+localizacao:{
+cidade:p.cidade ?? null,
+uf:p.uf ?? null
+},
+
+fonte:p.fonte ?? null
+
+}))
+
+const finalResponse = {
+
+status:true,
+
+meta:{
+sistema:"Astro Search",
+empresa:"Astro Company",
+endpoint:"telefone-cpf",
+timestamp:new Date().toISOString()
+},
+
+consulta:cpf,
+
+total_resultados:dados.length,
+
+dados:dados
+
+}
+
+response = new Response(JSON.stringify(finalResponse,null,2),{
+headers:{
+"Content-Type":"application/json"
+}
+})
+
+ctx.waitUntil(cache.put(cacheKey,response.clone()))
+
+return response
+
+}
+
+async function consultaDDD(request,url,ctx){
+
+if(request.method !== "GET"){
+return jsonErro("REQ_000","Método inválido")
+}
+
+const token = url.searchParams.get("token")
+const ddd = (url.searchParams.get("ddd") || "").replace(/\D/g,'')
+
+if(!token || !ddd){
+return jsonErro("REQ_001","Parâmetros incompletos")
+}
+
+if(!validarToken(token)){
+return jsonErro("AUTH_001","Token inválido")
+}
+
+const cacheKey = new Request(request.url,{method:"GET"})
+const cache = caches.default
+
+let response = await cache.match(cacheKey)
+
+if(response){
+return response
+}
+
+let api
+
+try{
+
+const res = await fetch(`https://sara-api.xyz/consulta/ddd?ddd=${ddd}`)
+
+if(!res.ok){
+return jsonErro("API_002","API offline")
+}
+
+api = await res.json()
+
+}catch(e){
+return jsonErro("API_001","Erro na conexão",e.toString())
+}
+
+if(!api?.resultado?.data){
+return jsonErro("DATA_001","Sem resultados")
+}
+
+const dados = api.resultado.data.map(p => ({
+
+cpf:p.cpf ?? null,
+nome:p.nome ?? null,
+
+telefone:p.telefone ?? null,
+
+localizacao:{
+cidade:p.cidade ?? null,
+uf:p.uf ?? null
+},
+
+operadora:p.operadora ?? null,
+fonte:p.fonte ?? null
+
+}))
+
+const finalResponse = {
+
+status:true,
+
+meta:{
+sistema:"Astro Search",
+empresa:"Astro Company",
+endpoint:"ddd",
+timestamp:new Date().toISOString()
+},
+
+consulta:ddd,
+
+total_resultados:dados.length,
+
+dados:dados
+
+}
+
+response = new Response(JSON.stringify(finalResponse,null,2),{
+headers:{
+"Content-Type":"application/json"
+}
+})
+
+ctx.waitUntil(cache.put(cacheKey,response.clone()))
+
+return response
+
+}
+
+async function consultaOperadora(request,url,ctx){
+
+if(request.method !== "GET"){
+return jsonErro("REQ_000","Método inválido")
+}
+
+const token = url.searchParams.get("token")
+const telefone = (url.searchParams.get("telefone") || "").replace(/\D/g,'')
+
+if(!token || !telefone){
+return jsonErro("REQ_001","Parâmetros incompletos")
+}
+
+if(!validarToken(token)){
+return jsonErro("AUTH_001","Token inválido")
+}
+
+let api
+
+try{
+
+const res = await fetch(`https://sara-api.xyz/consulta/operadora?telefone=${telefone}`)
+
+if(!res.ok){
+return jsonErro("API_002","API offline")
+}
+
+api = await res.json()
+
+}catch(e){
+return jsonErro("API_001","Erro na conexão",e.toString())
+}
+
+if(!api?.resultado?.data){
+return jsonErro("DATA_001","Sem dados")
+}
+
+const d = api.resultado.data
+
+return new Response(JSON.stringify({
+
+status:true,
+
+meta:{
+sistema:"Astro Search",
+empresa:"Astro Company",
+endpoint:"operadora",
+timestamp:new Date().toISOString()
+},
+
+consulta:telefone,
+
+dados:{
+telefone:d.telefone ?? null,
+telefone_formatado:d.telefone_formatado ?? null,
+
+ddd:d.ddd ?? null,
+numero:d.numero ?? null,
+
+estado:d.estado ?? null,
+
+tipo:d.tipo ?? null,
+
+operadora:d.operadora ?? null,
+
+portabilidade:d.portabilidade ?? null,
+
+confianca:d.confianca ?? null,
+
+nota:d.nota ?? null
+}
+
+},null,2),{
+headers:{
+"Content-Type":"application/json"
+}
+})
+
+}
+
+async function consultaRG(request,url,ctx){
+
+if(request.method !== "GET"){
+return jsonErro("REQ_000","Método inválido")
+}
+
+const token = url.searchParams.get("token")
+const rg = (url.searchParams.get("rg") || "").replace(/\D/g,'')
+
+if(!token || !rg){
+return jsonErro("REQ_001","Parâmetros incompletos")
+}
+
+if(!validarToken(token)){
+return jsonErro("AUTH_001","Token inválido")
+}
+
+let api
+
+try{
+
+const res = await fetch(`https://sara-api.xyz/consulta/rg?rg=${rg}`)
+
+if(!res.ok){
+return jsonErro("API_002","API offline")
+}
+
+api = await res.json()
+
+}catch(e){
+return jsonErro("API_001","Erro na conexão",e.toString())
+}
+
+if(!api?.resultado?.data){
+return jsonErro("DATA_001","Sem dados")
+}
+
+const p = api.resultado.data
+
+return new Response(JSON.stringify({
+
+status:true,
+
+meta:{
+sistema:"Astro Search",
+empresa:"Astro Company",
+endpoint:"rg",
+timestamp:new Date().toISOString()
+},
+
+consulta:rg,
+
+dados:{
+
+cpf:p.cpf ?? null,
+
+nome:p.nome ?? null,
+
+sexo:p.sexo ?? null,
+
+nascimento:p.nascimento ?? null,
+
+filiacao:{
+mae:p.nome_mae ?? null,
+pai:p.nome_pai ?? null
+},
+
+documentos:{
+rg:p.rg ?? null,
+titulo_eleitor:p.titulo_eleitor ?? null
+},
+
+profissional:{
+cbo:p.cbo ?? null,
+renda:p.renda ?? null
+}
+
+}
+
+},null,2),{
+headers:{
+"Content-Type":"application/json"
+}
+})
 
 }
 
@@ -952,6 +1730,180 @@ dados:dados
 },null,2),{
 headers:{
 "Content-Type":"application/json"
+}
+})
+
+}
+
+function home(){
+
+return new Response(`<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Astro Search API</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<style>
+
+body{
+margin:0;
+font-family:Inter;
+background:#020617;
+color:#e2e8f0;
+}
+
+header{
+padding:25px;
+border-bottom:1px solid rgba(255,255,255,0.05);
+}
+
+.logo{
+font-size:20px;
+font-weight:600;
+color:#60a5fa;
+}
+
+.container{
+max-width:1100px;
+margin:auto;
+padding:40px 20px;
+}
+
+.endpoint{
+background:#0f172a;
+border:1px solid rgba(255,255,255,0.05);
+border-radius:12px;
+padding:25px;
+margin-bottom:25px;
+}
+
+.method{
+background:#1e40af;
+padding:4px 10px;
+border-radius:6px;
+font-size:12px;
+margin-right:10px;
+}
+
+input{
+width:100%;
+padding:10px;
+margin-top:10px;
+border-radius:8px;
+border:1px solid rgba(255,255,255,0.08);
+background:#020617;
+color:white;
+}
+
+button{
+margin-top:10px;
+padding:10px 16px;
+border-radius:8px;
+border:none;
+background:#2563eb;
+color:white;
+cursor:pointer;
+}
+
+button:hover{
+background:#1d4ed8;
+}
+
+pre{
+background:#020617;
+border:1px solid rgba(255,255,255,0.05);
+padding:15px;
+border-radius:8px;
+overflow:auto;
+margin-top:15px;
+}
+
+</style>
+</head>
+
+<body>
+
+<header>
+<div class="logo">Astro Search API</div>
+</header>
+
+<div class="container" id="endpoints"></div>
+
+<script>
+
+const API = location.origin
+const TOKEN = "dragon"
+
+const endpoints = [
+
+{path:"cpf",param:"cpf",desc:"Consulta completa de CPF"},
+{path:"nome",param:"nome",desc:"Busca pessoas por nome"},
+{path:"telefone",param:"telefone",desc:"Busca dados vinculados ao telefone"},
+{path:"telefone-full",param:"telefone",desc:"Consulta completa de telefone"},
+{path:"telefone-cpf",param:"cpf",desc:"Telefones vinculados ao CPF"},
+{path:"ddd",param:"ddd",desc:"Busca telefones por DDD"},
+{path:"operadora",param:"telefone",desc:"Consulta operadora"},
+{path:"rg",param:"rg",desc:"Consulta RG"},
+{path:"titulo",param:"titulo",desc:"Consulta título eleitoral"},
+{path:"pis",param:"pis",desc:"Consulta PIS"},
+{path:"nis",param:"nis",desc:"Consulta NIS"},
+{path:"email",param:"email",desc:"Consulta por email"},
+{path:"parentes",param:"cpf",desc:"Busca parentes"},
+{path:"placa",param:"placa",desc:"Consulta veículo"},
+{path:"foto",param:"cpf",desc:"Busca fotos do CPF"}
+
+]
+
+const container = document.getElementById("endpoints")
+
+endpoints.forEach(api=>{
+
+const div = document.createElement("div")
+div.className="endpoint"
+
+div.innerHTML=\`
+<span class="method">GET</span>
+<b>/\${api.path}</b>
+
+<p>\${api.desc}</p>
+
+<input id="\${api.path}" placeholder="Digite \${api.param}">
+
+<button onclick="consultar('\${api.path}','\${api.param}')">Consultar</button>
+
+<pre id="result-\${api.path}"></pre>
+\`
+
+container.appendChild(div)
+
+})
+
+async function consultar(endpoint,param){
+
+let valor = document.getElementById(endpoint).value
+
+let url = \`\${API}/\${endpoint}?\${param}=\${encodeURIComponent(valor)}&token=\${TOKEN}\`
+
+let res = await fetch(url)
+
+let data = await res.json()
+
+document.getElementById("result-"+endpoint).textContent =
+JSON.stringify(data,null,2)
+
+}
+
+</script>
+
+</body>
+</html>`,{
+headers:{
+"Content-Type":"text/html;charset=UTF-8"
 }
 })
 
