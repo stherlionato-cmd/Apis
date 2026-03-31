@@ -339,240 +339,220 @@ return new Response(`
 
 <title>Astro Search API</title>
 
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+
 <style>
 
-/* RESET */
+/* BASE */
+
+:root{--blue:#3b82f6;}
 
 *{
 margin:0;
 padding:0;
 box-sizing:border-box;
-font-family:system-ui;
+font-family:'Inter',sans-serif;
 }
 
 body{
-background:#020617;
-color:#e5e7eb;
-min-height:100vh;
-overflow-x:hidden;
-}
-
-/* BACKGROUND GLOW */
-
-body::before{
-content:"";
-position:fixed;
-width:600px;
-height:600px;
-background:radial-gradient(circle,#4facfe33,transparent);
-top:-200px;
-left:-200px;
-filter:blur(120px);
-z-index:-2;
-}
-
-/* PARTICLES */
-
-canvas{
-position:fixed;
-top:0;
-left:0;
-z-index:-1;
-opacity:.4;
+background: radial-gradient(circle at 20% 20%, #0a0f2a, #02030a);
+color:#e2e8f0;
 }
 
 /* HEADER */
 
-header{
+.header{
+padding:25px;
 text-align:center;
-padding:40px 20px;
-animation:fadeIn .8s ease;
+font-size:22px;
+font-weight:800;
 }
 
-header h1{
-font-size:32px;
-background:linear-gradient(90deg,#4facfe,#00f2fe);
--webkit-background-clip:text;
--webkit-text-fill-color:transparent;
-}
-
-header p{
-opacity:.6;
-margin-top:8px;
-}
+.header span{color:var(--blue);}
 
 /* CONTAINER */
 
 .container{
-max-width:850px;
+max-width:900px;
 margin:auto;
-padding:20px;
+padding:15px;
 }
 
-/* CARD */
+/* CARD (SEU PADRÃO) */
 
 .card{
-background:rgba(255,255,255,0.04);
-border:1px solid rgba(255,255,255,0.08);
+margin-top:12px;
+padding:16px;
 border-radius:16px;
-padding:20px;
-margin-bottom:20px;
-
-backdrop-filter:blur(20px);
-
-transition:.25s ease;
-
-animation:fadeUp .6s ease;
+background:rgba(255,255,255,0.02);
+transition:.3s;
+cursor:pointer;
+position:relative;
+overflow:hidden;
 }
 
+.card::before{
+content:"";
+position:absolute;
+inset:0;
+background:radial-gradient(circle at var(--x,50%) var(--y,50%), rgba(59,130,246,.25), transparent 60%);
+opacity:0;
+transition:.2s;
+}
+
+.card:hover::before{opacity:1;}
+
 .card:hover{
-transform:translateY(-4px);
-border-color:#4facfe;
-box-shadow:0 10px 30px #4facfe22;
+transform:translateY(-6px) scale(1.02);
+box-shadow:0 10px 40px rgba(59,130,246,.25);
 }
 
 /* INPUT */
 
 .input-group{
-margin-top:14px;
+margin-top:10px;
 }
 
-input,select{
+.input-label{
+font-size:11px;
+opacity:.6;
+}
+
+.input{
 width:100%;
-padding:14px;
+padding:12px;
+margin-top:5px;
 border-radius:10px;
-border:1px solid transparent;
-background:#020617;
-color:white;
-transition:.2s;
-}
-
-input:focus,select:focus{
-border-color:#4facfe;
-box-shadow:0 0 0 2px #4facfe33;
-outline:none;
+border:none;
+background:#0b1228;
+color:#fff;
 }
 
 /* BUTTON */
 
-button{
+.btn{
+margin-top:12px;
 width:100%;
-padding:14px;
-margin-top:16px;
+padding:12px;
 border-radius:10px;
 border:none;
-font-weight:bold;
+background:rgba(59,130,246,0.2);
+border:1px solid rgba(59,130,246,0.3);
+color:#fff;
 cursor:pointer;
-
-background:linear-gradient(90deg,#4facfe,#00f2fe);
-color:#000;
-
 transition:.2s;
 }
 
-button:hover{
-transform:scale(1.03);
-box-shadow:0 0 20px #4facfe55;
-}
-
-button:active{
-transform:scale(.97);
-}
-
-/* COPY BTN */
-
-.copy{
-background:linear-gradient(90deg,#00ffb3,#00c8ff);
-color:#000;
-}
-
-/* CODE */
-
-pre{
-background:#020617;
-padding:16px;
-border-radius:10px;
-overflow:auto;
-font-size:13px;
-margin-top:10px;
-border:1px solid rgba(255,255,255,0.05);
-}
-
-/* LOADING OVERLAY */
-
-.overlay{
-position:fixed;
-inset:0;
-background:#020617cc;
-display:flex;
-align-items:center;
-justify-content:center;
-z-index:999;
-backdrop-filter:blur(10px);
-display:none;
-}
-
-.loader{
-width:50px;
-height:50px;
-border-radius:50%;
-border:4px solid rgba(255,255,255,.1);
-border-top:4px solid #4facfe;
-animation:spin 1s linear infinite;
+.btn:hover{
+background:rgba(59,130,246,0.3);
 }
 
 /* MODAL */
 
 .modal{
 position:fixed;
-top:50%;
-left:50%;
-transform:translate(-50%,-50%) scale(.8);
+inset:0;
+display:none;
+justify-content:center;
+align-items:center;
+background:rgba(0,0,0,.6);
+backdrop-filter:blur(10px);
+z-index:999;
+}
+
+.modal-box{
+width:92%;
+max-width:500px;
 background:#020617;
 padding:20px;
-border-radius:12px;
-border:1px solid #4facfe33;
-opacity:0;
-pointer-events:none;
-transition:.3s;
-z-index:1000;
-min-width:280px;
-text-align:center;
+border-radius:20px;
+border:1px solid rgba(255,255,255,0.05);
+animation:fade .3s ease;
+position:relative;
 }
 
-.modal.active{
-opacity:1;
-transform:translate(-50%,-50%) scale(1);
-pointer-events:all;
-}
-
-.modal button{
-margin-top:12px;
-}
-
-/* FOOTER */
-
-footer{
-text-align:center;
-padding:30px;
-opacity:.5;
-font-size:13px;
-}
-
-/* ANIMATIONS */
-
-@keyframes spin{
-to{transform:rotate(360deg)}
-}
-
-@keyframes fadeIn{
-from{opacity:0}
+@keyframes fade{
+from{opacity:0; transform:translateY(20px)}
 to{opacity:1}
 }
 
-@keyframes fadeUp{
-from{opacity:0; transform:translateY(10px)}
-to{opacity:1; transform:translateY(0)}
+/* ROUTE */
+
+.route-box{
+margin-top:10px;
+background:#020617;
+padding:10px;
+border-radius:10px;
+font-size:11px;
+display:flex;
+justify-content:space-between;
+}
+
+/* RESULT */
+
+.result-box{
+margin-top:12px;
+}
+
+.item{
+font-size:12px;
+display:flex;
+justify-content:space-between;
+padding:8px;
+border-radius:8px;
+margin-top:6px;
+background:rgba(255,255,255,0.02);
+}
+
+/* LOADING */
+
+.loader{
+margin-top:10px;
+height:40px;
+border-radius:10px;
+background:linear-gradient(90deg,#111,#1a1a1a,#111);
+background-size:200%;
+animation:load 1s infinite;
+}
+
+@keyframes load{
+0%{background-position:200%}
+100%{background-position:-200%}
+}
+
+/* SCAN */
+
+.scan{
+position:absolute;
+inset:0;
+background:linear-gradient(transparent,rgba(59,130,246,.15),transparent);
+animation:scan 1.4s infinite;
+border-radius:20px;
+}
+
+@keyframes scan{
+0%{transform:translateY(-100%)}
+100%{transform:translateY(100%)}
+}
+
+/* TOAST */
+
+#toast{
+position:fixed;
+bottom:20px;
+left:50%;
+transform:translateX(-50%) translateY(100px);
+background:#111827;
+padding:10px 20px;
+border-radius:10px;
+font-size:12px;
+opacity:0;
+transition:.3s;
+}
+
+#toast.show{
+transform:translateX(-50%) translateY(0);
+opacity:1;
 }
 
 </style>
@@ -581,182 +561,151 @@ to{opacity:1; transform:translateY(0)}
 
 <body>
 
-<canvas id="particles"></canvas>
-
-<div class="overlay" id="overlay">
-<div class="loader"></div>
-</div>
-
-<div class="modal" id="modal">
-<p id="modalText"></p>
-<button onclick="fecharModal()">OK</button>
-</div>
-
-<header>
-<h1>🚀 Astro Search</h1>
-<p>Interface premium de testes</p>
-</header>
+<div class="header">Astro <span>Search</span></div>
 
 <div class="container">
 
-<div class="card">
+${Object.keys(ENDPOINTS).map(e=>`
+<div class="card" onclick="openModal('${e}')">
+<strong>${e}</strong>
+<div style="font-size:12px;opacity:.6;">Consulta ${e}</div>
+</div>
+`).join("")}
 
-<div class="input-group">
-<label>Token</label>
-<input id="token" placeholder="Digite seu token">
+</div>
+
+<!-- MODAL -->
+
+<div class="modal" id="modal">
+<div class="modal-box">
+
+<div style="display:flex;justify-content:space-between;margin-bottom:10px;">
+<strong id="title"></strong>
+<span onclick="closeModal()" style="cursor:pointer;">✕</span>
 </div>
 
 <div class="input-group">
-<label>Endpoint</label>
-<select id="endpoint">
-${Object.keys(ENDPOINTS).map(e=>`<option>${e}</option>`).join("")}
-</select>
+<div class="input-label">Token</div>
+<input id="token" class="input">
 </div>
 
 <div class="input-group">
-<label>Valor</label>
-<input id="valor" placeholder="CPF / Nome / Telefone">
+<div class="input-label">Valor</div>
+<input id="valor" class="input">
 </div>
 
-<button onclick="consultar()">Consultar</button>
-
+<div class="route-box">
+<span id="url"></span>
+<button onclick="copy()">📋</button>
 </div>
 
-<div class="card">
+<button class="btn" onclick="consultar()">Consultar</button>
 
-<h3>URL</h3>
-<pre id="url"></pre>
-<button class="copy" onclick="copiar('url')">Copiar</button>
-
-</div>
-
-<div class="card">
-
-<h3>Resposta</h3>
-<pre id="resposta"></pre>
-<button class="copy" onclick="copiar('resposta')">Copiar</button>
+<div id="loading"></div>
+<div id="resposta" class="result-box"></div>
 
 </div>
-
 </div>
 
-<footer>
-Astro Search API • UI v2
-</footer>
+<div id="toast"></div>
 
 <script>
 
-/* PARTICLES */
+let endpoint=""
 
-const canvas=document.getElementById("particles")
-const ctx=canvas.getContext("2d")
-
-canvas.width=innerWidth
-canvas.height=innerHeight
-
-let particles=[]
-
-for(let i=0;i<50;i++){
-particles.push({
-x:Math.random()*canvas.width,
-y:Math.random()*canvas.height,
-r:Math.random()*1.5,
-vx:(Math.random()-.5)*.3,
-vy:(Math.random()-.5)*.3
-})
+function openModal(e){
+endpoint=e
+modal.style.display="flex"
+title.innerText="Consulta "+e
+resposta.innerHTML=""
+loading.innerHTML=""
+updateUrl()
 }
 
-function draw(){
-ctx.clearRect(0,0,canvas.width,canvas.height)
-
-particles.forEach(p=>{
-p.x+=p.vx
-p.y+=p.vy
-
-if(p.x<0||p.x>canvas.width)p.vx*=-1
-if(p.y<0||p.y>canvas.height)p.vy*=-1
-
-ctx.beginPath()
-ctx.arc(p.x,p.y,p.r,0,Math.PI*2)
-ctx.fillStyle="#4facfe"
-ctx.fill()
-})
-
-requestAnimationFrame(draw)
+function closeModal(){
+modal.style.display="none"
 }
 
-draw()
+function updateUrl(){
 
-/* MODAL */
+let t=token.value||"TOKEN"
+let v=valor.value||"VALOR"
 
-function showModal(msg){
-const m=document.getElementById("modal")
-document.getElementById("modalText").innerText=msg
-m.classList.add("active")
+const param=endpoint.replace(/[0-9]/g,'')
+
+url.innerText="${base}/"+endpoint+"?token="+t+"&"+param+"="+encodeURIComponent(v)
 }
 
-function fecharModal(){
-document.getElementById("modal").classList.remove("active")
-}
-
-/* CONSULTA */
+token.oninput=updateUrl
+valor.oninput=updateUrl
 
 async function consultar(){
 
-const token=tokenEl.value
-const endpoint=endpointEl.value
-const valor=valorEl.value
+let t=token.value
+let v=valor.value
 
-if(!token || !valor){
-showModal("Preenche tudo direito aí 😒")
+if(!t||!v){
+toast("Preenche tudo")
 return
 }
 
-const param=endpoint.replace(/[0-9]/g,'')
-const url="${base}/"+endpoint+"?token="+token+"&"+param+"="+encodeURIComponent(valor)
+loading.innerHTML=\`
+<div class="loader"></div>
+<div class="scan"></div>
+\`
 
-urlEl.innerText=url
-respostaEl.innerText=""
-
-overlay.style.display="flex"
+resposta.innerHTML=""
 
 try{
 
-const r=await fetch(url)
-const j=await r.json()
+const param=endpoint.replace(/[0-9]/g,'')
 
-respostaEl.innerText=JSON.stringify(j,null,2)
-showModal("Consulta concluída 🚀")
+const r=await fetch("${base}/"+endpoint+"?token="+t+"&"+param+"="+encodeURIComponent(v))
+const data=await r.json()
+
+loading.innerHTML=""
+
+for(let k in data){
+
+let div=document.createElement("div")
+div.className="item"
+div.innerHTML="<span>"+k+"</span><span>"+data[k]+"</span>"
+
+await new Promise(r=>setTimeout(r,80))
+
+resposta.appendChild(div)
+
+}
 
 }catch{
-respostaEl.innerText="Erro ao consultar API"
-showModal("Deu ruim na API 💀")
-}
 
-overlay.style.display="none"
+loading.innerHTML=""
+resposta.innerHTML="<div class='item'>Erro na API</div>"
 
 }
 
-/* COPY */
-
-function copiar(id){
-
-const text=document.getElementById(id).innerText
-
-navigator.clipboard.writeText(text)
-
-showModal("Copiado ✔️")
-
 }
 
-/* SHORTCUTS */
+function copy(){
+navigator.clipboard.writeText(url.innerText)
+toast("Copiado")
+}
 
-const tokenEl=document.getElementById("token")
-const endpointEl=document.getElementById("endpoint")
-const valorEl=document.getElementById("valor")
-const urlEl=document.getElementById("url")
-const respostaEl=document.getElementById("resposta")
-const overlay=document.getElementById("overlay")
+function toast(msg){
+toastEl.innerText=msg
+toastEl.classList.add("show")
+setTimeout(()=>toastEl.classList.remove("show"),2000)
+}
+
+const toastEl=document.getElementById("toast")
+
+document.querySelectorAll(".card").forEach(card=>{
+card.addEventListener("mousemove", e=>{
+const rect=card.getBoundingClientRect()
+card.style.setProperty("--x",(e.clientX-rect.left)+"px")
+card.style.setProperty("--y",(e.clientY-rect.top)+"px")
+})
+})
 
 </script>
 
