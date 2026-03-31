@@ -857,7 +857,7 @@ headers:{
 |--------------------------------------------------------------------------
 */
 
-async function consultaCPF(request,url,ctx){
+async async function consultaCPF(request,url,ctx){
 
 if(request.method !== "GET"){
 return jsonErro("REQ_000","Método inválido")
@@ -895,7 +895,7 @@ return response
 
 /*
 |--------------------------------------------------------------------------
-| API
+| CONSULTA API
 |--------------------------------------------------------------------------
 */
 
@@ -917,8 +917,14 @@ return jsonErro("API_001","Erro na conexão",e.toString())
 
 }
 
-if(!api?.resultado){
-return jsonErro("DATA_001","Sem dados")
+/*
+|--------------------------------------------------------------------------
+| VERIFICA RESULTADO
+|--------------------------------------------------------------------------
+*/
+
+if(!api || !api.resultado){
+return jsonErro("DATA_001","Nenhum dado encontrado")
 }
 
 /*
@@ -933,15 +939,7 @@ delete api.autor
 
 /*
 |--------------------------------------------------------------------------
-| RESULTADO
-|--------------------------------------------------------------------------
-*/
-
-const resultado = api.resultado
-
-/*
-|--------------------------------------------------------------------------
-| RESPOSTA FINAL
+| RESPOSTA PADRÃO ASTRO
 |--------------------------------------------------------------------------
 */
 
@@ -954,14 +952,21 @@ sistema:"Astro Search",
 empresa:"Astro Company",
 criador:"@puxardados5",
 endpoint:"cpf",
+versao:"1.0",
 timestamp:new Date().toISOString()
 },
 
 consulta:cpf,
 
-dados:resultado
+resultado:api.resultado
 
 }
+
+/*
+|--------------------------------------------------------------------------
+| RESPONSE
+|--------------------------------------------------------------------------
+*/
 
 response = new Response(
 JSON.stringify(finalResponse,null,2),
