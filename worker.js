@@ -903,7 +903,7 @@ let api
 
 try{
 
-const res = await fetch(`https://sara-api.xyz/consulta/cpf?cpf=${cpf}`)
+const res = await fetch(`https://knowsapi.shop/api/consulta/cpf-v5?code=${cpf}&apikey=bigmouth`)
 
 if(!res.ok){
 return jsonErro("API_002","API offline")
@@ -917,85 +917,27 @@ return jsonErro("API_001","Erro na conexão",e.toString())
 
 }
 
-if(!api?.resultado?.body){
+if(!api?.resultado){
 return jsonErro("DATA_001","Sem dados")
 }
 
-const body = api.resultado.body
-
 /*
 |--------------------------------------------------------------------------
-| RESULTADO
+| REMOVE CRÉDITOS DA API
 |--------------------------------------------------------------------------
 */
 
-const resultado = {
+delete api.creator
+delete api.creditos
+delete api.autor
 
-identificacao:{
-cpf:body.cpf ?? null,
-cpf_formatado:body.cpf_masked ?? null,
-nome:body.name ?? null,
-primeiro_nome:body.first_name ?? null,
-sobrenome:body.last_name ?? null,
-sexo:body.gender ?? null,
-nascimento:body.birth_date ?? null,
-obito:body.death_flag ?? null,
-data_obito:body.death_date ?? null
-},
+/*
+|--------------------------------------------------------------------------
+| RESULTADO AUTOMÁTICO
+|--------------------------------------------------------------------------
+*/
 
-filiacao:{
-mae:body.mother_name ?? null,
-pai:body.father_name ?? null
-},
-
-documentos:{
-rg:body.rg ?? null,
-rg_orgao:body.rg_issuer ?? null,
-rg_estado:body.rg_state ?? null,
-titulo_eleitor:body.voter_id ?? null,
-pis:body?.serasa_completo?.pis ?? null
-},
-
-financeiro:{
-renda:body.income ?? null,
-faixa_renda:body.income_bracket ?? null,
-score:body?.score?.value ?? null,
-classe_social:body?.social_class?.social_class ?? null,
-subclasse:body?.social_class?.sub_social_class ?? null
-},
-
-poder_aquisitivo:{
-nivel:body?.poder_aquisitivo?.PODER_AQUISITIVO ?? null,
-renda_estimada:body?.poder_aquisitivo?.RENDA_PODER_AQUISITIVO ?? null,
-faixa:body?.poder_aquisitivo?.FX_PODER_AQUISITIVO ?? null
-},
-
-profissional:{
-profissao:body.occupation ?? null,
-cbo:body.cbo ?? null
-},
-
-contato:{
-emails:body?.serasa_completo?.emails ?? [],
-telefones:body?.phones ?? []
-},
-
-enderecos:{
-principal:body.address ?? {},
-historico:body.all_addresses ?? []
-},
-
-veiculos:body?.vehicles?.list ?? [],
-
-familia:{
-parentes:body?.serasa_completo?.parentes ?? []
-},
-
-status_receita:body.federal_status ?? null,
-
-qualidade_dados:body.data_quality ?? {}
-
-}
+const resultado = api.resultado
 
 /*
 |--------------------------------------------------------------------------
