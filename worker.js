@@ -884,11 +884,7 @@ if(!validarToken(token)){
 return jsonErro("AUTH_001","Token inválido")
 }
 
-/*
-|--------------------------------------------------------------------------
-| CACHE
-|--------------------------------------------------------------------------
-*/
+/* CACHE */
 
 const cacheKey = new Request(request.url,{method:"GET"})
 const cache = caches.default
@@ -899,11 +895,7 @@ if(response){
 return response
 }
 
-/*
-|--------------------------------------------------------------------------
-| CONSULTA API
-|--------------------------------------------------------------------------
-*/
+/* CONSULTA API */
 
 let api
 
@@ -917,13 +909,11 @@ headers:{
 }
 })
 
-const text = await res.text()
-
-try{
-api = JSON.parse(text)
-}catch{
-return jsonErro("API_003","Resposta inválida da API",text)
+if(!res.ok){
+return jsonErro("API_002","API offline",`HTTP ${res.status}`)
 }
+
+api = await res.json()
 
 }catch(e){
 
@@ -931,35 +921,18 @@ return jsonErro("API_001","Erro na conexão",e.toString())
 
 }
 
-if(!api || api.status === false){
+/* VERIFICA DADOS */
+
+if(!api?.resultado){
 return jsonErro("DATA_001","Sem dados")
 }
 
-/*
-|--------------------------------------------------------------------------
-| VERIFICA RESULTADO
-|--------------------------------------------------------------------------
-*/
+const pessoal = api.resultado.pessoal || {}
+const financeiro = api.resultado.financeiro || {}
+const contatos = api.resultado.contatos_verificados || {}
+const documentos = api.resultado.documentos || {}
 
-if(!api){
-return jsonErro("DATA_001","Nenhum dado encontrado")
-}
-
-/*
-|--------------------------------------------------------------------------
-| REMOVE CREDITOS
-|--------------------------------------------------------------------------
-*/
-
-delete api.creator
-delete api.creditos
-delete api.autor
-
-/*
-|--------------------------------------------------------------------------
-| RESPOSTA PADRÃO ASTRO
-|--------------------------------------------------------------------------
-*/
+/* RESPOSTA PADRÃO */
 
 const finalResponse = {
 
@@ -968,23 +941,49 @@ status:true,
 meta:{
 sistema:"Astro Search",
 empresa:"Astro Company",
-criador:"@puxardados5",
 endpoint:"cpf",
-versao:"1.0",
 timestamp:new Date().toISOString()
 },
 
 consulta:cpf,
 
-dados:api
+dados:{
+
+identificacao:{
+nome:pessoal.nome ?? null,
+cpf:pessoal.cpf ?? null,
+sexo:pessoal.sexo ?? null,
+nascimento:pessoal.nascimento ?? null,
+raca:pessoal.raca ?? null,
+situacao:pessoal.situacao ?? null
+},
+
+financeiro:{
+renda:financeiro.renda ?? null,
+score:financeiro.score ?? null,
+inss:financeiro.inss ?? null
+},
+
+contato:{
+telefones:contatos.telefones ?? [],
+emails:contatos.emails ?? []
+},
+
+enderecos:contatos.enderecos ?? [],
+
+documentos:{
+rg:documentos.rg ?? null,
+pis:documentos.pis ?? null,
+nis:documentos.nis ?? null,
+cns:documentos.cns ?? null,
+titulo_eleitoral:documentos.titulo_eleitoral ?? null
+}
 
 }
 
-/*
-|--------------------------------------------------------------------------
-| RESPONSE
-|--------------------------------------------------------------------------
-*/
+}
+
+/* RESPONSE */
 
 response = new Response(
 JSON.stringify(finalResponse,null,2),
