@@ -1701,7 +1701,7 @@ headers:{
 
 function home(){
 
-return new Response(`<!DOCTYPE html>
+const html = `<!DOCTYPE html>
 <html lang="pt-BR">
 
 <head>
@@ -2157,7 +2157,9 @@ alert("URL copiada!")
 </script>
 
 </body>
-</html>`,{
+</html>`
+
+return new Response(html,{
 headers:{
 "Content-Type":"text/html;charset=UTF-8"
 }
