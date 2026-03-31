@@ -332,7 +332,6 @@ return new Response(`
 
 <!DOCTYPE html>
 <html lang="pt-BR">
-
 <head>
 
 <meta charset="UTF-8">
@@ -340,24 +339,36 @@ return new Response(`
 
 <title>Astro Search API</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
-
 <style>
+
+/* RESET */
 
 *{
 margin:0;
 padding:0;
 box-sizing:border-box;
-font-family:Inter,system-ui;
+font-family:system-ui;
 }
 
 body{
-
-background:#030712;
-color:white;
+background:#020617;
+color:#e5e7eb;
 min-height:100vh;
 overflow-x:hidden;
+}
 
+/* BACKGROUND GLOW */
+
+body::before{
+content:"";
+position:fixed;
+width:600px;
+height:600px;
+background:radial-gradient(circle,#4facfe33,transparent);
+top:-200px;
+left:-200px;
+filter:blur(120px);
+z-index:-2;
 }
 
 /* PARTICLES */
@@ -367,18 +378,19 @@ position:fixed;
 top:0;
 left:0;
 z-index:-1;
+opacity:.4;
 }
 
 /* HEADER */
 
 header{
 text-align:center;
-padding:60px 20px 30px;
+padding:40px 20px;
+animation:fadeIn .8s ease;
 }
 
 header h1{
-font-size:34px;
-font-weight:600;
+font-size:32px;
 background:linear-gradient(90deg,#4facfe,#00f2fe);
 -webkit-background-clip:text;
 -webkit-text-fill-color:transparent;
@@ -386,14 +398,13 @@ background:linear-gradient(90deg,#4facfe,#00f2fe);
 
 header p{
 opacity:.6;
-margin-top:10px;
-font-size:14px;
+margin-top:8px;
 }
 
 /* CONTAINER */
 
 .container{
-max-width:900px;
+max-width:850px;
 margin:auto;
 padding:20px;
 }
@@ -401,237 +412,167 @@ padding:20px;
 /* CARD */
 
 .card{
-
-background:rgba(255,255,255,0.03);
+background:rgba(255,255,255,0.04);
+border:1px solid rgba(255,255,255,0.08);
+border-radius:16px;
+padding:20px;
+margin-bottom:20px;
 
 backdrop-filter:blur(20px);
 
-border:1px solid rgba(255,255,255,0.05);
+transition:.25s ease;
 
-border-radius:18px;
-
-padding:22px;
-
-margin-bottom:18px;
-
-transition:.25s;
-
+animation:fadeUp .6s ease;
 }
 
 .card:hover{
+transform:translateY(-4px);
 border-color:#4facfe;
-transform:translateY(-2px);
+box-shadow:0 10px 30px #4facfe22;
 }
 
-/* LABEL */
+/* INPUT */
 
-label{
-font-size:13px;
-opacity:.7;
+.input-group{
+margin-top:14px;
 }
-
-/* INPUTS */
 
 input,select{
-
 width:100%;
 padding:14px;
-
-margin-top:8px;
-margin-bottom:14px;
-
 border-radius:10px;
-
-border:1px solid rgba(255,255,255,0.05);
-
+border:1px solid transparent;
 background:#020617;
-
 color:white;
-
-outline:none;
-
 transition:.2s;
-
 }
 
 input:focus,select:focus{
-
 border-color:#4facfe;
-box-shadow:0 0 0 1px #4facfe55;
-
+box-shadow:0 0 0 2px #4facfe33;
+outline:none;
 }
 
 /* BUTTON */
 
 button{
-
 width:100%;
-
 padding:14px;
-
+margin-top:16px;
 border-radius:10px;
-
 border:none;
-
-font-weight:600;
-
+font-weight:bold;
 cursor:pointer;
 
 background:linear-gradient(90deg,#4facfe,#00f2fe);
+color:#000;
 
 transition:.2s;
-
 }
 
 button:hover{
 transform:scale(1.03);
+box-shadow:0 0 20px #4facfe55;
 }
 
-/* COPY BUTTON */
+button:active{
+transform:scale(.97);
+}
+
+/* COPY BTN */
 
 .copy{
-
-margin-top:12px;
-
-background:linear-gradient(90deg,#00ffa6,#00c3ff);
-
+background:linear-gradient(90deg,#00ffb3,#00c8ff);
+color:#000;
 }
 
 /* CODE */
 
 pre{
-
 background:#020617;
-
 padding:16px;
-
 border-radius:10px;
-
 overflow:auto;
-
 font-size:13px;
-
-margin-top:12px;
-
+margin-top:10px;
 border:1px solid rgba(255,255,255,0.05);
+}
 
+/* LOADING OVERLAY */
+
+.overlay{
+position:fixed;
+inset:0;
+background:#020617cc;
+display:flex;
+align-items:center;
+justify-content:center;
+z-index:999;
+backdrop-filter:blur(10px);
+display:none;
+}
+
+.loader{
+width:50px;
+height:50px;
+border-radius:50%;
+border:4px solid rgba(255,255,255,.1);
+border-top:4px solid #4facfe;
+animation:spin 1s linear infinite;
 }
 
 /* MODAL */
 
 .modal{
-
 position:fixed;
-
-top:0;
-left:0;
-
-width:100%;
-height:100%;
-
-background:rgba(0,0,0,.6);
-
-display:none;
-
-align-items:center;
-justify-content:center;
-
-}
-
-.modal-content{
-
-background:#020617;
-
-border:1px solid rgba(255,255,255,0.08);
-
-padding:24px;
-
-border-radius:16px;
-
-width:90%;
-max-width:700px;
-
-animation:modal .3s ease;
-
-}
-
-@keyframes modal{
-
-from{
-opacity:0;
-transform:translateY(20px);
-}
-
-to{
-opacity:1;
-transform:translateY(0);
-}
-
-}
-
-/* LOADER */
-
-.loader{
-
-width:40px;
-height:40px;
-
-border-radius:50%;
-
-border:4px solid rgba(255,255,255,.1);
-border-top:4px solid #4facfe;
-
-animation:spin 1s linear infinite;
-
-margin:auto;
-
-}
-
-@keyframes spin{
-to{transform:rotate(360deg)}
-}
-
-/* TOAST */
-
-.toast{
-
-position:fixed;
-
-bottom:30px;
+top:50%;
 left:50%;
-
-transform:translateX(-50%);
-
+transform:translate(-50%,-50%) scale(.8);
 background:#020617;
-
-padding:12px 20px;
-
-border-radius:8px;
-
-border:1px solid rgba(255,255,255,0.1);
-
+padding:20px;
+border-radius:12px;
+border:1px solid #4facfe33;
 opacity:0;
-
+pointer-events:none;
 transition:.3s;
-
+z-index:1000;
+min-width:280px;
+text-align:center;
 }
 
-.toast.show{
+.modal.active{
 opacity:1;
+transform:translate(-50%,-50%) scale(1);
+pointer-events:all;
+}
+
+.modal button{
+margin-top:12px;
 }
 
 /* FOOTER */
 
 footer{
-
 text-align:center;
-
-padding:40px;
-
-font-size:13px;
-
+padding:30px;
 opacity:.5;
+font-size:13px;
+}
 
+/* ANIMATIONS */
+
+@keyframes spin{
+to{transform:rotate(360deg)}
+}
+
+@keyframes fadeIn{
+from{opacity:0}
+to{opacity:1}
+}
+
+@keyframes fadeUp{
+from{opacity:0; transform:translateY(10px)}
+to{opacity:1; transform:translateY(0)}
 }
 
 </style>
@@ -642,75 +583,72 @@ opacity:.5;
 
 <canvas id="particles"></canvas>
 
+<div class="overlay" id="overlay">
+<div class="loader"></div>
+</div>
+
+<div class="modal" id="modal">
+<p id="modalText"></p>
+<button onclick="fecharModal()">OK</button>
+</div>
+
 <header>
-
-<h1>Astro Search API</h1>
-
-<p>Painel interativo de testes da API</p>
-
+<h1>🚀 Astro Search</h1>
+<p>Interface premium de testes</p>
 </header>
 
 <div class="container">
 
 <div class="card">
 
+<div class="input-group">
 <label>Token</label>
 <input id="token" placeholder="Digite seu token">
+</div>
 
+<div class="input-group">
 <label>Endpoint</label>
 <select id="endpoint">
 ${Object.keys(ENDPOINTS).map(e=>`<option>${e}</option>`).join("")}
 </select>
+</div>
 
-<label>Valor da consulta</label>
-<input id="valor" placeholder="CPF, nome ou telefone">
+<div class="input-group">
+<label>Valor</label>
+<input id="valor" placeholder="CPF / Nome / Telefone">
+</div>
 
-<button onclick="consultar()">Consultar API</button>
+<button onclick="consultar()">Consultar</button>
 
 </div>
 
 <div class="card">
 
-<h3>URL gerada</h3>
-
+<h3>URL</h3>
 <pre id="url"></pre>
-
-<button class="copy" onclick="copiar('url')">Copiar URL</button>
-
-</div>
+<button class="copy" onclick="copiar('url')">Copiar</button>
 
 </div>
 
-<div class="modal" id="modal">
+<div class="card">
 
-<div class="modal-content">
-
-<h3>Resposta da API</h3>
-
-<div id="loading" class="loader" style="display:none"></div>
-
+<h3>Resposta</h3>
 <pre id="resposta"></pre>
-
-<button class="copy" onclick="copiar('resposta')">Copiar resposta</button>
-
-</div>
+<button class="copy" onclick="copiar('resposta')">Copiar</button>
 
 </div>
 
-<div class="toast" id="toast">Copiado!</div>
+</div>
 
 <footer>
-
-Astro Search API • Interface Premium
-
+Astro Search API • UI v2
 </footer>
 
 <script>
 
-/* PARTICLES CONSTELATION */
+/* PARTICLES */
 
 const canvas=document.getElementById("particles")
-
 const ctx=canvas.getContext("2d")
 
 canvas.width=innerWidth
@@ -718,25 +656,20 @@ canvas.height=innerHeight
 
 let particles=[]
 
-for(let i=0;i<100;i++){
-
+for(let i=0;i<50;i++){
 particles.push({
-
 x:Math.random()*canvas.width,
 y:Math.random()*canvas.height,
-vx:(Math.random()-.5)*0.4,
-vy:(Math.random()-.5)*0.4
-
+r:Math.random()*1.5,
+vx:(Math.random()-.5)*.3,
+vy:(Math.random()-.5)*.3
 })
-
 }
 
 function draw(){
-
 ctx.clearRect(0,0,canvas.width,canvas.height)
 
 particles.forEach(p=>{
-
 p.x+=p.vx
 p.y+=p.vy
 
@@ -744,71 +677,63 @@ if(p.x<0||p.x>canvas.width)p.vx*=-1
 if(p.y<0||p.y>canvas.height)p.vy*=-1
 
 ctx.beginPath()
-ctx.arc(p.x,p.y,1.8,0,Math.PI*2)
+ctx.arc(p.x,p.y,p.r,0,Math.PI*2)
 ctx.fillStyle="#4facfe"
 ctx.fill()
-
-particles.forEach(p2=>{
-
-const dist=Math.hypot(p.x-p2.x,p.y-p2.y)
-
-if(dist<100){
-
-ctx.beginPath()
-
-ctx.moveTo(p.x,p.y)
-ctx.lineTo(p2.x,p2.y)
-
-ctx.strokeStyle="rgba(79,172,254,.08)"
-ctx.stroke()
-
-}
-
-})
-
 })
 
 requestAnimationFrame(draw)
-
 }
 
 draw()
+
+/* MODAL */
+
+function showModal(msg){
+const m=document.getElementById("modal")
+document.getElementById("modalText").innerText=msg
+m.classList.add("active")
+}
+
+function fecharModal(){
+document.getElementById("modal").classList.remove("active")
+}
 
 /* CONSULTA */
 
 async function consultar(){
 
-const token=document.getElementById("token").value
-const endpoint=document.getElementById("endpoint").value
-const valor=document.getElementById("valor").value
+const token=tokenEl.value
+const endpoint=endpointEl.value
+const valor=valorEl.value
+
+if(!token || !valor){
+showModal("Preenche tudo direito aí 😒")
+return
+}
 
 const param=endpoint.replace(/[0-9]/g,'')
-
 const url="${base}/"+endpoint+"?token="+token+"&"+param+"="+encodeURIComponent(valor)
 
-document.getElementById("url").innerText=url
+urlEl.innerText=url
+respostaEl.innerText=""
 
-document.getElementById("modal").style.display="flex"
-
-document.getElementById("loading").style.display="block"
-
-document.getElementById("resposta").innerText=""
+overlay.style.display="flex"
 
 try{
 
 const r=await fetch(url)
-
 const j=await r.json()
 
-document.getElementById("resposta").innerText=JSON.stringify(j,null,2)
+respostaEl.innerText=JSON.stringify(j,null,2)
+showModal("Consulta concluída 🚀")
 
 }catch{
-
-document.getElementById("resposta").innerText="Erro ao consultar API"
-
+respostaEl.innerText="Erro ao consultar API"
+showModal("Deu ruim na API 💀")
 }
 
-document.getElementById("loading").style.display="none"
+overlay.style.display="none"
 
 }
 
@@ -820,21 +745,18 @@ const text=document.getElementById(id).innerText
 
 navigator.clipboard.writeText(text)
 
-const toast=document.getElementById("toast")
-
-toast.classList.add("show")
-
-setTimeout(()=>toast.classList.remove("show"),2000)
+showModal("Copiado ✔️")
 
 }
 
-/* FECHAR MODAL */
+/* SHORTCUTS */
 
-window.onclick=e=>{
-if(e.target.id==="modal"){
-document.getElementById("modal").style.display="none"
-}
-}
+const tokenEl=document.getElementById("token")
+const endpointEl=document.getElementById("endpoint")
+const valorEl=document.getElementById("valor")
+const urlEl=document.getElementById("url")
+const respostaEl=document.getElementById("resposta")
+const overlay=document.getElementById("overlay")
 
 </script>
 
