@@ -684,7 +684,9 @@ resposta.innerHTML="<div class='item'>Erro na API</div>"
 function render(obj){
 
 if(typeof obj !== "object" || obj === null){
-return `<div class="item"><span>${obj}</span></div>`
+return `<div class="item"><span>${
+typeof obj === "object" ? JSON.stringify(obj) : obj
+}</span></div>`
 }
 
 let html=""
@@ -705,7 +707,11 @@ html += `<div class="section">
 <div style="font-size:11px;opacity:.6;margin-bottom:6px;">${key} (${value.length})</div>`
 
 value.forEach(v=>{
+if(typeof v === "object"){
 html += render(v)
+}else{
+html += `<div class="item">${v}</div>`
+}
 })
 
 html += `</div>`
