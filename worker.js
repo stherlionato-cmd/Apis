@@ -608,7 +608,8 @@ function openModal(e){
 endpoint=e
 modal.style.display="flex"
 title.innerText="Consulta "+e
-resposta.innerHTML=""
+resposta.innerHTML = null
+resposta.textContent = ""
 loading.innerHTML=""
 updateUrl()
 }
@@ -667,15 +668,10 @@ consulta: data.consulta,
 dados: data.dados
 }
 
-resposta.innerHTML = "" // 🔥 LIMPA LIXO ANTIGO
+resposta.innerHTML = null
+resposta.textContent = ""
 
-const temp = document.createElement("div")
-temp.innerHTML = render(res)
-
-for(let el of temp.children){
-await new Promise(r=>setTimeout(r,50))
-resposta.appendChild(el)
-}
+resposta.innerHTML = render(res)
 
 }catch{
 
