@@ -1739,6 +1739,7 @@ function home(){
 
 return new Response(`<!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
 
 <meta charset="UTF-8">
@@ -1750,16 +1751,36 @@ return new Response(`<!DOCTYPE html>
 
 <style>
 
+*{
+box-sizing:border-box;
+}
+
 body{
 margin:0;
 font-family:Inter;
 background:#020617;
 color:#e2e8f0;
+overflow-x:hidden;
 }
+
+/* PARTICLES */
+
+canvas{
+position:fixed;
+top:0;
+left:0;
+z-index:-1;
+}
+
+/* HEADER */
 
 header{
 padding:25px;
 border-bottom:1px solid rgba(255,255,255,0.05);
+display:flex;
+justify-content:space-between;
+align-items:center;
+backdrop-filter:blur(10px);
 }
 
 .logo{
@@ -1768,26 +1789,52 @@ font-weight:600;
 color:#60a5fa;
 }
 
+/* TOKEN */
+
+.token-box{
+display:flex;
+gap:10px;
+}
+
+.token-box input{
+padding:8px 10px;
+border-radius:8px;
+border:1px solid rgba(255,255,255,0.08);
+background:#020617;
+color:white;
+}
+
+/* CONTAINER */
+
 .container{
 max-width:1100px;
 margin:auto;
-padding:40px 20px;
+padding:30px 20px;
 }
 
+/* ENDPOINT CARD */
+
 .endpoint{
-background:#0f172a;
+background:rgba(15,23,42,0.7);
 border:1px solid rgba(255,255,255,0.05);
-border-radius:12px;
-padding:25px;
-margin-bottom:25px;
+border-radius:14px;
+padding:20px;
+margin-bottom:20px;
+transition:0.25s;
+backdrop-filter:blur(12px);
+}
+
+.endpoint:hover{
+transform:translateY(-3px);
+border-color:#2563eb;
 }
 
 .method{
-background:#1e40af;
+background:#2563eb;
 padding:4px 10px;
 border-radius:6px;
 font-size:12px;
-margin-right:10px;
+margin-right:8px;
 }
 
 input{
@@ -1808,10 +1855,18 @@ border:none;
 background:#2563eb;
 color:white;
 cursor:pointer;
+transition:0.2s;
 }
 
 button:hover{
 background:#1d4ed8;
+}
+
+.url{
+font-size:12px;
+margin-top:8px;
+color:#94a3b8;
+word-break:break-all;
 }
 
 pre{
@@ -1820,7 +1875,20 @@ border:1px solid rgba(255,255,255,0.05);
 padding:15px;
 border-radius:8px;
 overflow:auto;
-margin-top:15px;
+margin-top:12px;
+font-size:12px;
+}
+
+/* MOBILE */
+
+@media(max-width:700px){
+
+header{
+flex-direction:column;
+align-items:flex-start;
+gap:10px;
+}
+
 }
 
 </style>
@@ -1828,23 +1896,77 @@ margin-top:15px;
 
 <body>
 
+<canvas id="bg"></canvas>
+
 <header>
+
 <div class="logo">Astro Search API</div>
+
+<div class="token-box">
+<input id="token" placeholder="Digite seu token">
+</div>
+
 </header>
 
 <div class="container" id="endpoints"></div>
 
 <script>
 
+/* PARTICLES */
+
+const canvas = document.getElementById("bg")
+const ctx = canvas.getContext("2d")
+
+canvas.width = window.innerWidth
+canvas.height = window.innerHeight
+
+let particles = []
+
+for(let i=0;i<60;i++){
+particles.push({
+x:Math.random()*canvas.width,
+y:Math.random()*canvas.height,
+vx:(Math.random()-0.5)*0.4,
+vy:(Math.random()-0.5)*0.4,
+r:Math.random()*2
+})
+}
+
+function animate(){
+
+ctx.clearRect(0,0,canvas.width,canvas.height)
+
+particles.forEach(p=>{
+
+p.x+=p.vx
+p.y+=p.vy
+
+if(p.x<0||p.x>canvas.width) p.vx*=-1
+if(p.y<0||p.y>canvas.height) p.vy*=-1
+
+ctx.beginPath()
+ctx.arc(p.x,p.y,p.r,0,Math.PI*2)
+ctx.fillStyle="#1d4ed8"
+ctx.fill()
+
+})
+
+requestAnimationFrame(animate)
+
+}
+
+animate()
+
+/* API */
+
 const API = location.origin
-const TOKEN = "dragon"
 
 const endpoints = [
 
 {path:"cpf",param:"cpf",desc:"Consulta completa de CPF"},
 {path:"nome",param:"nome",desc:"Busca pessoas por nome"},
-{path:"telefone",param:"telefone",desc:"Busca dados vinculados ao telefone"},
-{path:"telefone-full",param:"telefone",desc:"Consulta completa de telefone"},
+{path:"telefone",param:"telefone",desc:"Dados vinculados ao telefone"},
+{path:"telefone-full",param:"telefone",desc:"Consulta completa telefone"},
 {path:"telefone-cpf",param:"cpf",desc:"Telefones vinculados ao CPF"},
 {path:"ddd",param:"ddd",desc:"Busca telefones por DDD"},
 {path:"operadora",param:"telefone",desc:"Consulta operadora"},
@@ -1867,6 +1989,7 @@ const div = document.createElement("div")
 div.className="endpoint"
 
 div.innerHTML=\`
+
 <span class="method">GET</span>
 <b>/\${api.path}</b>
 
@@ -1874,9 +1997,14 @@ div.innerHTML=\`
 
 <input id="\${api.path}" placeholder="Digite \${api.param}">
 
-<button onclick="consultar('\${api.path}','\${api.param}')">Consultar</button>
+<button onclick="consultar('\${api.path}','\${api.param}')">
+Consultar
+</button>
+
+<div class="url" id="url-\${api.path}"></div>
 
 <pre id="result-\${api.path}"></pre>
+
 \`
 
 container.appendChild(div)
@@ -1886,15 +2014,33 @@ container.appendChild(div)
 async function consultar(endpoint,param){
 
 let valor = document.getElementById(endpoint).value
+let token = document.getElementById("token").value
 
-let url = \`\${API}/\${endpoint}?\${param}=\${encodeURIComponent(valor)}&token=\${TOKEN}\`
+if(!token){
+alert("Digite seu token")
+return
+}
+
+let url = \`\${API}/\${endpoint}?\${param}=\${encodeURIComponent(valor)}&token=\${token}\`
+
+document.getElementById("url-"+endpoint).textContent = url
 
 let res = await fetch(url)
 
-let data = await res.json()
+let text = await res.text()
+
+try{
+
+let json = JSON.parse(text)
 
 document.getElementById("result-"+endpoint).textContent =
-JSON.stringify(data,null,2)
+JSON.stringify(json,null,2)
+
+}catch{
+
+document.getElementById("result-"+endpoint).textContent = text
+
+}
 
 }
 
@@ -1908,7 +2054,6 @@ headers:{
 })
 
 }
-
 /*
 |--------------------------------------------------------------------------
 | ERROS
