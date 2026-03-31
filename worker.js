@@ -667,6 +667,8 @@ consulta: data.consulta,
 dados: data.dados
 }
 
+resposta.innerHTML = "" // 🔥 LIMPA LIXO ANTIGO
+
 const temp = document.createElement("div")
 temp.innerHTML = render(res)
 
