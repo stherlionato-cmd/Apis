@@ -1763,7 +1763,7 @@ color:#e2e8f0;
 overflow-x:hidden;
 }
 
-/* PARTICLES */
+/* CANVAS */
 
 canvas{
 position:fixed;
@@ -1780,13 +1780,21 @@ border-bottom:1px solid rgba(255,255,255,0.05);
 display:flex;
 justify-content:space-between;
 align-items:center;
-backdrop-filter:blur(10px);
+backdrop-filter:blur(12px);
+background:rgba(2,6,23,0.7);
 }
 
 .logo{
 font-size:20px;
 font-weight:600;
 color:#60a5fa;
+letter-spacing:0.5px;
+}
+
+.stats{
+font-size:12px;
+color:#94a3b8;
+margin-top:4px;
 }
 
 /* TOKEN */
@@ -1797,11 +1805,18 @@ gap:10px;
 }
 
 .token-box input{
-padding:8px 10px;
+padding:9px 12px;
 border-radius:8px;
 border:1px solid rgba(255,255,255,0.08);
 background:#020617;
 color:white;
+outline:none;
+transition:0.2s;
+}
+
+.token-box input:focus{
+border-color:#3b82f6;
+box-shadow:0 0 8px rgba(59,130,246,0.3);
 }
 
 /* CONTAINER */
@@ -1809,25 +1824,44 @@ color:white;
 .container{
 max-width:1100px;
 margin:auto;
-padding:30px 20px;
+padding:35px 20px;
 }
 
-/* ENDPOINT CARD */
+/* ENDPOINT */
 
 .endpoint{
 background:rgba(15,23,42,0.7);
 border:1px solid rgba(255,255,255,0.05);
 border-radius:14px;
-padding:20px;
-margin-bottom:20px;
+padding:22px;
+margin-bottom:22px;
 transition:0.25s;
-backdrop-filter:blur(12px);
+backdrop-filter:blur(14px);
+animation:fade 0.6s ease;
+position:relative;
+overflow:hidden;
 }
 
 .endpoint:hover{
-transform:translateY(-3px);
+transform:translateY(-4px);
 border-color:#2563eb;
+box-shadow:0 10px 30px rgba(37,99,235,0.2);
 }
+
+.endpoint::before{
+content:"";
+position:absolute;
+inset:0;
+background:linear-gradient(120deg,transparent,rgba(59,130,246,0.15),transparent);
+opacity:0;
+transition:0.3s;
+}
+
+.endpoint:hover::before{
+opacity:1;
+}
+
+/* METHOD */
 
 .method{
 background:#2563eb;
@@ -1837,6 +1871,8 @@ font-size:12px;
 margin-right:8px;
 }
 
+/* INPUT */
+
 input{
 width:100%;
 padding:10px;
@@ -1845,6 +1881,20 @@ border-radius:8px;
 border:1px solid rgba(255,255,255,0.08);
 background:#020617;
 color:white;
+outline:none;
+transition:0.2s;
+}
+
+input:focus{
+border-color:#3b82f6;
+}
+
+/* BUTTONS */
+
+.actions{
+display:flex;
+gap:8px;
+flex-wrap:wrap;
 }
 
 button{
@@ -1856,18 +1906,32 @@ background:#2563eb;
 color:white;
 cursor:pointer;
 transition:0.2s;
+font-size:13px;
 }
 
 button:hover{
 background:#1d4ed8;
+transform:scale(1.03);
 }
+
+.copy{
+background:#334155;
+}
+
+.copy:hover{
+background:#475569;
+}
+
+/* URL */
 
 .url{
 font-size:12px;
-margin-top:8px;
+margin-top:10px;
 color:#94a3b8;
 word-break:break-all;
 }
+
+/* RESULT */
 
 pre{
 background:#020617;
@@ -1877,6 +1941,35 @@ border-radius:8px;
 overflow:auto;
 margin-top:12px;
 font-size:12px;
+max-height:260px;
+}
+
+/* LOADER */
+
+.loader{
+width:18px;
+height:18px;
+border:2px solid rgba(255,255,255,0.2);
+border-top:2px solid #3b82f6;
+border-radius:50%;
+animation:spin 0.7s linear infinite;
+display:inline-block;
+margin-left:8px;
+}
+
+@keyframes spin{
+to{transform:rotate(360deg)}
+}
+
+@keyframes fade{
+from{
+opacity:0;
+transform:translateY(20px);
+}
+to{
+opacity:1;
+transform:translateY(0);
+}
 }
 
 /* MOBILE */
@@ -1900,7 +1993,10 @@ gap:10px;
 
 <header>
 
+<div>
 <div class="logo">Astro Search API</div>
+<div class="stats" id="count"></div>
+</div>
 
 <div class="token-box">
 <input id="token" placeholder="Digite seu token">
@@ -1917,18 +2013,17 @@ gap:10px;
 const canvas = document.getElementById("bg")
 const ctx = canvas.getContext("2d")
 
-canvas.width = window.innerWidth
-canvas.height = window.innerHeight
+canvas.width = innerWidth
+canvas.height = innerHeight
 
-let particles = []
+let particles=[]
 
-for(let i=0;i<60;i++){
+for(let i=0;i<80;i++){
 particles.push({
 x:Math.random()*canvas.width,
 y:Math.random()*canvas.height,
-vx:(Math.random()-0.5)*0.4,
-vy:(Math.random()-0.5)*0.4,
-r:Math.random()*2
+vx:(Math.random()-0.5)*0.3,
+vy:(Math.random()-0.5)*0.3
 })
 }
 
@@ -1936,7 +2031,7 @@ function animate(){
 
 ctx.clearRect(0,0,canvas.width,canvas.height)
 
-particles.forEach(p=>{
+for(let p of particles){
 
 p.x+=p.vx
 p.y+=p.vy
@@ -1945,11 +2040,11 @@ if(p.x<0||p.x>canvas.width) p.vx*=-1
 if(p.y<0||p.y>canvas.height) p.vy*=-1
 
 ctx.beginPath()
-ctx.arc(p.x,p.y,p.r,0,Math.PI*2)
-ctx.fillStyle="#1d4ed8"
+ctx.arc(p.x,p.y,1.6,0,Math.PI*2)
+ctx.fillStyle="#2563eb"
 ctx.fill()
 
-})
+}
 
 requestAnimationFrame(animate)
 
@@ -1981,11 +2076,13 @@ const endpoints = [
 
 ]
 
-const container = document.getElementById("endpoints")
+document.getElementById("count").innerText = endpoints.length+" endpoints disponíveis"
+
+const container=document.getElementById("endpoints")
 
 endpoints.forEach(api=>{
 
-const div = document.createElement("div")
+const div=document.createElement("div")
 div.className="endpoint"
 
 div.innerHTML=\`
@@ -1997,9 +2094,17 @@ div.innerHTML=\`
 
 <input id="\${api.path}" placeholder="Digite \${api.param}">
 
-<button onclick="consultar('\${api.path}','\${api.param}')">
+<div class="actions">
+
+<button onclick="consultar('\${api.path}','\${api.param}',this)">
 Consultar
 </button>
+
+<button class="copy" onclick="copiarUrl('\${api.path}')">
+Copiar URL
+</button>
+
+</div>
 
 <div class="url" id="url-\${api.path}"></div>
 
@@ -2011,36 +2116,50 @@ container.appendChild(div)
 
 })
 
-async function consultar(endpoint,param){
+async function consultar(endpoint,param,btn){
 
-let valor = document.getElementById(endpoint).value
-let token = document.getElementById("token").value
+let valor=document.getElementById(endpoint).value
+let token=document.getElementById("token").value
 
 if(!token){
 alert("Digite seu token")
 return
 }
 
-let url = \`\${API}/\${endpoint}?\${param}=\${encodeURIComponent(valor)}&token=\${token}\`
+let url=\`\${API}/\${endpoint}?\${param}=\${encodeURIComponent(valor)}&token=\${token}\`
 
-document.getElementById("url-"+endpoint).textContent = url
+document.getElementById("url-"+endpoint).textContent=url
 
-let res = await fetch(url)
+btn.innerHTML="Consultando <span class='loader'></span>"
 
-let text = await res.text()
+let res=await fetch(url)
+
+let text=await res.text()
+
+btn.innerHTML="Consultar"
 
 try{
 
-let json = JSON.parse(text)
+let json=JSON.parse(text)
 
-document.getElementById("result-"+endpoint).textContent =
+document.getElementById("result-"+endpoint).textContent=
 JSON.stringify(json,null,2)
 
 }catch{
 
-document.getElementById("result-"+endpoint).textContent = text
+document.getElementById("result-"+endpoint).textContent=text
 
 }
+
+}
+
+function copiarUrl(endpoint){
+
+let text=document.getElementById("url-"+endpoint).textContent
+
+if(!text)return
+
+navigator.clipboard.writeText(text)
 
 }
 
