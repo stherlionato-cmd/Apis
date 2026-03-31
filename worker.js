@@ -1761,6 +1761,7 @@ font-family:Inter;
 background:#020617;
 color:#e2e8f0;
 overflow-x:hidden;
+position:relative;
 }
 
 /* CANVAS */
@@ -1770,6 +1771,7 @@ position:fixed;
 top:0;
 left:0;
 z-index:-1;
+pointer-events:none;
 }
 
 /* HEADER */
@@ -2085,37 +2087,64 @@ endpoints.forEach(api=>{
 const div=document.createElement("div")
 div.className="endpoint"
 
-div.innerHTML=\`
+div.innerHTML=`
 
 <span class="method">GET</span>
-<b>/\${api.path}</b>
+<b>/${api.path}</b>
 
-<p>\${api.desc}</p>
+<p>${api.desc}</p>
 
-<input id="\${api.path}" placeholder="Digite \${api.param}">
+<input placeholder="Digite ${api.param}">
 
 <div class="actions">
 
-<button onclick="consultar('\${api.path}','\${api.param}',this)">
+<button onclick="consultar('${api.path}','${api.param}',this)">
 Consultar
 </button>
 
-<button class="copy" onclick="copiarUrl('\${api.path}')">
+<button class="copy" onclick="copiarUrl('${api.path}')">
 Copiar URL
 </button>
 
 </div>
 
-<div class="url" id="url-\${api.path}"></div>
+<div class="url" id="url-${api.path}"></div>
 
-<pre id="result-\${api.path}"></pre>
+<pre id="result-${api.path}"></pre>
 
-\`
+`
 
 container.appendChild(div)
 
+const input = div.querySelector("input")
+
+/* ENTER faz consulta */
+
+input.addEventListener("keypress",(e)=>{
+if(e.key==="Enter"){
+consultar(api.path,api.param,div.querySelector("button"))
+}
 })
 
+/* MOSTRAR URL AUTOMÁTICA */
+
+input.addEventListener("input",()=>{
+
+let token = document.getElementById("token").value
+let valor = input.value
+
+if(!token || !valor){
+document.getElementById("url-"+api.path).textContent=""
+return
+}
+
+let url = `${API}/${api.path}?${api.param}=${encodeURIComponent(valor)}&token=${token}`
+
+document.getElementById("url-"+api.path).textContent = url
+
+})
+
+})
 async function consultar(endpoint,param,btn){
 
 let valor=document.getElementById(endpoint).value
