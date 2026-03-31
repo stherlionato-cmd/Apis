@@ -6,7 +6,7 @@ const url = new URL(request.url)
 const endpoint = url.pathname.replace("/","")
 
 if(endpoint === ""){
-return home()
+return home(request)
 }
 
 if(!ENDPOINTS[endpoint]){
@@ -36,161 +36,49 @@ astropro:{plano:"PRO",limite:1000}
 
 /*
 |--------------------------------------------------------------------------
-| ENDPOINTS
+| CONFIG
 |--------------------------------------------------------------------------
 */
 
 const APIKEY = "bigmouth"
 
+/*
+|--------------------------------------------------------------------------
+| ENDPOINTS
+|--------------------------------------------------------------------------
+*/
+
 const ENDPOINTS = {
 
-/* CPF */
+cpf:{url:"https://knowsapi.shop/api/consulta/cpf",param:"code",query:"cpf"},
+cpf2:{url:"https://knowsapi.shop/api/consulta/cpf-v2",param:"code",query:"cpf"},
+cpf3:{url:"https://knowsapi.shop/api/consultas/cpf",param:"cpf",query:"cpf"},
+cpf4:{url:"https://knowsapi.shop/api/consulta/cpf-v3",param:"code",query:"cpf"},
+cpf5:{url:"https://knowsapi.shop/api/consulta/cpf-v4",param:"code",query:"cpf"},
+cpf6:{url:"https://knowsapi.shop/api/consulta/cpf-v5",param:"code",query:"cpf"},
 
-cpf:{
-url:"https://knowsapi.shop/api/consulta/cpf",
-param:"code",
-query:"cpf"
-},
+nome:{url:"https://knowsapi.shop/api/consultas/nome",param:"nome",query:"nome"},
+nome2:{url:"https://knowsapi.shop/api/consulta/nome-v1",param:"nome",query:"nome"},
 
-cpf2:{
-url:"https://knowsapi.shop/api/consulta/cpf-v2",
-param:"code",
-query:"cpf"
-},
+telefone:{url:"https://knowsapi.shop/api/consultas/telefone",param:"telefone",query:"telefone"},
+telefone2:{url:"https://knowsapi.shop/api/consulta/telefone-v1",param:"telefone",query:"telefone"},
+operadora:{url:"https://knowsapi.shop/api/consultas/operadora",param:"telefone",query:"telefone"},
 
-cpf3:{
-url:"https://knowsapi.shop/api/consultas/cpf",
-param:"cpf",
-query:"cpf"
-},
+email:{url:"https://knowsapi.shop/api/consultas/email",param:"email",query:"email"},
 
-cpf4:{
-url:"https://knowsapi.shop/api/consulta/cpf-v3",
-param:"code",
-query:"cpf"
-},
+cep:{url:"https://knowsapi.shop/api/consultas/cep-v1",param:"cep",query:"cep"},
+cep2:{url:"https://knowsapi.shop/api/consulta/cep-v1",param:"cep",query:"cep"},
 
-cpf5:{
-url:"https://knowsapi.shop/api/consulta/cpf-v4",
-param:"code",
-query:"cpf"
-},
+placa:{url:"https://knowsapi.shop/api/consulta/placa-v1",param:"placa",query:"placa"},
+placa2:{url:"https://knowsapi.shop/api/consulta/placa-v2",param:"placa",query:"placa"},
 
-cpf6:{
-url:"https://knowsapi.shop/api/consulta/cpf-v5",
-param:"code",
-query:"cpf"
-},
+rg:{url:"https://knowsapi.shop/api/consultas/rg",param:"cpf",query:"cpf"},
+titulo:{url:"https://knowsapi.shop/api/consultas/titulo",param:"cpf",query:"cpf"},
+pis:{url:"https://knowsapi.shop/api/consultas/pis",param:"cpf",query:"cpf"},
+nis:{url:"https://knowsapi.shop/api/consultas/nis",param:"cpf",query:"cpf"},
 
-/* NOME */
-
-nome:{
-url:"https://knowsapi.shop/api/consultas/nome",
-param:"nome",
-query:"nome"
-},
-
-nome2:{
-url:"https://knowsapi.shop/api/consulta/nome-v1",
-param:"nome",
-query:"nome"
-},
-
-/* TELEFONE */
-
-telefone:{
-url:"https://knowsapi.shop/api/consultas/telefone",
-param:"telefone",
-query:"telefone"
-},
-
-telefone2:{
-url:"https://knowsapi.shop/api/consulta/telefone-v1",
-param:"telefone",
-query:"telefone"
-},
-
-operadora:{
-url:"https://knowsapi.shop/api/consultas/operadora",
-param:"telefone",
-query:"telefone"
-},
-
-/* EMAIL */
-
-email:{
-url:"https://knowsapi.shop/api/consultas/email",
-param:"email",
-query:"email"
-},
-
-/* CEP */
-
-cep:{
-url:"https://knowsapi.shop/api/consultas/cep-v1",
-param:"cep",
-query:"cep"
-},
-
-cep2:{
-url:"https://knowsapi.shop/api/consulta/cep-v1",
-param:"cep",
-query:"cep"
-},
-
-/* PLACA */
-
-placa:{
-url:"https://knowsapi.shop/api/consulta/placa-v1",
-param:"placa",
-query:"placa"
-},
-
-placa2:{
-url:"https://knowsapi.shop/api/consulta/placa-v2",
-param:"placa",
-query:"placa"
-},
-
-/* DOCUMENTOS */
-
-rg:{
-url:"https://knowsapi.shop/api/consultas/rg",
-param:"cpf",
-query:"cpf"
-},
-
-titulo:{
-url:"https://knowsapi.shop/api/consultas/titulo",
-param:"cpf",
-query:"cpf"
-},
-
-pis:{
-url:"https://knowsapi.shop/api/consultas/pis",
-param:"cpf",
-query:"cpf"
-},
-
-nis:{
-url:"https://knowsapi.shop/api/consultas/nis",
-param:"cpf",
-query:"cpf"
-},
-
-/* RELAÇÕES */
-
-parentes:{
-url:"https://knowsapi.shop/api/consultas/parentes",
-param:"cpf",
-query:"cpf"
-},
-
-vizinhos:{
-url:"https://knowsapi.shop/api/consultas/vizinhos",
-param:"cpf",
-query:"cpf"
-}
+parentes:{url:"https://knowsapi.shop/api/consultas/parentes",param:"cpf",query:"cpf"},
+vizinhos:{url:"https://knowsapi.shop/api/consultas/vizinhos",param:"cpf",query:"cpf"}
 
 }
 
@@ -217,7 +105,6 @@ return jsonErro("AUTH_001","Token inválido")
 }
 
 const config = ENDPOINTS[endpoint]
-
 const valor = url.searchParams.get(config.query)
 
 if(!valor){
@@ -279,16 +166,26 @@ const text = await res.text()
 try{
 api = JSON.parse(text)
 }catch{
-return jsonErro("API_003","Resposta inválida",text)
+return jsonErro("API_003","Resposta inválida da API",text)
 }
 
 }catch(e){
-return jsonErro("API_001","Erro na conexão",e.toString())
+return jsonErro("API_001","Erro ao conectar API",e.toString())
 }
 
 /*
 |--------------------------------------------------------------------------
-| LIMPAR RESPOSTA
+| SEM RESULTADO
+|--------------------------------------------------------------------------
+*/
+
+if(!api || Object.keys(api).length === 0){
+return jsonErro("DATA_404","Nenhum dado encontrado")
+}
+
+/*
+|--------------------------------------------------------------------------
+| LIMPAR
 |--------------------------------------------------------------------------
 */
 
@@ -325,8 +222,8 @@ response = new Response(
 JSON.stringify(finalResponse,null,2),
 {
 headers:{
-"Content-Type":"application/json",
-"Cache-Control":"public, max-age=3600"
+"Content-Type":"application/json;charset=UTF-8",
+"Cache-Control":"public,max-age=3600"
 }
 }
 )
@@ -410,7 +307,7 @@ return novo
 if(typeof data === "string"){
 
 try{
-return decodeURIComponent(escape(data))
+return new TextDecoder().decode(new TextEncoder().encode(data))
 }catch{
 return data
 }
@@ -423,25 +320,161 @@ return data
 
 /*
 |--------------------------------------------------------------------------
-| HOME
+| HOME UI
 |--------------------------------------------------------------------------
 */
 
-function home(){
+function home(request){
 
-return new Response(JSON.stringify({
+const base = new URL(request.url).origin
 
-api:"Astro Search API",
-status:"online",
+return new Response(`
 
-endpoints:Object.keys(ENDPOINTS),
+<!DOCTYPE html>
+<html>
+<head>
 
-total_endpoints:Object.keys(ENDPOINTS).length
+<meta name="viewport" content="width=device-width,initial-scale=1">
 
-},null,2),{
+<title>Astro Search API</title>
+
+<style>
+
+body{
+font-family:Arial;
+background:#0b1f3a;
+color:white;
+padding:20px;
+}
+
+h1{
+text-align:center;
+color:#4da3ff;
+}
+
+.card{
+background:#132c52;
+padding:20px;
+border-radius:10px;
+margin-top:20px;
+}
+
+input,select{
+width:100%;
+padding:12px;
+margin-top:10px;
+border-radius:8px;
+border:none;
+}
+
+button{
+width:100%;
+padding:12px;
+margin-top:10px;
+background:#4da3ff;
+border:none;
+border-radius:8px;
+color:white;
+font-weight:bold;
+}
+
+pre{
+background:#000;
+padding:15px;
+border-radius:10px;
+overflow:auto;
+}
+
+.copy{
+background:#28c76f;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<h1>🚀 Astro Search API</h1>
+
+<div class="card">
+
+Token
+
+<input id="token" placeholder="seu token">
+
+Endpoint
+
+<select id="endpoint">
+${Object.keys(ENDPOINTS).map(e=>`<option>${e}</option>`).join("")}
+</select>
+
+Valor
+
+<input id="valor" placeholder="valor da consulta">
+
+<button onclick="consultar()">CONSULTAR</button>
+
+</div>
+
+<div class="card">
+
+URL
+
+<pre id="url"></pre>
+
+<button class="copy" onclick="copiar('url')">COPIAR URL</button>
+
+</div>
+
+<div class="card">
+
+RESPOSTA
+
+<pre id="resposta"></pre>
+
+<button class="copy" onclick="copiar('resposta')">COPIAR RESPOSTA</button>
+
+</div>
+
+<script>
+
+async function consultar(){
+
+const token=document.getElementById("token").value
+const endpoint=document.getElementById("endpoint").value
+const valor=document.getElementById("valor").value
+
+const url="${base}/"+endpoint+"?token="+token+"&"+endpoint.replace(/[0-9]/g,'')+"="+valor
+
+document.getElementById("url").innerText=url
+
+const r=await fetch(url)
+const j=await r.json()
+
+document.getElementById("resposta").innerText=JSON.stringify(j,null,2)
+
+}
+
+function copiar(id){
+
+const text=document.getElementById(id).innerText
+
+navigator.clipboard.writeText(text)
+
+alert("Copiado!")
+
+}
+
+</script>
+
+</body>
+</html>
+
+`,{
 
 headers:{
-"Content-Type":"application/json"
+"content-type":"text/html"
 }
 
 })
@@ -450,7 +483,7 @@ headers:{
 
 /*
 |--------------------------------------------------------------------------
-| ERRO
+| ERROS
 |--------------------------------------------------------------------------
 */
 
@@ -459,16 +492,23 @@ function jsonErro(code,msg,extra=null){
 return new Response(JSON.stringify({
 
 status:false,
-error_code:code,
-msg:msg,
+
+erro:{
+codigo:code,
+mensagem:msg
+},
+
+suporte:"@puxardados5",
+
 extra:extra
 
-}),{
+},null,2),{
+
+status:400,
 
 headers:{
 "Content-Type":"application/json"
-},
-status:400
+}
 
 })
 
