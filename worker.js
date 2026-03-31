@@ -661,7 +661,11 @@ resposta.innerHTML="<div class='item'>Erro: "+(data.message||"Falha")+"</div>"
 return
 }
 
-const res = data.dados || data
+const res = {
+meta: data.meta,
+consulta: data.consulta,
+dados: data.dados
+}
 
 const temp = document.createElement("div")
 temp.innerHTML = render(res)
@@ -689,30 +693,55 @@ for(let key in obj){
 
 let value = obj[key]
 
+// null
 if(value === null || value === undefined){
 html += `<div class="item"><span>${key}</span><span>null</span></div>`
 continue
 }
 
+// ARRAY
 if(Array.isArray(value)){
-html += `<div class="section"><strong>${key}</strong>`
-value.forEach(v=>{
+
+html += `
+<div class="section">
+<div style="font-size:11px;opacity:.6;margin-bottom:6px;">${key} (${value.length})</div>
+`
+
+value.forEach((v,i)=>{
+
 if(typeof v === "object"){
-html += render(v)
+html += `<div class="section" style="margin-top:6px;">${render(v)}</div>`
 }else{
 html += `<div class="item">${v}</div>`
 }
+
 })
+
 html += `</div>`
 continue
 }
 
+// OBJETO
 if(typeof value === "object"){
-html += `<div class="section"><strong>${key}</strong>${render(value)}</div>`
+
+html += `
+<div class="section">
+<div style="font-size:11px;opacity:.6;margin-bottom:6px;">${key}</div>
+${render(value)}
+</div>
+`
+
 continue
 }
 
-html += `<div class="item"><span>${key}</span><span>${value}</span></div>`
+// VALOR NORMAL
+html += `
+<div class="item">
+<span>${key}</span>
+<span>${value}</span>
+</div>
+`
+
 }
 
 return html
