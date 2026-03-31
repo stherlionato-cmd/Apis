@@ -495,6 +495,106 @@ pre{
  opacity:1;
 }
 
+/* MODAL */
+.modal{
+ position:fixed;
+ inset:0;
+ background:rgba(0,0,0,.7);
+ display:flex;
+ align-items:center;
+ justify-content:center;
+ z-index:999;
+ opacity:0;
+ pointer-events:none;
+ transition:.3s;
+}
+
+.modal.show{
+ opacity:1;
+ pointer-events:all;
+}
+
+.modal-box{
+ width:100%;
+ max-width:380px;
+ background:#020617;
+ border-radius:18px;
+ padding:20px;
+ transform:scale(.9);
+ transition:.3s;
+}
+
+.modal.show .modal-box{
+ transform:scale(1);
+}
+
+/* PLANOS */
+.plan{
+ padding:14px;
+ border-radius:14px;
+ margin-top:10px;
+ border:1px solid rgba(255,255,255,.05);
+ background:rgba(255,255,255,.02);
+ transition:.25s;
+ cursor:pointer;
+}
+
+.plan:hover{
+ transform:translateY(-3px);
+ border-color:rgba(59,130,246,.4);
+}
+
+/* BADGE */
+.badge{
+ display:inline-flex;
+ align-items:center;
+ gap:6px;
+ padding:6px 12px;
+ border-radius:999px;
+ font-size:11px;
+ font-weight:600;
+}
+
+/* FREE */
+.badge.free{
+ background:rgba(34,197,94,.15);
+ color:#22c55e;
+}
+
+/* PRO */
+.badge.pro{
+ background:rgba(59,130,246,.15);
+ color:#3b82f6;
+}
+
+/* VIP */
+.badge.vip{
+ background:rgba(168,85,247,.15);
+ color:#a855f7;
+ position:relative;
+ overflow:hidden;
+}
+
+/* PARTÍCULAS VIP */
+.badge.vip::after{
+ content:"";
+ position:absolute;
+ width:200%;
+ height:200%;
+ top:-50%;
+ left:-50%;
+ background:
+ radial-gradient(circle,#fff 1px,transparent 1px);
+ background-size:20px 20px;
+ opacity:.2;
+ animation:stars 6s linear infinite;
+}
+
+@keyframes stars{
+ from{transform:translateY(0)}
+ to{transform:translateY(40px)}
+}
+
 </style>
 
 </head>
@@ -550,6 +650,47 @@ ${Object.keys(ENDPOINTS).map(e=>`<option>${e}</option>`).join("")}
 
 <div id="toast">Copiado!</div>
 
+<!-- MODAL TOKEN -->
+<div class="modal" id="modal">
+  <div class="modal-box">
+
+    <h2 style="font-size:16px;margin-bottom:10px;">🔐 Acesso</h2>
+
+    <input id="tokenInput" placeholder="Digite seu token">
+
+    <button onclick="salvarToken()">Entrar</button>
+
+    <div style="margin-top:15px;font-size:12px;opacity:.6;">
+      Planos disponíveis:
+    </div>
+
+    <div class="plan">
+      <b>FREE</b><br>
+      100 consultas<br>
+      <span style="opacity:.6;">Grátis</span>
+    </div>
+
+    <div class="plan">
+      <b>PRO</b><br>
+      1000 consultas<br>
+      <span style="opacity:.6;">R$30 mensal</span>
+    </div>
+
+    <div class="plan">
+      <b>VIP</b><br>
+      Ilimitado<br>
+      <span style="opacity:.6;">R$50 vitalício</span>
+    </div>
+
+    <div class="plan">
+      <b>DIÁRIO</b><br>
+      Acesso 24h<br>
+      <span style="opacity:.6;">R$5</span>
+    </div>
+
+  </div>
+</div>
+
 <script>
 
 async function consultar(){
@@ -595,6 +736,61 @@ const t = document.getElementById("toast")
 t.classList.add("show")
 setTimeout(()=>t.classList.remove("show"),2000)
 }
+
+function getPlano(token){
+  if(!token) return "FREE"
+
+  if(token === "dragon" || token === "IFNastro") return "VIP"
+  if(token === "astropro") return "PRO"
+
+  return "FREE"
+}
+
+function renderBadge(plano){
+
+  const el = document.getElementById("badgeContainer")
+
+  let classe = plano.toLowerCase()
+
+  el.innerHTML = `
+    <div class="badge ${classe}">
+      ${plano}
+    </div>
+  `
+}
+
+/* SALVAR TOKEN */
+function salvarToken(){
+  const token = document.getElementById("tokenInput").value
+
+  if(!token) return
+
+  localStorage.setItem("astro_token",token)
+
+  document.getElementById("modal").classList.remove("show")
+
+  iniciar()
+}
+
+/* INICIAR */
+function iniciar(){
+
+  const token = localStorage.getItem("astro_token")
+
+  if(!token){
+    document.getElementById("modal").classList.add("show")
+    return
+  }
+
+  document.getElementById("token").value = token
+
+  const plano = getPlano(token)
+
+  renderBadge(plano)
+}
+
+/* AUTO LOAD */
+window.onload = iniciar
 
 </script>
 
