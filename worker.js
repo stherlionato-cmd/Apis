@@ -100,23 +100,28 @@ status:404
 |--------------------------------------------------------------------------
 */
 
-const TOKENS = [
-"dragon",
-"IFNastro"
-]
-
-const UNLIMITED = [
-"vip_token"
-]
+/* VALIDAR TOKEN */
 
 function validarToken(token){
-
-if(!TOKENS.includes(token) && !UNLIMITED.includes(token)){
-return false
+return TOKENS.hasOwnProperty(token)
 }
 
-return true
+/* OBTER PLANO */
 
+function obterPlanoToken(token){
+return TOKENS[token]?.plano || "FREE"
+}
+
+/* OBTER LIMITE */
+
+function obterLimiteToken(token){
+return TOKENS[token]?.limite || 0
+}
+
+/* TOKEN ILIMITADO */
+
+function tokenIlimitado(token){
+return TOKENS[token]?.limite === "unlimited"
 }
 
 async function consultaTelefoneFull(request,url,ctx){
