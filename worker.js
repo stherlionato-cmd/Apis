@@ -331,11 +331,11 @@ const base = new URL(request.url).origin
 return new Response(`
 
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
 
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
 
 <title>Astro Search API</title>
 
@@ -346,205 +346,153 @@ return new Response(`
 :root{--blue:#3b82f6;}
 
 *{
-margin:0;
-padding:0;
-box-sizing:border-box;
-font-family:'Inter',sans-serif;
+ margin:0;
+ padding:0;
+ box-sizing:border-box;
+ font-family:'Inter',sans-serif;
 }
 
 body{
-background: radial-gradient(circle at 20% 20%, #0a0f2a, #02030a);
-color:#e2e8f0;
-overflow-x:hidden;
+ background: radial-gradient(circle at 20% 20%, #0a0f2a, #02030a);
+ color:#e2e8f0;
+ padding:20px;
 }
 
 /* HEADER */
 .header{
-padding:25px;
-text-align:center;
-font-size:22px;
-font-weight:800;
+ text-align:center;
+ margin-bottom:20px;
 }
-.header span{color:var(--blue);}
 
-/* CONTAINER */
-.container{
-max-width:900px;
-margin:auto;
-padding:15px;
+.header h1{
+ font-size:22px;
+ font-weight:800;
+}
+
+.header span{
+ color:var(--blue);
 }
 
 /* CARD */
 .card{
-margin-top:12px;
-padding:16px;
-border-radius:16px;
-background:rgba(255,255,255,0.02);
-transition:.3s;
-cursor:pointer;
-position:relative;
-overflow:hidden;
+ margin-top:15px;
+ padding:16px;
+ border-radius:18px;
+ background:rgba(255,255,255,0.03);
+ border:1px solid rgba(255,255,255,0.05);
+ backdrop-filter:blur(10px);
+ transition:.3s;
 }
-
-.card::before{
-content:"";
-position:absolute;
-inset:0;
-background:radial-gradient(circle at var(--x,50%) var(--y,50%), rgba(59,130,246,.25), transparent 60%);
-opacity:0;
-transition:.2s;
-}
-
-.card:hover::before{opacity:1;}
 
 .card:hover{
-transform:translateY(-6px) scale(1.02);
-box-shadow:0 10px 40px rgba(59,130,246,.25);
+ transform:translateY(-3px);
+ border-color:rgba(59,130,246,.4);
 }
 
 /* INPUT */
 .input-group{
-margin-top:10px;
+ margin-top:10px;
 }
-.input-label{
-font-size:11px;
-opacity:.6;
+
+.label{
+ font-size:11px;
+ opacity:.6;
+ margin-bottom:4px;
 }
-.input{
-width:100%;
-padding:12px;
-margin-top:5px;
-border-radius:10px;
-border:none;
-background:#0b1228;
-color:#fff;
+
+input,select{
+ width:100%;
+ padding:12px;
+ border-radius:12px;
+ border:none;
+ background:#0b1228;
+ color:#fff;
+ outline:none;
+}
+
+input:focus,select:focus{
+ box-shadow:0 0 0 2px rgba(59,130,246,.3);
 }
 
 /* BUTTON */
-.btn{
-margin-top:12px;
-width:100%;
-padding:12px;
-border-radius:10px;
-border:none;
-background:rgba(59,130,246,0.2);
-border:1px solid rgba(59,130,246,0.3);
-color:#fff;
-cursor:pointer;
-transition:.2s;
-}
-.btn:hover{
-background:rgba(59,130,246,0.3);
+button{
+ width:100%;
+ padding:12px;
+ margin-top:12px;
+ border-radius:12px;
+ border:none;
+ font-weight:600;
+ background:linear-gradient(90deg,#3b82f6,#2563eb);
+ color:#fff;
+ cursor:pointer;
+ transition:.25s;
 }
 
-/* MODAL */
-.modal{
-position:fixed;
-inset:0;
-display:none;
-justify-content:center;
-align-items:center;
-background:rgba(0,0,0,.6);
-backdrop-filter:blur(10px);
-z-index:999;
+button:hover{
+ transform:translateY(-2px);
+ box-shadow:0 10px 25px rgba(59,130,246,.3);
 }
 
-.modal-box{
-width:92%;
-max-width:500px;
-background:#020617;
-padding:20px;
-border-radius:20px;
-border:1px solid rgba(255,255,255,0.05);
-animation:fade .3s ease;
-position:relative;
+button:active{
+ transform:scale(.96);
 }
 
-@keyframes fade{
-from{opacity:0; transform:translateY(20px)}
-to{opacity:1}
+/* BOX RESULT */
+.box{
+ margin-top:12px;
+ background:#020617;
+ padding:12px;
+ border-radius:12px;
+ font-size:12px;
+ position:relative;
 }
 
-/* ROUTE */
-.route-box{
-margin-top:10px;
-background:#020617;
-padding:10px;
-border-radius:10px;
-font-size:11px;
-display:flex;
-justify-content:space-between;
-align-items:center;
+pre{
+ white-space:pre-wrap;
+ word-wrap:break-word;
 }
 
-/* RESULT */
-.result-box{
-margin-top:12px;
+/* COPY */
+.copy{
+ margin-top:10px;
+ background:rgba(34,197,94,.2);
 }
 
-/* ITEM */
-.item{
-font-size:12px;
-display:flex;
-justify-content:space-between;
-padding:8px;
-border-radius:8px;
-margin-top:6px;
-background:rgba(255,255,255,0.02);
-}
-
-/* SECTION */
-.section{
-margin-top:10px;
-background:rgba(255,255,255,0.015);
-padding:10px;
-border-radius:12px;
-border:1px solid rgba(255,255,255,0.05);
+.copy:hover{
+ box-shadow:0 0 15px rgba(34,197,94,.3);
 }
 
 /* LOADING */
 .loader{
-margin-top:10px;
-height:40px;
-border-radius:10px;
-background:linear-gradient(90deg,#111,#1a1a1a,#111);
-background-size:200%;
-animation:load 1s infinite;
-}
-@keyframes load{
-0%{background-position:200%}
-100%{background-position:-200%}
+ height:40px;
+ border-radius:10px;
+ background:linear-gradient(90deg,#111 25%,#1a1a1a 50%,#111 75%);
+ background-size:200%;
+ animation:load 1s infinite;
 }
 
-/* SCAN */
-.scan{
-position:absolute;
-inset:0;
-background:linear-gradient(transparent,rgba(59,130,246,.15),transparent);
-animation:scan 1.4s infinite;
-border-radius:20px;
-}
-@keyframes scan{
-0%{transform:translateY(-100%)}
-100%{transform:translateY(100%)}
+@keyframes load{
+ 0%{background-position:200%}
+ 100%{background-position:-200%}
 }
 
 /* TOAST */
 #toast{
-position:fixed;
-bottom:20px;
-left:50%;
-transform:translateX(-50%) translateY(100px);
-background:#111827;
-padding:10px 20px;
-border-radius:10px;
-font-size:12px;
-opacity:0;
-transition:.3s;
+ position:fixed;
+ bottom:20px;
+ left:50%;
+ transform:translateX(-50%) translateY(100px);
+ background:#111827;
+ padding:10px 20px;
+ border-radius:10px;
+ font-size:12px;
+ opacity:0;
+ transition:.3s;
 }
+
 #toast.show{
-transform:translateX(-50%) translateY(0);
-opacity:1;
+ transform:translateX(-50%) translateY(0);
+ opacity:1;
 }
 
 </style>
@@ -553,211 +501,100 @@ opacity:1;
 
 <body>
 
-<div class="header">Astro <span>Search</span></div>
-
-<div class="container">
-
-${Object.keys(ENDPOINTS).map(e=>`
-<div class="card" onclick="openModal('${e}')">
-<strong>${e}</strong>
-<div style="font-size:12px;opacity:.6;">Consulta ${e}</div>
-</div>
-`).join("")}
-
+<div class="header">
+<h1>🚀 Astro <span>Search</span></h1>
 </div>
 
-<!-- MODAL -->
-<div class="modal" id="modal">
-<div class="modal-box">
+<div class="card">
 
-<div style="display:flex;justify-content:space-between;margin-bottom:10px;">
-<strong id="title"></strong>
-<span onclick="closeModal()" style="cursor:pointer;">✕</span>
+<div class="input-group">
+<div class="label">Token</div>
+<input id="token" placeholder="seu token">
 </div>
 
 <div class="input-group">
-<div class="input-label">Token</div>
-<input id="token" class="input">
+<div class="label">Endpoint</div>
+<select id="endpoint">
+${Object.keys(ENDPOINTS).map(e=>`<option>${e}</option>`).join("")}
+</select>
 </div>
 
 <div class="input-group">
-<div class="input-label">Valor</div>
-<input id="valor" class="input">
+<div class="label">Valor</div>
+<input id="valor" placeholder="valor da consulta">
 </div>
 
-<div class="route-box">
-<span id="url"></span>
-<button onclick="copy()">📋</button>
-</div>
-
-<button class="btn" onclick="consultar()">Consultar</button>
-
-<div id="loading"></div>
-<div id="resposta" class="result-box"></div>
+<button onclick="consultar()">Consultar</button>
 
 </div>
+
+<div class="card">
+
+<div class="label">URL</div>
+<div class="box"><pre id="url"></pre></div>
+
+<button class="copy" onclick="copiar('url')">Copiar URL</button>
+
 </div>
 
-<div id="toast"></div>
+<div class="card">
+
+<div class="label">Resposta</div>
+<div class="box" id="resBox">
+<pre id="resposta"></pre>
+</div>
+
+<button class="copy" onclick="copiar('resposta')">Copiar resposta</button>
+
+</div>
+
+<div id="toast">Copiado!</div>
 
 <script>
 
-let endpoint=""
-
-function openModal(e){
-endpoint=e
-modal.style.display="flex"
-title.innerText="Consulta "+e
-resposta.innerHTML = null
-resposta.textContent = ""
-loading.innerHTML=""
-updateUrl()
-}
-
-function closeModal(){
-modal.style.display="none"
-}
-
-function updateUrl(){
-
-let t=token.value||"TOKEN"
-let v=valor.value||"VALOR"
-
-const param=endpoint.replace(/[0-9]/g,'')
-
-url.innerText="${base}/"+endpoint+"?token="+t+"&"+param+"="+encodeURIComponent(v)
-}
-
-token.oninput=updateUrl
-valor.oninput=updateUrl
-
 async function consultar(){
 
-let t=token.value
-let v=valor.value
+const token = document.getElementById("token").value
+const endpoint = document.getElementById("endpoint").value
+const valor = document.getElementById("valor").value
 
-if(!t||!v){
-toast("Preenche tudo")
-return
-}
+const param = endpoint.replace(/[0-9]/g,'')
 
-loading.innerHTML=\`
-<div class="loader"></div>
-<div class="scan"></div>
-\`
+const url = "${base}/"+endpoint+"?token="+token+"&"+param+"="+valor
 
-resposta.innerHTML=""
+document.getElementById("url").innerText = url
+
+const resBox = document.getElementById("resBox")
+resBox.innerHTML = '<div class="loader"></div>'
 
 try{
 
-const param=endpoint.replace(/[0-9]/g,'')
+const r = await fetch(url)
+const j = await r.json()
 
-const r=await fetch("${base}/"+endpoint+"?token="+t+"&"+param+"="+encodeURIComponent(v))
-const data=await r.json()
-
-loading.innerHTML=""
-
-if(!data.status){
-resposta.innerHTML="<div class='item'>Erro: "+(data.message||"Falha")+"</div>"
-return
-}
-
-const res = {
-meta: data.meta,
-consulta: data.consulta,
-dados: data.dados
-}
-
-const safeData = JSON.parse(JSON.stringify(res))
-resposta.innerHTML = render(safeData)
+resBox.innerHTML = "<pre id='resposta'>"+JSON.stringify(j,null,2)+"</pre>"
 
 }catch{
-
-loading.innerHTML=""
-resposta.innerHTML="<div class='item'>Erro na API</div>"
-
+resBox.innerHTML = "<pre>Erro ao consultar</pre>"
 }
 
 }
 
-/* 🔥 RENDER DECENTE */
-function render(obj){
+function copiar(id){
 
-if(typeof obj !== "object" || obj === null){
-return `<div class="item"><span>${
-typeof obj === "object" ? JSON.stringify(obj) : obj
-}</span></div>`
-}
+const text = document.getElementById(id).innerText
 
-let html=""
+navigator.clipboard.writeText(text)
 
-for(let key in obj){
-
-let value = obj[key]
-
-// NULL
-if(value === null || value === undefined){
-html += `<div class="item"><span>${key}</span><span>null</span></div>`
-continue
-}
-
-// ARRAY
-if(Array.isArray(value)){
-html += `<div class="section">
-<div style="font-size:11px;opacity:.6;margin-bottom:6px;">${key} (${value.length})</div>`
-
-value.forEach(v=>{
-if(typeof v === "object"){
-html += render(v)
-}else{
-html += `<div class="item">${v}</div>`
-}
-})
-
-html += `</div>`
-continue
-}
-
-// OBJETO
-if(typeof value === "object"){
-html += `<div class="section">
-<div style="font-size:11px;opacity:.6;margin-bottom:6px;">${key}</div>
-${render(value)}
-</div>`
-continue
-}
-
-// STRING / NUMBER
-html += `<div class="item">
-<span>${key}</span>
-<span>${value}</span>
-</div>`
+toast()
 
 }
 
-return html
+function toast(){
+const t = document.getElementById("toast")
+t.classList.add("show")
+setTimeout(()=>t.classList.remove("show"),2000)
 }
-
-function copy(){
-navigator.clipboard.writeText(url.innerText)
-toast("Copiado")
-}
-
-function toast(msg){
-toastEl.innerText=msg
-toastEl.classList.add("show")
-setTimeout(()=>toastEl.classList.remove("show"),2000)
-}
-
-const toastEl=document.getElementById("toast")
-
-document.querySelectorAll(".card").forEach(card=>{
-card.addEventListener("mousemove", e=>{
-const rect=card.getBoundingClientRect()
-card.style.setProperty("--x",(e.clientX-rect.left)+"px")
-card.style.setProperty("--y",(e.clientY-rect.top)+"px")
-})
-})
 
 </script>
 
@@ -765,9 +602,40 @@ card.style.setProperty("--y",(e.clientY-rect.top)+"px")
 </html>
 
 `,{
-headers:{
-"content-type":"text/html;charset=UTF-8"
+headers:{ "content-type":"text/html" }
+})
+
 }
+
+/*
+|--------------------------------------------------------------------------
+| ERROS
+|--------------------------------------------------------------------------
+*/
+
+function jsonErro(code,msg,extra=null){
+
+return new Response(JSON.stringify({
+
+status:false,
+
+erro:{
+codigo:code,
+mensagem:msg
+},
+
+suporte:"@puxardados5",
+
+extra:extra
+
+},null,2),{
+
+status:400,
+
+headers:{
+"Content-Type":"application/json"
+}
+
 })
 
 }
