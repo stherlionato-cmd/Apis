@@ -531,17 +531,33 @@ pre{
 /* PLANOS */
 .plan{
  padding:14px;
- border-radius:14px;
+ border-radius:16px;
  margin-top:10px;
- border:1px solid rgba(255,255,255,.05);
- background:rgba(255,255,255,.02);
- transition:.25s;
+ border:1px solid rgba(255,255,255,.06);
+ background:linear-gradient(145deg,rgba(255,255,255,.03),rgba(255,255,255,.01));
+ transition:.3s;
  cursor:pointer;
+ position:relative;
+ overflow:hidden;
 }
 
 .plan:hover{
- transform:translateY(-3px);
+ transform:translateY(-4px) scale(1.02);
  border-color:rgba(59,130,246,.4);
+}
+
+/* glow */
+.plan::after{
+ content:"";
+ position:absolute;
+ inset:0;
+ background:linear-gradient(120deg,transparent,rgba(255,255,255,.1),transparent);
+ opacity:0;
+ transition:.4s;
+}
+
+.plan:hover::after{
+ opacity:1;
 }
 
 /* BADGE */
@@ -576,18 +592,26 @@ pre{
 }
 
 /* PARTÍCULAS VIP */
+/* FREE partículas leves */
+.badge.free::after{
+ content:"";
+ position:absolute;
+ inset:0;
+ background:radial-gradient(circle,#22c55e 1px,transparent 1px);
+ background-size:16px 16px;
+ opacity:.15;
+ animation:stars 10s linear infinite;
+}
+
+/* VIP mais forte */
 .badge.vip::after{
  content:"";
  position:absolute;
- width:200%;
- height:200%;
- top:-50%;
- left:-50%;
- background:
- radial-gradient(circle,#fff 1px,transparent 1px);
- background-size:20px 20px;
- opacity:.2;
- animation:stars 6s linear infinite;
+ inset:-50%;
+ background:radial-gradient(circle,#fff 1px,transparent 1px);
+ background-size:18px 18px;
+ opacity:.25;
+ animation:stars 4s linear infinite;
 }
 
 @keyframes stars{
@@ -602,7 +626,8 @@ pre{
 <body>
 
 <div class="header">
-<h1>🚀 Astro <span>Search</span></h1>
+  <h1>🚀 Astro <span>Search</span></h1>
+  <div id="badgeContainer" style="margin-top:8px;"></div>
 </div>
 
 <div class="card">
@@ -749,8 +774,9 @@ function getPlano(token){
 function renderBadge(plano){
 
   const el = document.getElementById("badgeContainer")
+  if(!el) return
 
-  let classe = plano.toLowerCase()
+  const classe = plano.toLowerCase()
 
   el.innerHTML = `
     <div class="badge ${classe}">
@@ -761,15 +787,29 @@ function renderBadge(plano){
 
 /* SALVAR TOKEN */
 function salvarToken(){
-  const token = document.getElementById("tokenInput").value
 
-  if(!token) return
+  const token = document.getElementById("tokenInput").value.trim()
+
+  if(!token){
+    document.getElementById("tokenInput").style.border = "1px solid red"
+    return
+  }
 
   localStorage.setItem("astro_token",token)
 
-  document.getElementById("modal").classList.remove("show")
+  fecharModal()
 
   iniciar()
+}
+
+/* FECHAR MODAL */
+function fecharModal(){
+  document.getElementById("modal").classList.remove("show")
+}
+
+/* ABRIR MODAL */
+function abrirModal(){
+  document.getElementById("modal").classList.add("show")
 }
 
 /* INICIAR */
@@ -778,19 +818,32 @@ function iniciar(){
   const token = localStorage.getItem("astro_token")
 
   if(!token){
-    document.getElementById("modal").classList.add("show")
+    abrirModal()
     return
   }
 
-  document.getElementById("token").value = token
+  const input = document.getElementById("token")
+  if(input) input.value = token
 
   const plano = getPlano(token)
 
   renderBadge(plano)
 }
 
-/* AUTO LOAD */
-window.onload = iniciar
+/* ENTER NO INPUT */
+document.addEventListener("keydown",e=>{
+  if(e.key === "Enter"){
+    const modal = document.getElementById("modal")
+    if(modal.classList.contains("show")){
+      salvarToken()
+    }
+  }
+})
+
+/* LOAD GARANTIDO */
+window.addEventListener("load", ()=>{
+  setTimeout(iniciar,100) // evita bug de render
+})
 
 </script>
 
