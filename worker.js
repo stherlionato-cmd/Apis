@@ -365,6 +365,7 @@ const blacklist=[
 "status",
 "creator",
 "api",
+"criador",
 "credits",
 "creditos",
 "mensagem",
