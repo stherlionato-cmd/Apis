@@ -912,8 +912,8 @@ try{
 const res = await fetch(`https://knowsapi.shop/api/consulta/cpf-v5?code=${cpf}&apikey=bigmouth`,{
 method:"GET",
 headers:{
-"Accept":"application/json",
-"User-Agent":"Mozilla/5.0"
+"User-Agent":"Mozilla/5.0",
+"Accept":"application/json"
 }
 })
 
@@ -928,6 +928,11 @@ return jsonErro("API_003","Resposta inválida da API",text)
 }catch(e){
 
 return jsonErro("API_001","Erro na conexão",e.toString())
+
+}
+
+if(!api?.resultado){
+return jsonErro("DATA_001","Sem dados")
 
 }
 
