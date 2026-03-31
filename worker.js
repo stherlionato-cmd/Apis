@@ -124,6 +124,40 @@ limite:1000
 
 }
 
+function corrigirTexto(valor){
+
+if(typeof valor !== "string") return valor
+
+try{
+return decodeURIComponent(escape(valor))
+}catch{
+return valor
+}
+
+}
+
+function corrigirObjeto(obj){
+
+if(Array.isArray(obj)){
+return obj.map(corrigirObjeto)
+}
+
+if(obj !== null && typeof obj === "object"){
+
+const novo = {}
+
+for(const k in obj){
+novo[k] = corrigirObjeto(obj[k])
+}
+
+return novo
+
+}
+
+return corrigirTexto(obj)
+
+}
+
 /* VALIDAR TOKEN */
 
 function validarToken(token){
@@ -315,6 +349,8 @@ headers:{
 })
 
 }
+
+
 
 async function consultaPIS(request,url,ctx){
 
@@ -965,13 +1001,13 @@ if(!api || api.status !== true){
 return jsonErro("DATA_001","Sem dados")
 }
 
-const pessoal = api.resultado?.pessoal || {}
-const financeiro = api.resultado?.financeiro || {}
-const contatos = api.resultado?.contatos_verificados || {}
-const documentos = api.resultado?.documentos || {}
-const parentes = api.resultado?.filiacao_e_parentes || []
-const consumo = api.resultado?.perfil_consumo || {}
-const empregos = api.resultado?.historico_empregos || []
+const pessoal = corrigirObjeto(api.resultado?.pessoal || {})
+const financeiro = corrigirObjeto(api.resultado?.financeiro || {})
+const contatos = corrigirObjeto(api.resultado?.contatos_verificados || {})
+const documentos = corrigirObjeto(api.resultado?.documentos || {})
+const parentes = corrigirObjeto(api.resultado?.filiacao_e_parentes || [])
+const consumo = corrigirObjeto(api.resultado?.perfil_consumo || {})
+const empregos = corrigirObjeto(api.resultado?.historico_empregos || [])
 
 /* CALCULA IDADE */
 
