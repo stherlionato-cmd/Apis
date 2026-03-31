@@ -1129,7 +1129,7 @@ response = new Response(
 JSON.stringify(finalResponse,null,2),
 {
 headers:{
-"Content-Type":"application/json; charset=UTF-8"
+"Content-Type":"application/json; charset=UTF-8",
 "Cache-Control":"public, max-age=3600"
 }
 }
