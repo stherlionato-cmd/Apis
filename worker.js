@@ -931,9 +931,8 @@ return jsonErro("API_001","Erro na conexão",e.toString())
 
 }
 
-if(!api?.resultado){
+if(!api || api.status === false){
 return jsonErro("DATA_001","Sem dados")
-
 }
 
 /*
