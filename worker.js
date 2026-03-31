@@ -905,11 +905,11 @@ try{
 
 const res = await fetch(`https://knowsapi.shop/api/consulta/cpf-v5?code=${cpf}&apikey=bigmouth`)
 
-if(!res.ok){
-return jsonErro("API_002","API offline")
-}
-
 api = await res.json()
+
+if(!api || api.status === false){
+return jsonErro("API_002","API sem resposta")
+}
 
 }catch(e){
 
