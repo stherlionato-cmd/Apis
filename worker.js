@@ -1715,9 +1715,7 @@ const html = `<!DOCTYPE html>
 
 <style>
 
-*{
-box-sizing:border-box;
-}
+*{box-sizing:border-box;}
 
 body{
 margin:0;
@@ -1754,7 +1752,6 @@ background:rgba(2,6,23,0.7);
 font-size:20px;
 font-weight:600;
 color:#60a5fa;
-letter-spacing:0.5px;
 }
 
 .stats{
@@ -1777,12 +1774,10 @@ border:1px solid rgba(255,255,255,0.08);
 background:#020617;
 color:white;
 outline:none;
-transition:0.2s;
 }
 
 .token-box input:focus{
 border-color:#3b82f6;
-box-shadow:0 0 8px rgba(59,130,246,0.3);
 }
 
 /* CONTAINER */
@@ -1803,28 +1798,12 @@ padding:22px;
 margin-bottom:22px;
 transition:0.25s;
 backdrop-filter:blur(14px);
-animation:fade 0.6s ease;
-position:relative;
-overflow:hidden;
 }
 
 .endpoint:hover{
 transform:translateY(-4px);
 border-color:#2563eb;
 box-shadow:0 10px 30px rgba(37,99,235,0.2);
-}
-
-.endpoint::before{
-content:"";
-position:absolute;
-inset:0;
-background:linear-gradient(120deg,transparent,rgba(59,130,246,0.15),transparent);
-opacity:0;
-transition:0.3s;
-}
-
-.endpoint:hover::before{
-opacity:1;
 }
 
 /* METHOD */
@@ -1848,7 +1827,6 @@ border:1px solid rgba(255,255,255,0.08);
 background:#020617;
 color:white;
 outline:none;
-transition:0.2s;
 }
 
 input:focus{
@@ -1871,13 +1849,11 @@ border:none;
 background:#2563eb;
 color:white;
 cursor:pointer;
-transition:0.2s;
 font-size:13px;
 }
 
 button:hover{
 background:#1d4ed8;
-transform:scale(1.03);
 }
 
 .copy{
@@ -1927,29 +1903,6 @@ margin-left:8px;
 to{transform:rotate(360deg)}
 }
 
-@keyframes fade{
-from{
-opacity:0;
-transform:translateY(20px);
-}
-to{
-opacity:1;
-transform:translateY(0);
-}
-}
-
-/* MOBILE */
-
-@media(max-width:700px){
-
-header{
-flex-direction:column;
-align-items:flex-start;
-gap:10px;
-}
-
-}
-
 </style>
 </head>
 
@@ -1976,11 +1929,16 @@ gap:10px;
 
 /* PARTICLES */
 
-const canvas = document.getElementById("bg")
-const ctx = canvas.getContext("2d")
+const canvas=document.getElementById("bg")
+const ctx=canvas.getContext("2d")
 
-canvas.width = innerWidth
-canvas.height = innerHeight
+function resize(){
+canvas.width=innerWidth
+canvas.height=innerHeight
+}
+
+resize()
+addEventListener("resize",resize)
 
 let particles=[]
 
@@ -2022,65 +1980,42 @@ animate()
 
 const API = location.origin
 
-const endpoints = [
+const endpoints=[
 
 {path:"cpf",param:"cpf",desc:"Consulta completa de CPF"},
 {path:"nome",param:"nome",desc:"Busca pessoas por nome"},
-{path:"telefone",param:"telefone",desc:"Dados vinculados ao telefone"},
 {path:"telefone-full",param:"telefone",desc:"Consulta completa telefone"},
 {path:"telefone-cpf",param:"cpf",desc:"Telefones vinculados ao CPF"},
-{path:"ddd",param:"ddd",desc:"Busca telefones por DDD"},
-{path:"operadora",param:"telefone",desc:"Consulta operadora"},
-{path:"rg",param:"rg",desc:"Consulta RG"},
-{path:"titulo",param:"titulo",desc:"Consulta título eleitoral"},
-{path:"pis",param:"pis",desc:"Consulta PIS"},
-{path:"nis",param:"nis",desc:"Consulta NIS"},
-{path:"email",param:"email",desc:"Consulta por email"},
-{path:"parentes",param:"cpf",desc:"Busca parentes"},
-{path:"placa",param:"placa",desc:"Consulta veículo"},
-{path:"foto",param:"cpf",desc:"Busca fotos do CPF"}
+{path:"ddd",param:"ddd",desc:"Busca telefones por DDD"}
 
 ]
 
-document.getElementById("count").innerText = endpoints.length+" endpoints disponíveis"
+document.getElementById("count").innerText=endpoints.length+" endpoints disponíveis"
 
 const container=document.getElementById("endpoints")
 
 endpoints.forEach(api=>{
 
 const div=document.createElement("div")
-div.className = "endpoint";
-div.innerHTML = `
-<span class="method">GET</span>
-<b>/${api.path}</b>
+div.className="endpoint"
 
-<p>${api.desc}</p>
-
-<input placeholder="Digite ${api.param}">
-
-<div class="actions">
-<button onclick="consultar('${api.path}','${api.param}', this)">
-Consultar
-</button>
-
-<button class="copy" onclick="copiarUrl('${api.path}')">
-Copiar URL
-</button>
-</div>
-
-<div class="url" id="url-${api.path}"></div>
-
-<pre id="result-${api.path}"></pre>
-`
+div.innerHTML='<span class="method">GET</span>'+
+'<b>/'+api.path+'</b>'+
+'<p>'+api.desc+'</p>'+
+'<input placeholder="Digite '+api.param+'">'+
+'<div class="actions">'+
+'<button onclick="consultar(\\''+api.path+'\\',\\''+api.param+'\\',this)">Consultar</button>'+
+'<button class="copy" onclick="copiarUrl(\\''+api.path+'\\')">Copiar URL</button>'+
+'</div>'+
+'<div class="url" id="url-'+api.path+'"></div>'+
+'<pre id="result-'+api.path+'"></pre>'
 
 container.appendChild(div)
 
-const input = div.querySelector("input")
-
-/* ENTER faz consulta */
+const input=div.querySelector("input")
 
 input.addEventListener("keypress",(e)=>{
-if(e.key === "Enter"){
+if(e.key==="Enter"){
 consultar(api.path,api.param,input)
 }
 })
@@ -2089,7 +2024,7 @@ consultar(api.path,api.param,input)
 
 function consultar(path,param,el){
 
-const token = document.getElementById("token").value.trim()
+const token=document.getElementById("token").value.trim()
 
 if(!token){
 alert("Digite seu token primeiro")
@@ -2098,10 +2033,10 @@ return
 
 let input
 
-if(el.tagName === "INPUT"){
-input = el.value
+if(el.tagName==="INPUT"){
+input=el.value
 }else{
-input = el.parentElement.parentElement.querySelector("input").value
+input=el.parentElement.parentElement.querySelector("input").value
 }
 
 if(!input){
@@ -2109,39 +2044,35 @@ alert("Digite o valor da consulta")
 return
 }
 
-const url = API + "/" + path + "?token=" + token + "&" + param + "=" + encodeURIComponent(input)
+const url=API+"/"+path+"?token="+token+"&"+param+"="+encodeURIComponent(input)
 
-document.getElementById("url-"+path).innerText = url
+document.getElementById("url-"+path).innerText=url
 
-const resultBox = document.getElementById("result-"+path)
+const resultBox=document.getElementById("result-"+path)
 
-resultBox.innerHTML = '<span class="loader"></span> consultando...'
+resultBox.innerHTML='<span class="loader"></span> consultando...'
 
 fetch(url)
 .then(r=>r.json())
 .then(d=>{
-
-resultBox.textContent = JSON.stringify(d,null,2)
-
+resultBox.textContent=JSON.stringify(d,null,2)
 })
 .catch(()=>{
-
-resultBox.textContent = "Erro na consulta"
-
+resultBox.textContent="Erro na consulta"
 })
 
 }
 
 function copiarUrl(path){
 
-const token = document.getElementById("token").value.trim()
+const token=document.getElementById("token").value.trim()
 
 if(!token){
 alert("Digite o token primeiro")
 return
 }
 
-const url = API + "/" + path + "?token=" + token
+const url=API+"/"+path+"?token="+token
 
 navigator.clipboard.writeText(url)
 
@@ -2161,6 +2092,7 @@ headers:{
 })
 
 }
+
 /*
 |--------------------------------------------------------------------------
 | ERROS
