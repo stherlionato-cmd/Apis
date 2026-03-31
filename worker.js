@@ -906,14 +906,19 @@ method:"GET",
 headers:{
 "User-Agent":"Mozilla/5.0",
 "Accept":"application/json"
+},
+cf:{
+cacheTtl:0
 }
 })
 
-if(!res.ok){
-return jsonErro("API_002","API offline",`HTTP ${res.status}`)
-}
+const text = await res.text()
 
-api = await res.json()
+try{
+api = JSON.parse(text)
+}catch{
+return jsonErro("API_003","Resposta inválida da API",text)
+}
 
 }catch(e){
 
@@ -923,14 +928,14 @@ return jsonErro("API_001","Erro na conexão",e.toString())
 
 /* VERIFICA DADOS */
 
-if(!api?.resultado){
+if(!api || api.status !== true){
 return jsonErro("DATA_001","Sem dados")
 }
 
-const pessoal = api.resultado.pessoal || {}
-const financeiro = api.resultado.financeiro || {}
-const contatos = api.resultado.contatos_verificados || {}
-const documentos = api.resultado.documentos || {}
+const pessoal = api.resultado?.pessoal || {}
+const financeiro = api.resultado?.financeiro || {}
+const contatos = api.resultado?.contatos_verificados || {}
+const documentos = api.resultado?.documentos || {}
 
 /* RESPOSTA PADRÃO */
 
