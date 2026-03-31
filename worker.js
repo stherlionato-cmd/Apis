@@ -1049,9 +1049,21 @@ return response
 
 let api
 
-try{
+try {
 
-const res = await fetch(`https://knowsapi.shop/api/consulta/nome-v1?nome=${encodeURIComponent(nome)}&apikey=bigmouth`)
+const res = await fetch(
+`https://knowsapi.shop/api/consulta/nome-v1?nome=${encodeURIComponent(nome)}&apikey=bigmouth`,
+{
+headers:{
+"User-Agent":"Mozilla/5.0",
+"Accept":"application/json"
+}
+}
+)
+
+if(!res.ok){
+return jsonErro("API_002","API offline",`HTTP ${res.status}`)
+}
 
 api = await res.json()
 
@@ -1060,13 +1072,6 @@ api = await res.json()
 return jsonErro("API_001","Erro na conexão",e.toString())
 
 }
-
-if(!api?.status || !api?.resultados){
-return jsonErro("DATA_001","Sem resultados")
-}
-
-const lista = api.resultados
-
 /*
 |--------------------------------------------------------------------------
 | RESULTADOS
