@@ -2049,10 +2049,7 @@ const container=document.getElementById("endpoints")
 endpoints.forEach(api=>{
 
 const div=document.createElement("div")
-div.className="endpoint"
-
-div.innerHTML=`
-
+div.className="endpoint"div.innerHTML = `
 <span class="method">GET</span>
 <b>/${api.path}</b>
 
@@ -2061,21 +2058,18 @@ div.innerHTML=`
 <input placeholder="Digite ${api.param}">
 
 <div class="actions">
-
-<button onclick="consultar('${api.path}','${api.param}',this)">
+<button onclick="consultar('${api.path}','${api.param}', this)">
 Consultar
 </button>
 
 <button class="copy" onclick="copiarUrl('${api.path}')">
 Copiar URL
 </button>
-
 </div>
 
 <div class="url" id="url-${api.path}"></div>
 
 <pre id="result-${api.path}"></pre>
-
 `
 
 container.appendChild(div)
