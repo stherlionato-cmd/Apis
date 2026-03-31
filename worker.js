@@ -857,7 +857,7 @@ headers:{
 |--------------------------------------------------------------------------
 */
 
-async async function consultaCPF(request,url,ctx){
+async function consultaCPF(request,url,ctx){
 
 if(request.method !== "GET"){
 return jsonErro("REQ_000","Método inválido")
