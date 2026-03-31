@@ -737,10 +737,17 @@ continue
 }
 
 // VALOR NORMAL
+// VALOR NORMAL (ANTI OBJECT BUG)
+let safeValue = value
+
+if(typeof value === "object"){
+safeValue = JSON.stringify(value, null, 2)
+}
+
 html += `
 <div class="item">
 <span>${key}</span>
-<span>${value}</span>
+<span>${safeValue}</span>
 </div>
 `
 
