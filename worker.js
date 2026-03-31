@@ -912,16 +912,18 @@ try{
 const res = await fetch(`https://knowsapi.shop/api/consulta/cpf-v5?code=${cpf}&apikey=bigmouth`,{
 method:"GET",
 headers:{
-"User-Agent":"AstroAPI/1.0",
-"Accept":"application/json"
+"Accept":"application/json",
+"User-Agent":"Mozilla/5.0"
 }
 })
 
-if(!res.ok){
-return jsonErro("API_002","API erro",res.status)
-}
+const text = await res.text()
 
-api = await res.json()
+try{
+api = JSON.parse(text)
+}catch{
+return jsonErro("API_003","Resposta inválida da API",text)
+}
 
 }catch(e){
 
