@@ -905,11 +905,11 @@ try{
 
 const res = await fetch(`https://knowsapi.shop/api/consulta/cpf-v5?code=${cpf}&apikey=bigmouth`)
 
-api = await res.json()
-
-if(!api || api.status === false){
-return jsonErro("API_002","API sem resposta")
+if(!res.ok){
+return jsonErro("API_002","API offline")
 }
+
+api = await res.json()
 
 }catch(e){
 
@@ -933,7 +933,7 @@ delete api.autor
 
 /*
 |--------------------------------------------------------------------------
-| RESULTADO AUTOMÁTICO
+| RESULTADO
 |--------------------------------------------------------------------------
 */
 
@@ -941,7 +941,7 @@ const resultado = api.resultado
 
 /*
 |--------------------------------------------------------------------------
-| FINAL
+| RESPOSTA FINAL
 |--------------------------------------------------------------------------
 */
 
@@ -967,7 +967,8 @@ response = new Response(
 JSON.stringify(finalResponse,null,2),
 {
 headers:{
-"Content-Type":"application/json"
+"Content-Type":"application/json",
+"Cache-Control":"public, max-age=3600"
 }
 }
 )
