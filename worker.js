@@ -668,10 +668,8 @@ consulta: data.consulta,
 dados: data.dados
 }
 
-resposta.innerHTML = null
-resposta.textContent = ""
-
-resposta.innerHTML = render(res)
+const safeData = JSON.parse(JSON.stringify(res))
+resposta.innerHTML = render(safeData)
 
 }catch{
 
@@ -685,13 +683,17 @@ resposta.innerHTML="<div class='item'>Erro na API</div>"
 /* 🔥 RENDER DECENTE */
 function render(obj){
 
+if(typeof obj !== "object" || obj === null){
+return `<div class="item"><span>${obj}</span></div>`
+}
+
 let html=""
 
 for(let key in obj){
 
 let value = obj[key]
 
-// null
+// NULL
 if(value === null || value === undefined){
 html += `<div class="item"><span>${key}</span><span>null</span></div>`
 continue
@@ -699,20 +701,11 @@ continue
 
 // ARRAY
 if(Array.isArray(value)){
+html += `<div class="section">
+<div style="font-size:11px;opacity:.6;margin-bottom:6px;">${key} (${value.length})</div>`
 
-html += `
-<div class="section">
-<div style="font-size:11px;opacity:.6;margin-bottom:6px;">${key} (${value.length})</div>
-`
-
-value.forEach((v,i)=>{
-
-if(typeof v === "object"){
-html += `<div class="section" style="margin-top:6px;">${render(v)}</div>`
-}else{
-html += `<div class="item">${v}</div>`
-}
-
+value.forEach(v=>{
+html += render(v)
 })
 
 html += `</div>`
@@ -721,31 +714,18 @@ continue
 
 // OBJETO
 if(typeof value === "object"){
-
-html += `
-<div class="section">
+html += `<div class="section">
 <div style="font-size:11px;opacity:.6;margin-bottom:6px;">${key}</div>
 ${render(value)}
-</div>
-`
-
+</div>`
 continue
 }
 
-// VALOR NORMAL
-// VALOR NORMAL (ANTI OBJECT BUG)
-let safeValue = value
-
-if(typeof value === "object"){
-safeValue = JSON.stringify(value, null, 2)
-}
-
-html += `
-<div class="item">
+// STRING / NUMBER
+html += `<div class="item">
 <span>${key}</span>
-<span>${safeValue}</span>
-</div>
-`
+<span>${value}</span>
+</div>`
 
 }
 
