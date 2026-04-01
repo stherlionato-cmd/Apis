@@ -845,9 +845,9 @@ function fecharMaintenanceModal(){
 /* ===== BADGE ===== */
 function renderBadge(plano){
   const el = document.getElementById("badgeContainer");
-  el.innerHTML = `<div class="badge ${plano.toLowerCase()}" style="background:rgba(250,204,21,.2); color:#facc15;">
-                    ${plano.toUpperCase()} • MANUTENÇÃO
-                  </div>`;
+  const classe = plano.toLowerCase();
+  const texto = plano.toUpperCase() + " • MANUTENÇÃO";
+  el.innerHTML = '<div class="badge ' + classe + '" style="background:rgba(250,204,21,.2); color:#facc15;">' + texto + '</div>';
 }
 
 /* ===== PREMIUM EFFECT ===== */
