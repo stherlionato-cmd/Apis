@@ -239,18 +239,28 @@ dados = normalizarDados(dados)
 
 // Ajuste específico para placa3
 // Ajuste específico para placa3
+// Ajuste específico para placa3
 if(endpoint === "placa3" && dados?.resultado){
-  let texto = dados.resultado;
+  let apiDados = dados.resultado;
 
-  // Remove linhas indesejadas (CPF/CNPJ, NOME, USUÁRIO e créditos)
-  texto = texto
-    .replace(/• (CPF\/CNPJ|NOME|USUÁRIO):.*?(\n|$)/gi, "")
+  // Destacar CPF do possuidor se existir
+  let possuidor = {};
+  const possuidorMatch = apiDados.match(/• POSSUIDOR\s*\n\s*• CPF\/CNPJ:\s*(.*?)\n\s*• NOME:\s*(.*?)\n/);
+  if(possuidorMatch){
+    possuidor = {
+      cpf_cnpj: possuidorMatch[1].trim(),
+      nome: possuidorMatch[2].trim()
+    };
+  }
+
+  // Remover linhas de CPF/NOME do texto grande
+  apiDados = apiDados
+    .replace(/• CPF\/CNPJ:.*?\n/gi,"")
+    .replace(/• NOME:.*?\n/gi,"")
     .replace(/🔛 BY: @Skynet07Robot/gi, "");
 
-  // Atualiza o resultado limpo
-  dados.resultado = texto.trim();
-
-  // Remove meta_turbo completamente
+  dados.resultado = apiDados.trim();
+  dados.proprietario = { possuidor }; // adiciona objeto estruturado
   delete dados.meta_turbo;
 }
 
