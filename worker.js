@@ -54,7 +54,12 @@ const ENDPOINTS = {
   cpf5:{ url:"https://knowsapi.shop/api/consulta/cpf-v4", param:"code", query:"cpf" },
   cpf6:{ url:"https://knowsapi.shop/api/consulta/cpf-v5", param:"code", query:"cpf" },
 
-  nome:{ url:"https://knowsapi.shop/api/consultas/nome", param:"nome", query:"nome" },
+  nome: { 
+  url: "https://api.blackaut.shop/api/dados-pessoais/nome", 
+  param: "nome", 
+  query: "nome",
+  apiKey: "EbmScZ0ntHf61KJz3H"
+},
   nome2:{ url:"https://knowsapi.shop/api/consulta/nome-v1", param:"nome", query:"nome" },
 
   telefone:{ url:"https://knowsapi.shop/api/consultas/telefone", param:"telefone", query:"telefone" },
