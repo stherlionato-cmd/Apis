@@ -86,6 +86,13 @@ const APIKEY = "bigmouth"
 
 const ENDPOINTS = {
 
+placa3: {
+  url: "https://api.blackaut.shop/api/dados-pessoais/placa",
+  param: "placa",
+  query: "placa",
+  apikey: "EbmScZ0ntHf61KJz3H"  // chave da API
+}
+
 cpf:{url:"https://knowsapi.shop/api/consulta/cpf",param:"code",query:"cpf"},
 cpf2:{url:"https://knowsapi.shop/api/consulta/cpf-v2",param:"code",query:"cpf"},
 cpf3:{url:"https://knowsapi.shop/api/consultas/cpf",param:"cpf",query:"cpf"},
@@ -170,14 +177,13 @@ return response
 |--------------------------------------------------------------------------
 */
 
-const apiURL =
-config.url +
-"?" +
-config.param +
-"=" +
-encodeURIComponent(valor) +
-"&apikey=" +
-APIKEY
+let apiURL = config.url + "?" + config.param + "=" + encodeURIComponent(valor);
+
+if(config.apikey){
+  apiURL += "&apikey=" + config.apikey;
+} else {
+  apiURL += "&apikey=" + APIKEY;
+}
 
 /*
 |--------------------------------------------------------------------------
@@ -315,6 +321,52 @@ return data.resultado
 
 return data
 
+}
+
+function normalizarPlaca3(api){
+  if(!api || !api.resultado) return {};
+
+  const r = api.resultado;
+
+  return {
+    detalhes_veiculo: {
+      placa: r.placa,
+      cor: r.MARCA_MODELO?.COR || r.cor || "SEM INFORMAÇÃO",
+      ano_fab: r.ANO_FABRICACAO || "SEM INFORMAÇÃO",
+      ano_mod: r.ANO_MODELO || "SEM INFORMAÇÃO",
+      combustivel: r.COMBUSTIVEL || "SEM INFORMAÇÃO",
+      potencia: r.POTENCIA || "SEM INFORMAÇÃO",
+      cilindradas: r.CILINDRADAS || "SEM INFORMAÇÃO",
+      tipo: r.TIPO_DE_VEICULO || "SEM INFORMAÇÃO",
+      especie: r.ESPECIE || "SEM INFORMAÇÃO",
+      passageiros: r.QUANTIDADE_DE_PASSAGEIROS || "SEM INFORMAÇÃO"
+    },
+    identificadores: {
+      chassi: r.CHASSI || "SEM INFORMAÇÃO",
+      renavam: r.RENAVAM || "SEM INFORMAÇÃO",
+      motor: r.NUM_MOTOR || "SEM INFORMAÇÃO",
+      origem: r.ORIGEM || "SEM INFORMAÇÃO"
+    },
+    geografia: {
+      atual: r.MUNICIPIO || "SEM INFORMAÇÃO",
+      fabricacao: r.MUNICIPIO_FAB || "SEM INFORMAÇÃO"
+    },
+    legal: {
+      situacao: r.SITUACAO || "SEM INFORMAÇÃO",
+      ultima_atualizacao: r.ULTIMA_ATUALIZACAO || "SEM INFORMAÇÃO",
+      emissao_crv: r.EMISSAO_ULTIMO_CRV || "SEM INFORMAÇÃO",
+      restricoes: [
+        r.RESTRICAO_1,
+        r.RESTRICAO_2,
+        r.RESTRICAO_3,
+        r.RESTRICAO_4
+      ].filter(x => x && x !== "SEM RESTRICAO")
+    },
+    proprietario: {
+      documento: r.PROPRIETARIO?.CPF_CNPJ || "SEM INFORMAÇÃO",
+      nome: r.PROPRIETARIO?.NOME || "SEM INFORMAÇÃO"
+    }
+  };
 }
 
 /*
