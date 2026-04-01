@@ -201,34 +201,6 @@ async function consultar(endpoint, request, url, ctx) {
   return response;
 }
 
-/*
-|--------------------------------------------------------------------------
-| CACHE
-|--------------------------------------------------------------------------
-*/
-
-const cacheKey = new Request(request.url,{method:"GET"})
-const cache = caches.default
-
-let response = await cache.match(cacheKey)
-
-if(response){
-return response
-}
-
-/*
-|--------------------------------------------------------------------------
-| URL FINAL
-|--------------------------------------------------------------------------
-*/
-
-const apiURL = config.url +
-  "?" +
-  config.param +
-  "=" +
-  encodeURIComponent(valor) +
-  (config.apikey ? "&apikey=" + config.apikey : "&apikey=" + APIKEY);
-
 const STATUS_APIS = {
   cpf:"yellow",
   cpf2:"yellow",
@@ -345,24 +317,18 @@ if(endpoint === "placa3" && dados?.resultado){
 */
 
 const finalResponse = {
-
-status:true,
-
-meta:{
-api:"Astro Search API",
-empresa:"Astro Company",
-plano_token:plano,
-endpoint:endpoint,
-timestamp:new Date().toISOString()
-},
-
-consulta:{
-[config.query]:valor
-},
-
-dados:dados
-
-}
+  status: true,
+  meta: {
+    api: "Astro Search API",
+    empresa: "Astro Company",
+    plano_token: plano,
+    endpoint,
+    timestamp: new Date().toISOString(),
+    status_api: STATUS_APIS[endpoint] || "unknown"  // ← aqui
+  },
+  consulta: { [config.query]: valor },
+  dados
+};
 
 response = new Response(
 JSON.stringify(finalResponse,null,2),
