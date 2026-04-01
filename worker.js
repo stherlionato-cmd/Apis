@@ -1211,64 +1211,56 @@ button:hover{
 
 <script>
 
-const ADMIN = "${ADMIN_TOKEN}"
-const ENDPOINTS = ${JSON.stringify(Object.keys(ENDPOINTS))}
+const ADMIN = "${ADMIN_TOKEN}";
+const ENDPOINTS = ${JSON.stringify(Object.keys(ENDPOINTS))};
 
 /* LOGIN */
 function login(){
- const val = document.getElementById("adminToken").value
-
+ const val = document.getElementById("adminToken").value;
  if(val !== ADMIN){
-  alert("Token inválido")
-  return
+  alert("Token inválido");
+  return;
  }
-
- document.getElementById("loginBox").style.display="none"
- document.getElementById("panel").style.display="block"
- renderEndpoints()
+ document.getElementById("loginBox").style.display="none";
+ document.getElementById("panel").style.display="block";
+ renderEndpoints();
 }
 
 /* CHECKBOX */
 function renderEndpoints(){
-  const div = document.getElementById("endpoints")
+  const div = document.getElementById("endpoints");
   div.innerHTML = ENDPOINTS.map(e =>
     '<label style="display:flex;gap:8px;margin-top:6px;font-size:12px;">' +
       '<input type="checkbox" value="' + e + '" checked>' +
       e +
     '</label>'
-  ).join('')
+  ).join('');
 }
 
 function gerar(){
-  const nome = document.getElementById("nome").value || "user"
-  const plano = document.getElementById("plano").value
+  const nome = document.getElementById("nome").value || "user";
+  const plano = document.getElementById("plano").value;
 
-  const checks = [...document.querySelectorAll("#endpoints input:checked")]
-  const perms = checks.map(c=>c.value)
+  const checks = [...document.querySelectorAll("#endpoints input:checked")];
+  const perms = checks.map(c=>c.value);
 
-  const token = nome + "_" + Math.random().toString(36).slice(2,10)
+  const token = nome + "_" + Math.random().toString(36).slice(2,10);
 
-  let limite = "100 consultas"
-  if(plano === "PRO") limite = "1000 consultas"
-  if(plano === "VIP") limite = "Ilimitado"
+  let limite = "100 consultas";
+  if(plano === "PRO") limite = "1000 consultas";
+  if(plano === "VIP") limite = "Ilimitado";
 
-  const base = window.location.origin
+  const base = window.location.origin;
 
   const mensagem = 
-  "\u{1F389} TOKEN GERADO COM SUCESSO!\n\n" +
-  "\u{1F511} • Token: " + token + "\n" +
-  "\u{1F48E} • Plano: " + plano + "\n" +
-  "\u{267E}\u{FE0F} • Limite: " + limite + "\n\n" +
-  "\u26A0\uFE0F ATENÇÃO:\n" +
-  "Seu token é privado e intransferível.\n" +
-  "NÃO compartilhe com ninguém.\n\n" +
-  "━━━━━━━━━━━━━━━━━━\n\n" +
-  "🌐 • BASE DA API:\n" +
-  "👉 • " + base + "\n\n" +
-  "━━━━━━━━━━━━━━━━━━\n\n" +
-  "🚀 Pronto! Só substituir os dados e começar a usar."
-  
-  document.getElementById("resultado").innerText = mensagem
+    "\u{1F389} TOKEN GERADO COM SUCESSO!\n\n" +
+    "\u{1F511} • Token: " + token + "\n" +
+    "\u{1F48E} • Plano: " + plano + "\n" +
+    "♾️ • Limite: " + limite + "\n\n" +
+    "⚠️ ATENÇÃO:\n" +
+    "Endpoints liberados: " + perms.join(", ");
+
+  document.getElementById("resultado").innerText = mensagem;
 }
 
 </script>
@@ -1281,39 +1273,6 @@ function gerar(){
     "content-type": "text/html",
     "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate"
   }
-})
-
-}
-
-/*
-|--------------------------------------------------------------------------
-| ERROS
-|--------------------------------------------------------------------------
-*/
-
-function jsonErro(code,msg,extra=null){
-
-return new Response(JSON.stringify({
-
-status:false,
-
-erro:{
-codigo:code,
-mensagem:msg
-},
-
-suporte:"@puxardados5",
-
-extra:extra
-
-},null,2),{
-
-status:400,
-
-headers:{
-"Content-Type":"application/json"
-}
-
 })
 
 }
