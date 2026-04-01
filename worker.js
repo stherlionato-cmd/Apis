@@ -588,7 +588,7 @@ pre{
   <div class="modal-box">
     <h2 style="font-size:16px;margin-bottom:10px;">⚠️ Sistema em Manutenção</h2>
     <p style="font-size:14px;opacity:.8;line-height:1.5;">
-      O sistema está passando por atualizações e estará disponível novamente às <b>07:30</b>.<br>
+      O sistema está passando por atualizações e estará disponível novamente às <b>08:30</b>.<br>
       Estamos trabalhando o mais rápido possível, <b>3 pessoas</b> estão dedicadas para isso.
     </p>
     <button onclick="fecharMaintenanceModal()" style="margin-top:15px;">Fechar</button>
