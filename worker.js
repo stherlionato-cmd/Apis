@@ -83,7 +83,7 @@ instagram: {
   apikey: "bigmouth"
 }
 
-nome:{url:"https://knowsapi.shop/api/consultas/nome",param:"nome",query:"nome"},
+nome:{url:"https://know sapo.shop/api/consultas/nome",param:"nome",query:"nome"},
 nome2:{url:"https://knowsapi.shop/api/consulta/nome-v1",param:"nome",query:"nome"},
 
 telefone:{url:"https://knowsapi.shop/api/consultas/telefone",param:"telefone",query:"telefone"},
@@ -168,16 +168,21 @@ async function consultar(endpoint, request, url, ctx) {
   let dados = limparRespostaAPI(api);
   dados = normalizarDados(dados);
 
-if(endpoint === "instagram" && dados?.resultado){
-  const res = dados.resultado;
-  dados.normalizado = {
+if(endpoint === "instagram" && dados){
+  const res = dados;
+
+  dados = {
     id: res.id,
     username: res.username,
     nome: res.nome,
     categoria: res.categoria,
     bio: res.bio,
+    seguidores: res.seguidores,
+    seguindo: res.seguindo,
+    postagens: res.postagens,
+    verificada: res.verificada,
     links: res.bio_links?.map(l => ({
-      url: l.lynx_url,
+      url: l.url,
       type: l.link_type
     })) || []
   };
@@ -422,29 +427,33 @@ return TOKENS[token]?.plano || "FREE"
 
 function limparRespostaAPI(data){
 
-if(!data || typeof data !== "object") return data
+  if(!data || typeof data !== "object") return data
 
-const blacklist=[
-"status",
-"creator",
-"api",
-"criador",
-"credits",
-"creditos",
-"mensagem",
-"message"
-]
+  const blacklist=[
+    "status",
+    "creator",
+    "api",
+    "criador",
+    "credits",
+    "creditos",
+    "mensagem",
+    "message"
+  ]
 
-for(const campo of blacklist){
-delete data[campo]
-}
+  for(const campo of blacklist){
+    delete data[campo]
+  }
 
-if(data.resultado){
-return data.resultado
-}
+  // ✅ NOVO: trata APIs com "data.resultado"
+  if(data.data && data.data.resultado){
+    return data.data.resultado
+  }
 
-return data
+  if(data.resultado){
+    return data.resultado
+  }
 
+  return data
 }
 
 /*
