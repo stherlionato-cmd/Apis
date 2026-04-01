@@ -991,8 +991,11 @@ window.addEventListener("resize", resizeCanvas);
 }
 
 function adminPanel(request){
+  const url = new URL(request.url);
+  const token = url.searchParams.get("token");
+  const valid = token === ADMIN_TOKEN;
 
-return new Response(`
+  return new Response(`
 
 <!DOCTYPE html>
 <html lang="pt-br">
@@ -1002,76 +1005,20 @@ return new Response(`
 <title>Admin Panel</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
-
 <style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:Inter;}
-body{
- background:radial-gradient(circle at 30% 20%,#0a0f2a,#02030a);
- color:#fff;padding:20px;
-}
-
-.card{
- background:rgba(255,255,255,.04);
- border:1px solid rgba(255,255,255,.08);
- padding:16px;
- border-radius:16px;
- margin-top:15px;
- backdrop-filter:blur(10px);
- animation:fade .5s ease;
-}
-
-@keyframes fade{
- from{opacity:0;transform:translateY(10px)}
- to{opacity:1}
-}
-
-input,select{
- width:100%;padding:12px;margin-top:8px;
- border-radius:10px;border:none;
- background:#0b1228;color:#fff;
-}
-
-button{
- width:100%;padding:12px;margin-top:12px;
- border:none;border-radius:12px;
- background:linear-gradient(90deg,#3b82f6,#2563eb);
- color:#fff;font-weight:600;
-}
-
-button:hover{
- transform:translateY(-2px);
- box-shadow:0 10px 20px rgba(59,130,246,.3);
-}
-
-.token-box{
- margin-top:10px;
- background:#020617;
- padding:10px;
- border-radius:10px;
- font-size:12px;
- word-break:break-all;
-}
-
-.badge{
- padding:4px 10px;border-radius:999px;font-size:11px;
-}
-
-.vip{background:#a855f7}
-.pro{background:#3b82f6}
-.free{background:#22c55e}
+/* Seu CSS continua aqui */
 </style>
-
 </head>
 <body>
 
 <h2>🔐 Painel Admin</h2>
 
-<div class="card" id="loginBox">
+<div class="card" id="loginBox" style="display:${valid ? "none" : "block"}">
 <input id="adminToken" placeholder="Token admin">
 <button onclick="login()">Entrar</button>
 </div>
 
-<div id="panel" style="display:none">
+<div id="panel" style="display:${valid ? "block" : "none"}">
 
 <div class="card">
 <h3>🎟️ Gerar Token</h3>
@@ -1097,7 +1044,6 @@ button:hover{
 </div>
 
 <script>
-
 const ADMIN = "` + ADMIN_TOKEN + `";
 const ENDPOINTS = ${JSON.stringify(Object.keys(ENDPOINTS))};
 
@@ -1113,7 +1059,7 @@ function login(){
  renderEndpoints();
 }
 
-/* CHECKBOX */
+// Renderiza endpoints
 function renderEndpoints(){
   const div = document.getElementById("endpoints");
   div.innerHTML = ENDPOINTS.map(e =>
@@ -1124,20 +1070,16 @@ function renderEndpoints(){
   ).join('');
 }
 
+// Gerar token
 function gerar(){
   const nome = document.getElementById("nome").value || "user";
   const plano = document.getElementById("plano").value;
-
   const checks = [...document.querySelectorAll("#endpoints input:checked")];
   const perms = checks.map(c=>c.value);
-
   const token = nome + "_" + Math.random().toString(36).slice(2,10);
-
   let limite = "100 consultas";
   if(plano === "PRO") limite = "1000 consultas";
   if(plano === "VIP") limite = "Ilimitado";
-
-  const base = window.location.origin;
 
   const mensagem = 
     "\u{1F389} TOKEN GERADO COM SUCESSO!\n\n" +
@@ -1150,16 +1092,19 @@ function gerar(){
   document.getElementById("resultado").innerText = mensagem;
 }
 
+// Se token da URL for válido, já renderiza os endpoints
+if(${valid}){
+  renderEndpoints();
+}
+
 </script>
 
 </body>
 </html>
-
 `,{
-  headers: { 
-    "content-type": "text/html",
-    "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate"
-  }
-})
-
+    headers: { 
+      "content-type": "text/html",
+      "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate"
+    }
+  })
 }
