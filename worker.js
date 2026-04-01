@@ -1100,7 +1100,7 @@ button:hover{
 </head>
 <body>
 
-<h2>🔐 Painel Admin</h2>
+<h2>\u{1F512} Painel Admin</h2>
 
 <div class="card" id="loginBox">
 <input id="adminToken" placeholder="Token admin">
@@ -1110,7 +1110,7 @@ button:hover{
 <div id="panel" style="display:none">
 
 <div class="card">
-<h3>🎟️ Gerar Token</h3>
+<h3>\u{1F39F} Gerar Token</h3>
 
 <input id="nome" placeholder="Nome do cliente">
 
@@ -1179,26 +1179,24 @@ function gerar(){
 
  const base = "https://astro.stherlionato.workers.dev"
 
- const mensagem = `🎉 TOKEN GERADO COM SUCESSO!
+ const mensagem = `\u{1F389} TOKEN GERADO COM SUCESSO!
 
-🔑 • Token: ${token}
-💎 • Plano: ${plano}
-♾️ • Limite: ${limite}
+\u{1F511} • Token: ${token}
+\u{1F48E} • Plano: ${plano}
+\u267E\uFE0F • Limite: ${limite}
 
-⚠️ ATENÇÃO:
+\u26A0\uFE0F ATENÇÃO:
 Seu token é privado e intransferível.
 NÃO compartilhe com ninguém.
 
 ━━━━━━━━━━━━━━━━━━
 
-🌐 • BASE DA API:
+\u{1F310} • BASE DA API:
 👉 • ${base}
 
 ━━━━━━━━━━━━━━━━━━
 
-🚀 EXEMPLOS PRONTOS:
-
-Altere as últimas informações pela informação que deseja buscar.
+\u{1F680} EXEMPLOS PRONTOS:
 
 👤 CPF
 ${base}/cpf?token=${token}&cpf=00000000000
@@ -1248,9 +1246,6 @@ ${base}/titulo?token=${token}&cpf=00000000000
 💼 PIS
 ${base}/pis?token=${token}&cpf=00000000000
 
-📊 NIS
-${base}/nis?token=${token}&cpf=00000000000
-
 👨‍👩‍👧 Parentes
 ${base}/parentes?token=${token}&cpf=00000000000
 
@@ -1259,7 +1254,7 @@ ${base}/vizinhos?token=${token}&cpf=00000000000
 
 ━━━━━━━━━━━━━━━━━━
 
-🚀 Pronto! Só substituir os dados e começar a usar.
+\u{1F680} Pronto! Só substituir os dados e começar a usar.
 `
 
  document.getElementById("resultado").innerText = mensagem
