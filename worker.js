@@ -62,6 +62,48 @@ const ENDPOINTS = {
 },
   nome2:{ url:"https://knowsapi.shop/api/consulta/nome-v1", param:"nome", query:"nome" },
 
+renavam: { 
+  url: "https://api.blackaut.shop/api/dados-pessoais/renavam", 
+  param: "renavam", 
+  query: "renavam",
+  apiKey: "EbmScZ0ntHf61KJz3H"
+},
+
+nome3: { 
+  url: "https://api.blackaut.shop/api/dados-pessoais/nome2", 
+  param: "nome2", 
+  query: "nome",
+  apiKey: "EbmScZ0ntHf61KJz3H"
+},
+
+telefone3: { 
+  url: "https://api.blackaut.shop/api/dados-pessoais/telefone2", 
+  param: "telefone2", 
+  query: "telefone",
+  apiKey: "EbmScZ0ntHf61KJz3H"
+},
+
+parentes2: { 
+  url: "https://api.blackaut.shop/api/dados-pessoais/parentes", 
+  param: "parentes", 
+  query: "cpf",
+  apiKey: "EbmScZ0ntHf61KJz3H"
+},
+
+cnh: { 
+  url: "https://api.blackaut.shop/api/dados-pessoais/cnh", 
+  param: "cnh", 
+  query: "cpf",
+  apiKey: "EbmScZ0ntHf61KJz3H"
+},
+
+cnpj: { 
+  url: "https://api.blackaut.shop/api/dados-pessoais/cnpj", 
+  param: "cnpj", 
+  query: "cnpj",
+  apiKey: "EbmScZ0ntHf61KJz3H"
+},
+
   telefone:{ url:"https://knowsapi.shop/api/consultas/telefone", param:"telefone", query:"telefone" },
   telefone2:{ url:"https://knowsapi.shop/api/consulta/telefone-v1", param:"telefone", query:"telefone" },
   operadora:{ url:"https://knowsapi.shop/api/consultas/operadora", param:"telefone", query:"telefone" },
