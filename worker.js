@@ -83,7 +83,7 @@ instagram: {
   apikey: "bigmouth"
 }
 
-nome:{url:"https://know sapo.shop/api/consultas/nome",param:"nome",query:"nome"},
+nome:{url:"https://knowsapi.shop/api/consultas/nome",param:"nome",query:"nome"},
 nome2:{url:"https://knowsapi.shop/api/consulta/nome-v1",param:"nome",query:"nome"},
 
 telefone:{url:"https://knowsapi.shop/api/consultas/telefone",param:"telefone",query:"telefone"},
