@@ -1038,7 +1038,7 @@ async function consultar(){
 
   const token = document.getElementById("token").value.trim();
   const endpoint = document.getElementById("endpoint").value;
-  const valor = document.getElementById("valor").value;
+  const valor = document.getElementById("valor").value.trim();
 
   if(!token){
     abrirModal();
@@ -1058,11 +1058,20 @@ async function consultar(){
   salvarToken(token);
   efeitoPremium(token);
 
-  const param = endpoint.replace(/[0-9]/g,'');
+  // ✅ Usa o parâmetro correto definido no ENDPOINTS
+  const config = ENDPOINTS[endpoint];
+  if(!config){
+    document.getElementById("resBox").innerHTML = "<pre>Endpoint inválido</pre>";
+    btn.disabled = false;
+    btn.innerText = "Consultar";
+    return;
+  }
+
   const url = window.location.origin + "/" + endpoint +
-              "?token=" + token + "&" + param + "=" + valor;
+              "?token=" + token + "&" + config.query + "=" + encodeURIComponent(valor);
 
   document.getElementById("url").innerText = url;
+
   const resBox = document.getElementById("resBox");
   resBox.innerHTML = '<div class="loader"></div>';
 
@@ -1071,7 +1080,8 @@ async function consultar(){
     const j = await r.json();
     resBox.innerHTML = "<pre id='resposta'>"+JSON.stringify(j,null,2)+"</pre>";
     mostrarToast("Consulta feita com sucesso 🚀");
-  } catch {
+  } catch(e){
+    console.error(e);
     resBox.innerHTML = "<pre>Erro ao consultar</pre>";
     mostrarToast("Erro na consulta ❌");
   }
