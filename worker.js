@@ -1255,19 +1255,19 @@ function gerar(){
   const base = window.location.origin
 
   const mensagem = 
-    "🎉 TOKEN GERADO COM SUCESSO!\n\n" +
-    "🔑 • Token: " + token + "\n" +
-    "💎 • Plano: " + plano + "\n" +
-    "♾️ • Limite: " + limite + "\n\n" +
-    "⚠️ ATENÇÃO:\n" +
-    "Seu token é privado e intransferível.\n" +
-    "NÃO compartilhe com ninguém.\n\n" +
-    "━━━━━━━━━━━━━━━━━━\n\n" +
-    "🌐 • BASE DA API:\n" +
-    "👉 • " + base + "\n\n" +
-    "━━━━━━━━━━━━━━━━━━\n\n" +
-    "🚀 Pronto! Só substituir os dados e começar a usar."
-
+  "\u{1F389} TOKEN GERADO COM SUCESSO!\n\n" +
+  "\u{1F511} • Token: " + token + "\n" +
+  "\u{1F48E} • Plano: " + plano + "\n" +
+  "\u{267E}\u{FE0F} • Limite: " + limite + "\n\n" +
+  "\u26A0\uFE0F ATENÇÃO:\n" +
+  "Seu token é privado e intransferível.\n" +
+  "NÃO compartilhe com ninguém.\n\n" +
+  "━━━━━━━━━━━━━━━━━━\n\n" +
+  "🌐 • BASE DA API:\n" +
+  "👉 • " + base + "\n\n" +
+  "━━━━━━━━━━━━━━━━━━\n\n" +
+  "🚀 Pronto! Só substituir os dados e começar a usar."
+  
   document.getElementById("resultado").innerText = mensagem
 }
 
