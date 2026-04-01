@@ -5,6 +5,12 @@ async fetch(request, env, ctx){
 const url = new URL(request.url)
 const endpoint = url.pathname.replace(/^\/|\/$/g, "")
 
+console.log("Endpoint:", endpoint)
+console.log("URL:", request.url)
+console.log("Pathname:", url.pathname)
+console.log("Endpoint:", endpoint)
+console.log("Token:", url.searchParams.get("token"))
+
 if(endpoint === "admin"){
   const token = url.searchParams.get("token")
 
@@ -293,8 +299,6 @@ return data.resultado
 return data
 
 }
-
-return new Response(endpoint)
 
 /*
 |--------------------------------------------------------------------------
