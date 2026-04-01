@@ -744,23 +744,29 @@ const TOKENS = {
 /* CONSULTAR */
 async function consultar(){
 
+const btn = document.getElementById("btnConsultar")
+btn.disabled = true
+btn.innerText = "Consultando..."
+
 const token = document.getElementById("token").value.trim()
 const endpoint = document.getElementById("endpoint").value
 const valor = document.getElementById("valor").value
 
 if(!token){
   abrirModal()
+  btn.disabled = false
+  btn.innerText = "Consultar"
   return
 }
 
-/* VALIDAÇÃO FRONT */
 if(!TOKENS[token]){
   abrirModal()
   efeitoErro()
+  btn.disabled = false
+  btn.innerText = "Consultar"
   return
 }
 
-/* TOKEN VÁLIDO */
 salvarToken(token)
 efeitoPremium(token)
 
@@ -775,11 +781,17 @@ resBox.innerHTML = '<div class="loader"></div>'
 try{
 const r = await fetch(url)
 const j = await r.json()
+
 resBox.innerHTML = "<pre id='resposta'>"+JSON.stringify(j,null,2)+"</pre>"
+mostrarToast("Consulta feita com sucesso 🚀")
+
 }catch{
 resBox.innerHTML = "<pre>Erro ao consultar</pre>"
+mostrarToast("Erro na consulta ❌")
 }
 
+btn.disabled = false
+btn.innerText = "Consultar"
 }
 
 /* ===== TOKEN ===== */
@@ -826,9 +838,17 @@ function efeitoErro(){
 
 /* ===== MODAL ===== */
 
-function abrirModal(){
-  document.getElementById("modal").classList.add("show")
-}
+window.addEventListener("load", ()=>{
+  const token = localStorage.getItem("astro_token")
+
+  if(token && TOKENS[token]){
+    document.getElementById("token").value = token
+    renderBadge(TOKENS[token])
+    efeitoPremium(token)
+  } else {
+    abrirModal()
+  }
+})
 
 function fecharModal(){
   document.getElementById("modal").classList.remove("show")
