@@ -19,12 +19,31 @@ console.log("ENDPOINT LIMPO:", JSON.stringify(endpoint))
 
 /* ✅ ADMIN CORRETO */
 if(endpoint === "panel"){
-  return adminPanel(request)
+  // redireciona para o HTML externo
+  const base = new URL(request.url).origin;
+  return fetch(`${base}/admin/adminpanel.html`);
 }
 
 /* HOME */
 if(endpoint === ""){
   return home(request)
+}
+
+// Rota para gerar token
+if(endpoint === "gerartoken" && request.method === "POST"){
+  const body = await request.json();
+  if(body.adminToken !== ADMIN_TOKEN) return jsonErro("AUTH_003","Admin token inválido");
+
+  const nome = body.nome || "user";
+  const plano = body.plano || "FREE";
+  const endpoints = body.endpoints || Object.keys(ENDPOINTS);
+
+  const token = `${nome}_${Math.random().toString(36).slice(2,10)}`;
+  TOKENS[token] = {plano, endpoints, criado: new Date().toISOString()};
+
+  return new Response(JSON.stringify({status:true, token, plano, endpoints}, null, 2), {
+    headers: {"Content-Type":"application/json"}
+  });
 }
 
 return consultar(endpoint,request,url,ctx)
@@ -258,11 +277,11 @@ return response
 */
 
 function validarToken(token){
-return TOKENS.hasOwnProperty(token)
+  return TOKENS.hasOwnProperty(token);
 }
 
 function obterPlanoToken(token){
-return TOKENS[token]?.plano || "FREE"
+  return TOKENS[token]?.plano || "FREE";
 }
 
 /*
