@@ -63,39 +63,40 @@ const APIKEY = "bigmouth"
 
 const ENDPOINTS = {
 
-cpf:{
-  url:"https://api.blackaut.shop/api/dados-pessoais/cpf",
-  param:"cpf",
-  query:"cpf"
-},
-cpf2:{url:"https://knowsapi.shop/api/consulta/cpf-v2",param:"code",query:"cpf"},
-cpf3:{url:"https://knowsapi.shop/api/consultas/cpf",param:"cpf",query:"cpf"},
-cpf4:{url:"https://knowsapi.shop/api/consulta/cpf-v3",param:"code",query:"cpf"},
-cpf5:{url:"https://knowsapi.shop/api/consulta/cpf-v4",param:"code",query:"cpf"},
-cpf6:{url:"https://knowsapi.shop/api/consulta/cpf-v5",param:"code",query:"cpf"},
+  cpf:{ 
+    url:"https://api.blackaut.shop/api/dados-pessoais/cpf",  // NOVO ENDPOINT
+    param:"cpf",
+    query:"cpf"
+  },
 
-nome:{url:"https://knowsapi.shop/api/consultas/nome",param:"nome",query:"nome"},
-nome2:{url:"https://knowsapi.shop/api/consulta/nome-v1",param:"nome",query:"nome"},
+  cpf2:{url:"https://knowsapi.shop/api/consulta/cpf-v2",param:"code",query:"cpf"},
+  cpf3:{url:"https://knowsapi.shop/api/consultas/cpf",param:"cpf",query:"cpf"},
+  cpf4:{url:"https://knowsapi.shop/api/consulta/cpf-v3",param:"code",query:"cpf"},
+  cpf5:{url:"https://knowsapi.shop/api/consulta/cpf-v4",param:"code",query:"cpf"},
+  cpf6:{url:"https://knowsapi.shop/api/consulta/cpf-v5",param:"code",query:"cpf"},
 
-telefone:{url:"https://knowsapi.shop/api/consultas/telefone",param:"telefone",query:"telefone"},
-telefone2:{url:"https://knowsapi.shop/api/consulta/telefone-v1",param:"telefone",query:"telefone"},
-operadora:{url:"https://knowsapi.shop/api/consultas/operadora",param:"telefone",query:"telefone"},
+  nome:{url:"https://knowsapi.shop/api/consultas/nome",param:"nome",query:"nome"},
+  nome2:{url:"https://knowsapi.shop/api/consulta/nome-v1",param:"nome",query:"nome"},
 
-email:{url:"https://knowsapi.shop/api/consultas/email",param:"email",query:"email"},
+  telefone:{url:"https://knowsapi.shop/api/consultas/telefone",param:"telefone",query:"telefone"},
+  telefone2:{url:"https://knowsapi.shop/api/consulta/telefone-v1",param:"telefone",query:"telefone"},
+  operadora:{url:"https://knowsapi.shop/api/consultas/operadora",param:"telefone",query:"telefone"},
 
-cep:{url:"https://knowsapi.shop/api/consultas/cep-v1",param:"cep",query:"cep"},
-cep2:{url:"https://knowsapi.shop/api/consulta/cep-v1",param:"cep",query:"cep"},
+  email:{url:"https://knowsapi.shop/api/consultas/email",param:"email",query:"email"},
 
-placa:{url:"https://knowsapi.shop/api/consulta/placa-v1",param:"placa",query:"placa"},
-placa2:{url:"https://knowsapi.shop/api/consulta/placa-v2",param:"placa",query:"placa"},
+  cep:{url:"https://knowsapi.shop/api/consultas/cep-v1",param:"cep",query:"cep"},
+  cep2:{url:"https://knowsapi.shop/api/consulta/cep-v1",param:"cep",query:"cep"},
 
-rg:{url:"https://knowsapi.shop/api/consultas/rg",param:"cpf",query:"cpf"},
-titulo:{url:"https://knowsapi.shop/api/consultas/titulo",param:"cpf",query:"cpf"},
-pis:{url:"https://knowsapi.shop/api/consultas/pis",param:"cpf",query:"cpf"},
-nis:{url:"https://knowsapi.shop/api/consultas/nis",param:"cpf",query:"cpf"},
+  placa:{url:"https://knowsapi.shop/api/consulta/placa-v1",param:"placa",query:"placa"},
+  placa2:{url:"https://knowsapi.shop/api/consulta/placa-v2",param:"placa",query:"placa"},
 
-parentes:{url:"https://knowsapi.shop/api/consultas/parentes",param:"cpf",query:"cpf"},
-vizinhos:{url:"https://knowsapi.shop/api/consultas/vizinhos",param:"cpf",query:"cpf"}
+  rg:{url:"https://knowsapi.shop/api/consultas/rg",param:"cpf",query:"cpf"},
+  titulo:{url:"https://knowsapi.shop/api/consultas/titulo",param:"cpf",query:"cpf"},
+  pis:{url:"https://knowsapi.shop/api/consultas/pis",param:"cpf",query:"cpf"},
+  nis:{url:"https://knowsapi.shop/api/consultas/nis",param:"cpf",query:"cpf"},
+
+  parentes:{url:"https://knowsapi.shop/api/consultas/parentes",param:"cpf",query:"cpf"},
+  vizinhos:{url:"https://knowsapi.shop/api/consultas/vizinhos",param:"cpf",query:"cpf"}
 
 }
 
