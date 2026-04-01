@@ -837,6 +837,32 @@ ${Object.keys(ENDPOINTS).map(e=>`<option>${e}</option>`).join("")}
 <canvas id="bg"></canvas>
 
 <script>
+
+const ENDPOINTS = {
+  cpf: { param: "cpf" },
+  cpf2: { param: "code" },
+  cpf3: { param: "cpf" },
+  cpf4: { param: "code" },
+  cpf5: { param: "code" },
+  cpf6: { param: "code" },
+  nome: { param: "nome" },
+  nome2: { param: "nome" },
+  telefone: { param: "telefone" },
+  telefone2: { param: "telefone" },
+  operadora: { param: "telefone" },
+  email: { param: "email" },
+  cep: { param: "cep" },
+  cep2: { param: "cep" },
+  placa: { param: "placa" },
+  placa2: { param: "placa" },
+  rg: { param: "cpf" },
+  titulo: { param: "cpf" },
+  pis: { param: "cpf" },
+  nis: { param: "cpf" },
+  parentes: { param: "cpf" },
+  vizinhos: { param: "cpf" }
+};
+
 /* ===== TOKENS ===== */
 const TOKENS = {
   dragon: "VIP",
@@ -945,9 +971,14 @@ async function consultar(){
   salvarToken(token);
   efeitoPremium(token);
 
-  const config = ENDPOINTS[endpoint]; // pega url, param e query do endpoint
+  const config = ENDPOINTS[endpoint];
+if(!config){
+  alert("Endpoint inválido");
+  return;
+}
+
 const url = window.location.origin + "/" + endpoint +
-            "?token=" + token + "&" + config.param + "=" + valor;
+            "?token=" + token + "&" + config.param + "=" + encodeURIComponent(valor);
 
   document.getElementById("url").innerText = url;
   const resBox = document.getElementById("resBox");
