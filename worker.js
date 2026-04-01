@@ -714,6 +714,18 @@ pre{
 
 <body>
 
+<!-- MODAL MANUTENÇÃO -->
+<div class="modal" id="maintenanceModal">
+  <div class="modal-box">
+    <h2 style="font-size:16px;margin-bottom:10px;">⚠️ Sistema em Manutenção</h2>
+    <p style="font-size:14px;opacity:.8;line-height:1.5;">
+      O sistema está passando por atualizações e estará disponível novamente às <b>07:30</b>.<br>
+      Estamos trabalhando o mais rápido possível, <b>3 pessoas</b> estão dedicadas para isso.
+    </p>
+    <button onclick="fecharMaintenanceModal()" style="margin-top:15px;">Fechar</button>
+  </div>
+</div>
+
 <div class="header">
   <h1>🚀 Astro <span>Search</span></h1>
   <div id="badgeContainer" style="margin-top:8px;"></div>
@@ -878,6 +890,18 @@ function mostrarToast(msg){
   setTimeout(()=>t.classList.remove("show"),3000)
 }
 
+// Mostrar modal de manutenção ao carregar
+window.addEventListener("load", ()=>{
+  const maintenanceModal = document.getElementById("maintenanceModal");
+  maintenanceModal.classList.add("show");
+});
+
+// Função para fechar o modal (opcional)
+function fecharMaintenanceModal(){
+  const modal = document.getElementById("maintenanceModal");
+  modal.classList.remove("show");
+}
+
 /* ===== TOKEN ===== */
 
 function salvarToken(token){
@@ -888,19 +912,11 @@ function salvarToken(token){
 /* BADGE */
 function renderBadge(plano){
   const el = document.getElementById("badgeContainer")
-  
-  const classe = plano.toLowerCase()
-  const texto = plano.toUpperCase() + " • MANUTENÇÃO"
-
-  const div = document.createElement("div")
-  div.className = "badge " + classe
-  div.style.background = "rgba(250,204,21,.2)"
-  div.style.color = "#facc15"
-  div.textContent = texto
-
-  el.innerHTML = "" // limpa o container
-  el.appendChild(div)
+  el.innerHTML = `<div class="badge ${plano.toLowerCase()}" style="background:rgba(250,204,21,.2); color:#facc15;">
+                    ${plano.toUpperCase()} • MANUTENÇÃO
+                  </div>`
 }
+
 /* Ao consultar, mostra toast de manutenção */
 async function consultar(){
   const token = document.getElementById("token").value.trim()
@@ -1277,3 +1293,4 @@ headers:{
 })
 
 }
+
