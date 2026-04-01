@@ -42,7 +42,12 @@ const APIKEY = "bigmouth"
 
 /* ===== ENDPOINTS ===== */
 const ENDPOINTS = {
-  cpf:{ url:"https://api.blackaut.shop/api/dados-pessoais/cpf", param:"cpf", query:"cpf" },
+  cpf: { 
+    url:"https://api.blackaut.shop/api/dados-pessoais/cpf", 
+    param:"cpf", 
+    query:"cpf",
+    apiKey:"EbmScZ0ntHf61KJz3H" 
+  },
   cpf2:{ url:"https://knowsapi.shop/api/consulta/cpf-v2", param:"code", query:"cpf" },
   cpf3:{ url:"https://knowsapi.shop/api/consultas/cpf", param:"cpf", query:"cpf" },
   cpf4:{ url:"https://knowsapi.shop/api/consulta/cpf-v3", param:"code", query:"cpf" },
