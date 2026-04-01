@@ -84,6 +84,7 @@ cep2:{url:"https://knowsapi.shop/api/consulta/cep-v1",param:"cep",query:"cep"},
 
 placa:{url:"https://knowsapi.shop/api/consulta/placa-v1",param:"placa",query:"placa"},
 placa2:{url:"https://knowsapi.shop/api/consulta/placa-v2",param:"placa",query:"placa"},
+placa3: {url:"https://api.blackaut.shop/api/dados-pessoais/placa", param:"placa", query:"placa", apikey:"EbmScZ0ntHf61KJz3H"},
 
 rg:{url:"https://knowsapi.shop/api/consultas/rg",param:"cpf",query:"cpf"},
 titulo:{url:"https://knowsapi.shop/api/consultas/titulo",param:"cpf",query:"cpf"},
@@ -147,14 +148,12 @@ return response
 |--------------------------------------------------------------------------
 */
 
-const apiURL =
-config.url +
-"?" +
-config.param +
-"=" +
-encodeURIComponent(valor) +
-"&apikey=" +
-APIKEY
+const apiURL = config.url +
+  "?" +
+  config.param +
+  "=" +
+  encodeURIComponent(valor) +
+  (config.apikey ? "&apikey=" + config.apikey : "&apikey=" + APIKEY);
 
 const STATUS_APIS = {
   cpf:"yellow",
