@@ -159,7 +159,6 @@ function normalizarDados(data){
   return data
 }
 
-/* ===== ERROS ===== */
 function jsonErro(code,msg,extra=null){
   return new Response(JSON.stringify({
     status:false,
@@ -170,93 +169,6 @@ function jsonErro(code,msg,extra=null){
     status:400,
     headers:{ "Content-Type":"application/json" }
   })
-}
-
-/*
-|--------------------------------------------------------------------------
-| TOKENS
-|--------------------------------------------------------------------------
-*/
-
-function validarToken(token){
-return TOKENS.hasOwnProperty(token)
-}
-
-function obterPlanoToken(token){
-return TOKENS[token]?.plano || "FREE"
-}
-
-/*
-|--------------------------------------------------------------------------
-| LIMPAR API
-|--------------------------------------------------------------------------
-*/
-
-function limparRespostaAPI(data){
-
-if(!data || typeof data !== "object") return data
-
-const blacklist=[
-"status",
-"creator",
-"criador",
-"api",
-"credits",
-"creditos",
-"mensagem",
-"message"
-]
-
-// remove campos indesejados
-for(const campo of blacklist){
-  delete data[campo]
-}
-
-// 🔥 prioridade total pro resultado
-if(data.resultado){
-  return data.resultado
-}
-
-// fallback
-return data
-
-}
-
-/*
-|--------------------------------------------------------------------------
-| NORMALIZAR
-|--------------------------------------------------------------------------
-*/
-
-function normalizarDados(data){
-
-if(Array.isArray(data)){
-return data.map(normalizarDados)
-}
-
-if(data !== null && typeof data === "object"){
-
-const novo={}
-
-for(const k in data){
-novo[k]=normalizarDados(data[k])
-}
-
-return novo
-}
-
-if(typeof data === "string"){
-
-try{
-return new TextDecoder().decode(new TextEncoder().encode(data))
-}catch{
-return data
-}
-
-}
-
-return data
-
 }
 
 /*
