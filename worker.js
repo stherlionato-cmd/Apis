@@ -14,12 +14,6 @@ console.log("ENDPOINT LIMPO:", JSON.stringify(endpoint))
 
 /* ✅ ADMIN CORRETO */
 if(endpoint === "admin"){
-  const token = url.searchParams.get("token")
-
-  if(token !== ADMIN_TOKEN){
-    return jsonErro("AUTH_ADMIN", "Token admin inválido")
-  }
-
   return adminPanel(request)
 }
 
