@@ -1079,13 +1079,12 @@ function login(){
 function renderEndpoints(){
  const div = document.getElementById("endpoints")
 
- div.innerHTML = ENDPOINTS.map(e=>`
-  <label style="display:flex;gap:8px;margin-top:6px;font-size:12px;">
-    <input type="checkbox" value="${e}" checked>
-    ${e}
-  </label>
- `).join("")
-}
+ div.innerHTML = ENDPOINTS.map(e =>
+  '<label style="display:flex;gap:8px;margin-top:6px;font-size:12px;">' +
+    '<input type="checkbox" value="' + e + '" checked>' +
+    e +
+  '</label>'
+).join('')
 
 /* GERAR TOKEN */
 function gerar(){
