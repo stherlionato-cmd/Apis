@@ -14,6 +14,7 @@ const endpoint = url.pathname
   .trim()
   .toLowerCase()
 
+console.log("🚀 Worker versão ativa: 2026-04-01 01:00")
 console.log("RAW PATH:", url.pathname)
 console.log("ENDPOINT LIMPO:", JSON.stringify(endpoint))
 
