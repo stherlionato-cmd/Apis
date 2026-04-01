@@ -1211,7 +1211,7 @@ button:hover{
 
 <script>
 
-const ADMIN = "${ADMIN_TOKEN}";
+const ADMIN = `${ADMIN_TOKEN}`;
 const ENDPOINTS = ${JSON.stringify(Object.keys(ENDPOINTS))};
 
 /* LOGIN */
