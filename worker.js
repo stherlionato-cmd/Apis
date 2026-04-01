@@ -820,227 +820,197 @@ ${Object.keys(ENDPOINTS).map(e=>`<option>${e}</option>`).join("")}
 <canvas id="bg"></canvas>
 
 <script>
-
+/* ===== TOKENS ===== */
 const TOKENS = {
-  dragon:"VIP",
-  italoedu7:"VIP",
-  IFNastro:"VIP",
-  astrofree:"FREE",
-  astropro:"PRO"
+  dragon: "VIP",
+  italoedu7: "VIP",
+  IFNastro: "VIP",
+  astrofree: "FREE",
+  astropro: "PRO"
+};
+
+/* ===== MODAIS ===== */
+function abrirModal(){
+  document.getElementById("modal").classList.add("show");
 }
-
-/* CONSULTAR */
-async function consultar(){
-
-const btn = document.getElementById("btnConsultar")
-btn.disabled = true
-btn.innerText = "Consultando..."
-
-const token = document.getElementById("token").value.trim()
-const endpoint = document.getElementById("endpoint").value
-const valor = document.getElementById("valor").value
-
-if(!token){
-  abrirModal()
-  btn.disabled = false
-  btn.innerText = "Consultar"
-  return
-}
-
-if(!TOKENS[token]){
-  abrirModal()
-  efeitoErro()
-  btn.disabled = false
-  btn.innerText = "Consultar"
-  return
-}
-
-salvarToken(token)
-efeitoPremium(token)
-
-const param = endpoint.replace(/[0-9]/g,'')
-const url = window.location.origin + "/" + endpoint +
-"?token=" + token + "&" + param + "=" + valor
-
-document.getElementById("url").innerText = url
-
-const resBox = document.getElementById("resBox")
-resBox.innerHTML = '<div class="loader"></div>'
-
-try{
-const r = await fetch(url)
-const j = await r.json()
-
-resBox.innerHTML = "<pre id='resposta'>"+JSON.stringify(j,null,2)+"</pre>"
-mostrarToast("Consulta feita com sucesso 🚀")
-
-}catch{
-resBox.innerHTML = "<pre>Erro ao consultar</pre>"
-mostrarToast("Erro na consulta ❌")
-}
-
-btn.disabled = false
-btn.innerText = "Consultar"
-}
-
-function mostrarToast(msg){
-  const t = document.getElementById("toast")
-  t.innerText = msg
-  t.classList.add("show")
-  setTimeout(()=>t.classList.remove("show"),3000)
-}
-
-// Mostrar modal de manutenção ao carregar
-window.addEventListener("load", ()=>{
-  const maintenanceModal = document.getElementById("maintenanceModal");
-  maintenanceModal.classList.add("show");
-});
-
-// Função para fechar o modal (opcional)
-function fecharMaintenanceModal(){
-  const modal = document.getElementById("maintenanceModal");
-  modal.classList.remove("show");
-}
-
-/* ===== TOKEN ===== */
-
-function salvarToken(token){
-  localStorage.setItem("astro_token", token)
-  renderBadge(TOKENS[token])
-}
-
-/* BADGE */
-function renderBadge(plano){
-  const el = document.getElementById("badgeContainer")
-  el.innerHTML = `<div class="badge ${plano.toLowerCase()}" style="background:rgba(250,204,21,.2); color:#facc15;">
-                    ${plano.toUpperCase()} • MANUTENÇÃO
-                  </div>`
-}
-
-/* Ao consultar, mostra toast de manutenção */
-async function consultar(){
-  const token = document.getElementById("token").value.trim()
-  const endpoint = document.getElementById("endpoint").value
-
-  if(true){ // força manutenção
-    mostrarToast("⚠️ Endpoint em manutenção")
-    return
-  }
-
-/* ===== EFEITOS ===== */
-
-/* VIP / FREE ANIMAÇÃO */
-function efeitoPremium(token){
-
-  const plano = TOKENS[token]
-
-  const body = document.body
-
-  if(plano === "VIP"){
-    body.style.boxShadow = "inset 0 0 120px rgba(168,85,247,.3)"
-  }
-
-  if(plano === "FREE"){
-    body.style.boxShadow = "inset 0 0 80px rgba(34,197,94,.2)"
-  }
-
-}
-
-/* ERRO SHAKE */
-function efeitoErro(){
-  const input = document.getElementById("token")
-  input.style.animation = "shake .3s"
-
-  setTimeout(()=>{
-    input.style.animation = ""
-  },300)
-}
-
-/* ===== MODAL ===== */
-
-window.addEventListener("load", ()=>{
-  const token = localStorage.getItem("astro_token")
-
-  if(token && TOKENS[token]){
-    document.getElementById("token").value = token
-    renderBadge(TOKENS[token])
-    efeitoPremium(token)
-  } else {
-    abrirModal()
-  }
-})
 
 function fecharModal(){
-  document.getElementById("modal").classList.remove("show")
+  document.getElementById("modal").classList.remove("show");
 }
 
-/* SALVAR PELO MODAL */
-function salvarTokenModal(){
+function fecharMaintenanceModal(){
+  document.getElementById("maintenanceModal").classList.remove("show");
+}
 
-  const input = document.getElementById("tokenInput")
-  const token = input.value.trim()
+/* ===== BADGE ===== */
+function renderBadge(plano){
+  const el = document.getElementById("badgeContainer");
+  el.innerHTML = `<div class="badge ${plano.toLowerCase()}" style="background:rgba(250,204,21,.2); color:#facc15;">
+                    ${plano.toUpperCase()} • MANUTENÇÃO
+                  </div>`;
+}
+
+/* ===== PREMIUM EFFECT ===== */
+function efeitoPremium(token){
+  const plano = TOKENS[token];
+  const body = document.body;
+
+  if(plano === "VIP"){
+    body.style.boxShadow = "inset 0 0 120px rgba(168,85,247,.3)";
+  } else if(plano === "FREE"){
+    body.style.boxShadow = "inset 0 0 80px rgba(34,197,94,.2)";
+  }
+}
+
+/* ===== ERRO SHAKE ===== */
+function efeitoErro(){
+  const input = document.getElementById("token");
+  input.style.animation = "shake .3s";
+  setTimeout(()=>input.style.animation="",300);
+}
+
+/* ===== SALVAR TOKEN ===== */
+function salvarToken(token){
+  localStorage.setItem("astro_token", token);
+  renderBadge(TOKENS[token]);
+}
+
+/* ===== SALVAR TOKEN PELO MODAL ===== */
+function salvarTokenModal(){
+  const input = document.getElementById("tokenInput");
+  const token = input.value.trim();
 
   if(!TOKENS[token]){
-    input.style.border = "1px solid red"
-    return
+    input.style.border = "1px solid red";
+    efeitoErro();
+    return;
   }
 
-  document.getElementById("token").value = token
-  salvarToken(token)
-  efeitoPremium(token)
-  fecharModal()
+  document.getElementById("token").value = token;
+  salvarToken(token);
+  efeitoPremium(token);
+  fecharModal();
 }
 
-/* ===== AUTO LOAD ===== */
-
-const canvas = document.getElementById("bg")
-const ctx = canvas.getContext("2d")
-
-let particles = []
-
-function resize(){
- canvas.width = window.innerWidth
- canvas.height = window.innerHeight
+/* ===== TOAST ===== */
+function mostrarToast(msg){
+  const t = document.getElementById("toast");
+  t.innerText = msg;
+  t.classList.add("show");
+  setTimeout(()=>t.classList.remove("show"),3000);
 }
 
-window.addEventListener("resize", resize)
-resize()
+/* ===== CONSULTAR ===== */
+async function consultar(){
+  const btn = document.getElementById("btnConsultar");
+  btn.disabled = true;
+  btn.innerText = "Consultando...";
+
+  const token = document.getElementById("token").value.trim();
+  const endpoint = document.getElementById("endpoint").value;
+  const valor = document.getElementById("valor").value;
+
+  if(!token){
+    abrirModal();
+    btn.disabled = false;
+    btn.innerText = "Consultar";
+    return;
+  }
+
+  if(!TOKENS[token]){
+    abrirModal();
+    efeitoErro();
+    btn.disabled = false;
+    btn.innerText = "Consultar";
+    return;
+  }
+
+  salvarToken(token);
+  efeitoPremium(token);
+
+  const param = endpoint.replace(/[0-9]/g,'');
+  const url = window.location.origin + "/" + endpoint +
+              "?token=" + token + "&" + param + "=" + valor;
+
+  document.getElementById("url").innerText = url;
+  const resBox = document.getElementById("resBox");
+  resBox.innerHTML = '<div class="loader"></div>';
+
+  try{
+    const r = await fetch(url);
+    const j = await r.json();
+    resBox.innerHTML = "<pre id='resposta'>"+JSON.stringify(j,null,2)+"</pre>";
+    mostrarToast("Consulta feita com sucesso 🚀");
+  } catch {
+    resBox.innerHTML = "<pre>Erro ao consultar</pre>";
+    mostrarToast("Erro na consulta ❌");
+  }
+
+  btn.disabled = false;
+  btn.innerText = "Consultar";
+}
+
+/* ===== PARTICULAS DE FUNDO ===== */
+const canvas = document.getElementById("bg");
+const ctx = canvas.getContext("2d");
+let particles = [];
+
+function resizeCanvas(){
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
 
 function createParticles(qtd=60){
- particles = []
- for(let i=0;i<qtd;i++){
-  particles.push({
-   x:Math.random()*canvas.width,
-   y:Math.random()*canvas.height,
-   r:Math.random()*1.5,
-   speed:Math.random()*0.5 + 0.2
-  })
- }
+  particles = [];
+  for(let i=0;i<qtd;i++){
+    particles.push({
+      x: Math.random()*canvas.width,
+      y: Math.random()*canvas.height,
+      r: Math.random()*1.5,
+      speed: Math.random()*0.5 + 0.2
+    });
+  }
 }
 
-function draw(){
- ctx.clearRect(0,0,canvas.width,canvas.height)
+function drawParticles(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  particles.forEach(p=>{
+    p.y += p.speed;
+    if(p.y > canvas.height){
+      p.y = 0;
+      p.x = Math.random()*canvas.width;
+    }
+    ctx.beginPath();
+    ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+    ctx.fillStyle="rgba(255,255,255,0.6)";
+    ctx.fill();
+  });
+  requestAnimationFrame(drawParticles);
+}
 
- particles.forEach(p=>{
-  p.y += p.speed
+/* ===== LOAD ===== */
+window.addEventListener("load", ()=>{
+  // Modal de manutenção
+  const maintenanceModal = document.getElementById("maintenanceModal");
+  maintenanceModal.classList.add("show");
 
-  if(p.y > canvas.height){
-   p.y = 0
-   p.x = Math.random()*canvas.width
+  // Modal de token
+  const token = localStorage.getItem("astro_token");
+  if(token && TOKENS[token]){
+    document.getElementById("token").value = token;
+    renderBadge(TOKENS[token]);
+    efeitoPremium(token);
+  } else {
+    abrirModal();
   }
 
-  ctx.beginPath()
-  ctx.arc(p.x,p.y,p.r,0,Math.PI*2)
-  ctx.fillStyle="rgba(255,255,255,0.6)"
-  ctx.fill()
- })
+  // Partículas
+  resizeCanvas();
+  createParticles();
+  drawParticles();
+});
 
- requestAnimationFrame(draw)
-}
-
-createParticles()
-draw()
-
+window.addEventListener("resize", resizeCanvas);
 </script>
 
 </body>
