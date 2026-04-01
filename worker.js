@@ -771,7 +771,8 @@ salvarToken(token)
 efeitoPremium(token)
 
 const param = endpoint.replace(/[0-9]/g,'')
-const url = "${base}/"+endpoint+"?token="+token+"&"+param+"="+valor
+const url = window.location.origin + "/" + endpoint +
+"?token=" + token + "&" + param + "=" + valor
 
 document.getElementById("url").innerText = url
 
@@ -872,16 +873,6 @@ function salvarTokenModal(){
 }
 
 /* ===== AUTO LOAD ===== */
-
-window.addEventListener("load", ()=>{
-  const token = localStorage.getItem("astro_token")
-
-  if(token && TOKENS[token]){
-    document.getElementById("token").value = token
-    renderBadge(TOKENS[token])
-    efeitoPremium(token)
-  }
-})
 
 const canvas = document.getElementById("bg")
 const ctx = canvas.getContext("2d")
