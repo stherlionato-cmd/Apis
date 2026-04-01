@@ -192,7 +192,7 @@ function obterPlanoToken(token){ return TOKENS[token]?.plano || "FREE" }
 
 function limparRespostaAPI(data){
   if(!data || typeof data!=="object") return data
-  const blacklist=["status","creator","criador","api","credits","creditos","mensagem","message"]
+  const blacklist=["status","creator","criador","api","credits","creditos","mensagem","message","meta_turbo","CRIADOR"]
   for(const campo of blacklist) delete data[campo]
   if(data.resultado) return data.resultado
   return data
@@ -608,10 +608,17 @@ pre{
 </div>
 
 <div class="input-group">
-<div class="label">Endpoint</div>
-<select id="endpoint">
-${Object.keys(ENDPOINTS).map(e=>`<option>${e}</option>`).join("")}
-</select>
+  <div class="label">Endpoint</div>
+  <select id="endpoint">
+    <option value="cpf">cpf</option>
+    <option value="nome">nome</option>
+    <option value="nome3">nome3</option>
+    <option value="renavam">renavam</option>
+    <option value="telefone3">telefone3</option>
+    <option value="parentes2">parentes2</option>
+    <option value="cnh">cnh</option>
+    <option value="cnpj">cnpj</option>
+  </select>
 </div>
 
 <div class="input-group">
@@ -690,30 +697,26 @@ ${Object.keys(ENDPOINTS).map(e=>`<option>${e}</option>`).join("")}
 
 <script>
 
-const ENDPOINTS = {
-  cpf: { param: "cpf" },
-  cpf2: { param: "code" },
-  cpf3: { param: "cpf" },
-  cpf4: { param: "code" },
-  cpf5: { param: "code" },
-  cpf6: { param: "code" },
-  nome: { param: "nome" },
-  nome2: { param: "nome" },
-  telefone: { param: "telefone" },
-  telefone2: { param: "telefone" },
-  operadora: { param: "telefone" },
-  email: { param: "email" },
-  cep: { param: "cep" },
-  cep2: { param: "cep" },
-  placa: { param: "placa" },
-  placa2: { param: "placa" },
-  rg: { param: "cpf" },
-  titulo: { param: "cpf" },
-  pis: { param: "cpf" },
-  nis: { param: "cpf" },
-  parentes: { param: "cpf" },
-  vizinhos: { param: "cpf" }
-};
+const endpoint = document.getElementById("endpoint").value;
+const valor = document.getElementById("valor").value;
+const token = document.getElementById("token").value;
+
+const url = `${window.location.origin}/${endpoint}?token=${token}&${endpointParam(endpoint)}=${encodeURIComponent(valor)}`;
+
+async function endpointParam(ep) {
+  // retorna o nome do parâmetro que o Worker espera
+  const map = {
+    cpf: "cpf",
+    nome: "nome",
+    nome3: "nome2",
+    renavam: "renavam",
+    telefone3: "telefone2",
+    parentes2: "parentes",
+    cnh: "cnh",
+    cnpj: "cnpj"
+  };
+  return map[ep] || ep;
+}
 
 /* ===== TOKENS ===== */
 const TOKENS = {
