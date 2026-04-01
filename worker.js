@@ -3,6 +3,7 @@ export default {
 async fetch(request, env, ctx){
 
 const url = new URL(request.url)
+
 const endpoint = url.pathname
   .replace(/^\/|\/$/g, "")
   .trim()
@@ -11,19 +12,25 @@ const endpoint = url.pathname
 console.log("RAW PATH:", url.pathname)
 console.log("ENDPOINT LIMPO:", JSON.stringify(endpoint))
 
-if(endpoint.includes("admin")){
-  return new Response("ENTROU NO ADMIN: " + endpoint)
-}
+/* ✅ ADMIN CORRETO */
+if(endpoint === "admin"){
+  const token = url.searchParams.get("token")
+
+  if(token !== ADMIN_TOKEN){
+    return jsonErro("AUTH_ADMIN", "Token admin inválido")
+  }
 
   return adminPanel(request)
 }
 
+/* HOME */
 if(endpoint === ""){
-return home(request)
+  return home(request)
 }
 
+/* ENDPOINTS */
 if(!ENDPOINTS[endpoint]){
-return jsonErro("ENDPOINT_404","Endpoint não encontrado")
+  return jsonErro("ENDPOINT_404","Endpoint não encontrado")
 }
 
 return consultar(endpoint,request,url,ctx)
