@@ -92,7 +92,7 @@ placa3: {
   param: "placa",
   query: "placa",
   apikey: "EbmScZ0ntHf61KJz3H"  // chave da API
-}
+},
 
 cpf:{url:"https://knowsapi.shop/api/consulta/cpf",param:"code",query:"cpf"},
 cpf2:{url:"https://knowsapi.shop/api/consulta/cpf-v2",param:"code",query:"cpf"},
