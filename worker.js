@@ -99,8 +99,8 @@ async function consultar(endpoint,request,url,ctx){
   if(response) return response
 
   /* URL FINAL */
-  const apiURL = `${config.url}?${config.param}=${encodeURIComponent(valor)}&apikey=${APIKEY}`
-
+  const keyToUse = config.apiKey || APIKEY; // se endpoint tiver apiKey, usa; senão, usa global
+  const apiURL = `${config.url}?${config.param}=${encodeURIComponent(valor)}&apikey=${keyToUse}`;
   /* FETCH */
   let api
   try{
