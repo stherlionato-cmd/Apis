@@ -823,7 +823,7 @@ function salvarToken(token){
 /* BADGE */
 function renderBadge(plano){
   const el = document.getElementById("badgeContainer")
-  el.innerHTML = `<div class="badge ${plano.toLowerCase()}">${plano}</div>`
+  el.innerHTML = \`<div class="badge \${plano.toLowerCase()}">\${plano}</div>\`
 }
 
 /* ===== EFEITOS ===== */
@@ -1080,13 +1080,12 @@ function login(){
 function renderEndpoints(){
  const div = document.getElementById("endpoints")
 
- div.innerHTML = ENDPOINTS.map(e=>`
-  <label style="display:flex;gap:8px;margin-top:6px;font-size:12px;">
-    <input type="checkbox" value="${e}" checked>
-    ${e}
-  </label>
- `).join("")
-}
+ div.innerHTML = ENDPOINTS.map(e =>
+  "<label style='display:flex;gap:8px;margin-top:6px;font-size:12px;'>" +
+    "<input type='checkbox' value='" + e + "' checked>" +
+    e +
+  "</label>"
+).join("")
 
 /* GERAR TOKEN */
 function gerar(){
