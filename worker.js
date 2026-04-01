@@ -888,11 +888,10 @@ function salvarToken(token){
 /* BADGE */
 function renderBadge(plano){
   const el = document.getElementById("badgeContainer")
-  el.innerHTML = `<div class="badge ${plano.toLowerCase()}" style="background:rgba(250,204,21,.2); color:#facc15;">
+  el.innerHTML = `<div class='badge ${plano.toLowerCase()}' style='background:rgba(250,204,21,.2); color:#facc15;'>
                     ${plano.toUpperCase()} • MANUTENÇÃO
                   </div>`
 }
-
 /* Ao consultar, mostra toast de manutenção */
 async function consultar(){
   const token = document.getElementById("token").value.trim()
