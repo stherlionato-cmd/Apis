@@ -64,7 +64,7 @@ const TOKENS = {
 
 dragon:{plano:"VIP",limite:"unlimited"},
 IFNastro:{plano:"VIP",limite:"unlimited"},
-italoedu7:{plano:"VIP",limite:"unlimited"},
+italoedu:{plano:"VIP",limite:"unlimited"},
 astrofree:{plano:"FREE",limite:100},
 astropro:{plano:"PRO",limite:1000}
 
@@ -824,7 +824,7 @@ ${Object.keys(ENDPOINTS).map(e=>`<option>${e}</option>`).join("")}
 
 const TOKENS = {
   dragon:"VIP",
-  italoedu7:"VIP",
+  italoedu:"VIP",
   IFNastro:"VIP",
   astrofree:"FREE",
   astropro:"PRO"
