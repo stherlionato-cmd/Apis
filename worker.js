@@ -18,7 +18,7 @@ console.log("RAW PATH:", url.pathname)
 console.log("ENDPOINT LIMPO:", JSON.stringify(endpoint))
 
 /* ✅ ADMIN CORRETO */
-if(endpoint === "admin"){
+if(endpoint === "panel"){
   return adminPanel(request)
 }
 
