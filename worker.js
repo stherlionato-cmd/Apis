@@ -819,7 +819,7 @@ function salvarToken(token){
 /* BADGE */
 function renderBadge(plano){
   const el = document.getElementById("badgeContainer")
-  el.innerHTML = `<div class="badge ${plano.toLowerCase()}">${plano}</div>`
+el.innerHTML = '<div class="badge ' + plano.toLowerCase() + '">' + plano + '</div>'
 }
 
 /* ===== EFEITOS ===== */
