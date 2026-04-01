@@ -1080,37 +1080,3 @@ function gerar(){
 })
 
 }
-
-/*
-|--------------------------------------------------------------------------
-| ERROS
-|--------------------------------------------------------------------------
-*/
-
-function jsonErro(code,msg,extra=null){
-
-return new Response(JSON.stringify({
-
-status:false,
-
-erro:{
-codigo:code,
-mensagem:msg
-},
-
-suporte:"@puxardados5",
-
-extra:extra
-
-},null,2),{
-
-status:400,
-
-headers:{
-"Content-Type":"application/json"
-}
-
-})
-
-}
-
