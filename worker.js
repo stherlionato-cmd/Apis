@@ -1018,7 +1018,10 @@ draw()
 </html>
 
 `,{
-headers:{ "content-type":"text/html" }
+  headers: { 
+    "content-type": "text/html",
+    "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate"
+  }
 })
 
 }
