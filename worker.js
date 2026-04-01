@@ -945,9 +945,9 @@ async function consultar(){
   salvarToken(token);
   efeitoPremium(token);
 
-  const param = endpoint.replace(/[0-9]/g,'');
-  const url = window.location.origin + "/" + endpoint +
-              "?token=" + token + "&" + param + "=" + valor;
+  const config = ENDPOINTS[endpoint]; // pega url, param e query do endpoint
+const url = window.location.origin + "/" + endpoint +
+            "?token=" + token + "&" + config.param + "=" + valor;
 
   document.getElementById("url").innerText = url;
   const resBox = document.getElementById("resBox");
