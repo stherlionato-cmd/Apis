@@ -1,8 +1,3 @@
-/* ENDPOINTS */
-if(!ENDPOINTS[endpoint]){
-  return jsonErro("ENDPOINT_404","Endpoint não encontrado")
-}
-
 export default {
 
 async fetch(request, env, ctx){
@@ -28,6 +23,11 @@ if(endpoint === "panel"){
 /* HOME */
 if(endpoint === ""){
   return home(request)
+}
+
+/* ENDPOINTS */
+if(!ENDPOINTS[endpoint]){
+  return jsonErro("ENDPOINT_404","Endpoint não encontrado")
 }
 
 // Rota para gerar token
