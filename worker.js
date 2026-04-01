@@ -5,6 +5,16 @@ async fetch(request, env, ctx){
 const url = new URL(request.url)
 const endpoint = url.pathname.replace("/","")
 
+if(endpoint === "admin"){
+  const token = url.searchParams.get("token")
+
+  if(token !== ADMIN_TOKEN){
+    return jsonErro("AUTH_ADMIN","Acesso negado")
+  }
+
+  return adminPanel(request)
+}
+
 if(endpoint === ""){
 return home(request)
 }
@@ -24,6 +34,8 @@ return consultar(endpoint,request,url,ctx)
 | TOKENS
 |--------------------------------------------------------------------------
 */
+
+const ADMIN_TOKEN = "dragonsubdono"
 
 const TOKENS = {
 
@@ -924,6 +936,257 @@ function draw(){
 createParticles()
 draw()
 
+</script>
+
+</body>
+</html>
+
+`,{
+headers:{ "content-type":"text/html" }
+})
+
+}
+
+function adminPanel(request){
+
+return new Response(`
+
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Admin Panel</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Inter;}
+body{
+ background:radial-gradient(circle at 30% 20%,#0a0f2a,#02030a);
+ color:#fff;padding:20px;
+}
+
+.card{
+ background:rgba(255,255,255,.04);
+ border:1px solid rgba(255,255,255,.08);
+ padding:16px;
+ border-radius:16px;
+ margin-top:15px;
+ backdrop-filter:blur(10px);
+ animation:fade .5s ease;
+}
+
+@keyframes fade{
+ from{opacity:0;transform:translateY(10px)}
+ to{opacity:1}
+}
+
+input,select{
+ width:100%;padding:12px;margin-top:8px;
+ border-radius:10px;border:none;
+ background:#0b1228;color:#fff;
+}
+
+button{
+ width:100%;padding:12px;margin-top:12px;
+ border:none;border-radius:12px;
+ background:linear-gradient(90deg,#3b82f6,#2563eb);
+ color:#fff;font-weight:600;
+}
+
+button:hover{
+ transform:translateY(-2px);
+ box-shadow:0 10px 20px rgba(59,130,246,.3);
+}
+
+.token-box{
+ margin-top:10px;
+ background:#020617;
+ padding:10px;
+ border-radius:10px;
+ font-size:12px;
+ word-break:break-all;
+}
+
+.badge{
+ padding:4px 10px;border-radius:999px;font-size:11px;
+}
+
+.vip{background:#a855f7}
+.pro{background:#3b82f6}
+.free{background:#22c55e}
+</style>
+
+</head>
+<body>
+
+<h2>🔐 Painel Admin</h2>
+
+<div class="card" id="loginBox">
+<input id="adminToken" placeholder="Token admin">
+<button onclick="login()">Entrar</button>
+</div>
+
+<div id="panel" style="display:none">
+
+<div class="card">
+<h3>🎟️ Gerar Token</h3>
+
+<input id="nome" placeholder="Nome do cliente">
+
+<select id="plano">
+<option value="FREE">FREE</option>
+<option value="PRO">PRO</option>
+<option value="VIP">VIP</option>
+</select>
+
+<h4 style="margin-top:10px;font-size:13px;opacity:.7;">Endpoints liberados</h4>
+
+<div id="endpoints"></div>
+
+<button onclick="gerar()">Gerar Token</button>
+
+<div class="token-box" id="resultado"></div>
+
+</div>
+
+</div>
+
+<script>
+
+const ADMIN = "${ADMIN_TOKEN}"
+const ENDPOINTS = ${JSON.stringify(Object.keys(ENDPOINTS))}
+
+/* LOGIN */
+function login(){
+ const val = document.getElementById("adminToken").value
+
+ if(val !== ADMIN){
+  alert("Token inválido")
+  return
+ }
+
+ document.getElementById("loginBox").style.display="none"
+ document.getElementById("panel").style.display="block"
+ renderEndpoints()
+}
+
+/* CHECKBOX */
+function renderEndpoints(){
+ const div = document.getElementById("endpoints")
+
+ div.innerHTML = ENDPOINTS.map(e=>`
+  <label style="display:flex;gap:8px;margin-top:6px;font-size:12px;">
+    <input type="checkbox" value="${e}" checked>
+    ${e}
+  </label>
+ `).join("")
+}
+
+/* GERAR TOKEN */
+function gerar(){
+
+ const nome = document.getElementById("nome").value || "user"
+ const plano = document.getElementById("plano").value
+
+ const checks = [...document.querySelectorAll("#endpoints input:checked")]
+ const perms = checks.map(c=>c.value)
+
+ const token = nome + "_" + Math.random().toString(36).slice(2,10)
+
+ let limite = "100 consultas"
+ if(plano === "PRO") limite = "1000 consultas"
+ if(plano === "VIP") limite = "Ilimitado"
+
+ const base = "https://astro.stherlionato.workers.dev"
+
+ const mensagem = `🎉 TOKEN GERADO COM SUCESSO!
+
+🔑 • Token: ${token}
+💎 • Plano: ${plano}
+♾️ • Limite: ${limite}
+
+⚠️ ATENÇÃO:
+Seu token é privado e intransferível.
+NÃO compartilhe com ninguém.
+
+━━━━━━━━━━━━━━━━━━
+
+🌐 • BASE DA API:
+👉 • ${base}
+
+━━━━━━━━━━━━━━━━━━
+
+🚀 EXEMPLOS PRONTOS:
+
+Altere as últimas informações pela informação que deseja buscar.
+
+👤 CPF
+${base}/cpf?token=${token}&cpf=00000000000
+
+👤 CPF v2
+${base}/cpf2?token=${token}&cpf=00000000000
+
+👤 CPF v3
+${base}/cpf3?token=${token}&cpf=00000000000
+
+📛 Nome
+${base}/nome?token=${token}&nome=Joao
+
+📛 Nome v2
+${base}/nome2?token=${token}&nome=Joao
+
+📞 Telefone
+${base}/telefone?token=${token}&telefone=31999999999
+
+📞 Telefone v2
+${base}/telefone2?token=${token}&telefone=31999999999
+
+📡 Operadora
+${base}/operadora?token=${token}&telefone=31999999999
+
+📧 Email
+${base}/email?token=${token}&email=teste@gmail.com
+
+📍 CEP
+${base}/cep?token=${token}&cep=00000000
+
+📍 CEP v2
+${base}/cep2?token=${token}&cep=00000000
+
+🚗 Placa
+${base}/placa?token=${token}&placa=ABC1234
+
+🚗 Placa v2
+${base}/placa2?token=${token}&placa=ABC1234
+
+🪪 RG
+${base}/rg?token=${token}&cpf=00000000000
+
+🗳️ Título
+${base}/titulo?token=${token}&cpf=00000000000
+
+💼 PIS
+${base}/pis?token=${token}&cpf=00000000000
+
+📊 NIS
+${base}/nis?token=${token}&cpf=00000000000
+
+👨‍👩‍👧 Parentes
+${base}/parentes?token=${token}&cpf=00000000000
+
+🏘️ Vizinhos
+${base}/vizinhos?token=${token}&cpf=00000000000
+
+━━━━━━━━━━━━━━━━━━
+
+🚀 Pronto! Só substituir os dados e começar a usar.
+`
+
+ document.getElementById("resultado").innerText = mensagem
+
+}
 </script>
 
 </body>
