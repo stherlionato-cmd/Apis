@@ -1100,7 +1100,7 @@ button:hover{
 </head>
 <body>
 
-<h2>\u{1F512} Painel Admin</h2>
+<h2>🔐 Painel Admin</h2>
 
 <div class="card" id="loginBox">
 <input id="adminToken" placeholder="Token admin">
@@ -1110,7 +1110,7 @@ button:hover{
 <div id="panel" style="display:none">
 
 <div class="card">
-<h3>\u{1F39F} Gerar Token</h3>
+<h3>\uD83C\uDF9F\uFE0F Gerar Token</h3>
 
 <input id="nome" placeholder="Nome do cliente">
 
@@ -1179,83 +1179,36 @@ function gerar(){
 
  const base = "https://astro.stherlionato.workers.dev"
 
- const mensagem = `\u{1F389} TOKEN GERADO COM SUCESSO!
-
-\u{1F511} • Token: ${token}
-\u{1F48E} • Plano: ${plano}
-\u267E\uFE0F • Limite: ${limite}
-
-\u26A0\uFE0F ATENÇÃO:
-Seu token é privado e intransferível.
-NÃO compartilhe com ninguém.
-
-━━━━━━━━━━━━━━━━━━
-
-\u{1F310} • BASE DA API:
-👉 • ${base}
-
-━━━━━━━━━━━━━━━━━━
-
-\u{1F680} EXEMPLOS PRONTOS:
-
-👤 CPF
-${base}/cpf?token=${token}&cpf=00000000000
-
-👤 CPF v2
-${base}/cpf2?token=${token}&cpf=00000000000
-
-👤 CPF v3
-${base}/cpf3?token=${token}&cpf=00000000000
-
-📛 Nome
-${base}/nome?token=${token}&nome=Joao
-
-📛 Nome v2
-${base}/nome2?token=${token}&nome=Joao
-
-📞 Telefone
-${base}/telefone?token=${token}&telefone=31999999999
-
-📞 Telefone v2
-${base}/telefone2?token=${token}&telefone=31999999999
-
-📡 Operadora
-${base}/operadora?token=${token}&telefone=31999999999
-
-📧 Email
-${base}/email?token=${token}&email=teste@gmail.com
-
-📍 CEP
-${base}/cep?token=${token}&cep=00000000
-
-📍 CEP v2
-${base}/cep2?token=${token}&cep=00000000
-
-🚗 Placa
-${base}/placa?token=${token}&placa=ABC1234
-
-🚗 Placa v2
-${base}/placa2?token=${token}&placa=ABC1234
-
-🪪 RG
-${base}/rg?token=${token}&cpf=00000000000
-
-🗳️ Título
-${base}/titulo?token=${token}&cpf=00000000000
-
-💼 PIS
-${base}/pis?token=${token}&cpf=00000000000
-
-👨‍👩‍👧 Parentes
-${base}/parentes?token=${token}&cpf=00000000000
-
-🏘️ Vizinhos
-${base}/vizinhos?token=${token}&cpf=00000000000
-
-━━━━━━━━━━━━━━━━━━
-
-\u{1F680} Pronto! Só substituir os dados e começar a usar.
-`
+ const mensagem = "\uD83C\uDF89 TOKEN GERADO COM SUCESSO!\n\n" +
+ "\uD83D\uDD11 • Token: " + token + "\n" +
+ "\uD83D\uDC8E • Plano: " + plano + "\n" +
+ "\u267E\uFE0F • Limite: " + limite + "\n\n" +
+ "\u26A0\uFE0F ATENÇÃO:\nSeu token é privado e intransferível.\nNÃO compartilhe com ninguém.\n\n" +
+ "━━━━━━━━━━━━━━━━━━\n\n" +
+ "\uD83C\uDF10 • BASE DA API:\n👉 • " + base + "\n\n" +
+ "━━━━━━━━━━━━━━━━━━\n\n" +
+ "\uD83D\uDE80 EXEMPLOS PRONTOS:\n\n" +
+ "👤 CPF\n" + base + "/cpf?token=" + token + "&cpf=00000000000\n" +
+ "👤 CPF v2\n" + base + "/cpf2?token=" + token + "&cpf=00000000000\n" +
+ "👤 CPF v3\n" + base + "/cpf3?token=" + token + "&cpf=00000000000\n" +
+ "📛 Nome\n" + base + "/nome?token=" + token + "&nome=Joao\n" +
+ "📛 Nome v2\n" + base + "/nome2?token=" + token + "&nome=Joao\n" +
+ "📞 Telefone\n" + base + "/telefone?token=" + token + "&telefone=31999999999\n" +
+ "📞 Telefone v2\n" + base + "/telefone2?token=" + token + "&telefone=31999999999\n" +
+ "📡 Operadora\n" + base + "/operadora?token=" + token + "&telefone=31999999999\n" +
+ "📧 Email\n" + base + "/email?token=" + token + "&email=teste@gmail.com\n" +
+ "📍 CEP\n" + base + "/cep?token=" + token + "&cep=00000000\n" +
+ "📍 CEP v2\n" + base + "/cep2?token=" + token + "&cep=00000000\n" +
+ "🚗 Placa\n" + base + "/placa?token=" + token + "&placa=ABC1234\n" +
+ "🚗 Placa v2\n" + base + "/placa2?token=" + token + "&placa=ABC1234\n" +
+ "🪪 RG\n" + base + "/rg?token=" + token + "&cpf=00000000000\n" +
+ "🗳️ Título\n" + base + "/titulo?token=" + token + "&cpf=00000000000\n" +
+ "💼 PIS\n" + base + "/pis?token=" + token + "&cpf=00000000000\n" +
+ "📊 NIS\n" + base + "/nis?token=" + token + "&cpf=00000000000\n" +
+ "👨‍👩‍👧 Parentes\n" + base + "/parentes?token=" + token + "&cpf=00000000000\n" +
+ "🏘️ Vizinhos\n" + base + "/vizinhos?token=" + token + "&cpf=00000000000\n" +
+ "━━━━━━━━━━━━━━━━━━\n\n" +
+ "\uD83D\uDE80 Pronto! Só substituir os dados e começar a usar.";
 
  document.getElementById("resultado").innerText = mensagem
 
