@@ -3,48 +3,24 @@ export default {
 async fetch(request, env, ctx){
 
 const url = new URL(request.url)
+const endpoint = url.pathname.replace("/","")
 
-const endpoint = url.pathname
-  .replace(/^\/|\/$/g, "")
-  .trim()
-  .toLowerCase()
+if(endpoint === "admin"){
+  const token = url.searchParams.get("token")
 
-console.log("🚀 Worker versão ativa: 2026-04-01 03:09")
-console.log("RAW PATH:", url.pathname)
-console.log("ENDPOINT LIMPO:", JSON.stringify(endpoint))
+  if(token !== ADMIN_TOKEN){
+    return jsonErro("AUTH_ADMIN","Acesso negado")
+  }
 
-/* ✅ ADMIN CORRETO */
-if(endpoint === "panel"){
-  // redireciona para o HTML externo
-  const base = new URL(request.url).origin;
-  return fetch(`${base}/admin/adminpanel.html`);
+  return adminPanel(request)
 }
 
-/* HOME */
 if(endpoint === ""){
-  return home(request)
+return home(request)
 }
 
-/* ENDPOINTS */
 if(!ENDPOINTS[endpoint]){
-  return jsonErro("ENDPOINT_404","Endpoint não encontrado")
-}
-
-// Rota para gerar token
-if(endpoint === "gerartoken" && request.method === "POST"){
-  const body = await request.json();
-  if(body.adminToken !== ADMIN_TOKEN) return jsonErro("AUTH_003","Admin token inválido");
-
-  const nome = body.nome || "user";
-  const plano = body.plano || "FREE";
-  const endpoints = body.endpoints || Object.keys(ENDPOINTS);
-
-  const token = `${nome}_${Math.random().toString(36).slice(2,10)}`;
-  TOKENS[token] = {plano, endpoints, criado: new Date().toISOString()};
-
-  return new Response(JSON.stringify({status:true, token, plano, endpoints}, null, 2), {
-    headers: {"Content-Type":"application/json"}
-  });
+return jsonErro("ENDPOINT_404","Endpoint não encontrado")
 }
 
 return consultar(endpoint,request,url,ctx)
@@ -65,7 +41,7 @@ const TOKENS = {
 
 dragon:{plano:"VIP",limite:"unlimited"},
 IFNastro:{plano:"VIP",limite:"unlimited"},
-italoedu:{plano:"VIP",limite:"unlimited"},
+italoedu7:{plano:"VIP",limite:"unlimited"},
 astrofree:{plano:"FREE",limite:100},
 astropro:{plano:"PRO",limite:1000}
 
@@ -86,13 +62,6 @@ const APIKEY = "bigmouth"
 */
 
 const ENDPOINTS = {
-
-placa3: {
-  url: "https://api.blackaut.shop/api/dados-pessoais/placa",
-  param: "placa",
-  query: "placa",
-  apikey: "EbmScZ0ntHf61KJz3H"  // chave da API
-},
 
 cpf:{url:"https://knowsapi.shop/api/consulta/cpf",param:"code",query:"cpf"},
 cpf2:{url:"https://knowsapi.shop/api/consulta/cpf-v2",param:"code",query:"cpf"},
@@ -178,13 +147,14 @@ return response
 |--------------------------------------------------------------------------
 */
 
-let apiURL = config.url + "?" + config.param + "=" + encodeURIComponent(valor);
-
-if(config.apikey){
-  apiURL += "&apikey=" + config.apikey;
-} else {
-  apiURL += "&apikey=" + APIKEY;
-}
+const apiURL =
+config.url +
+"?" +
+config.param +
+"=" +
+encodeURIComponent(valor) +
+"&apikey=" +
+APIKEY
 
 /*
 |--------------------------------------------------------------------------
@@ -284,11 +254,11 @@ return response
 */
 
 function validarToken(token){
-  return TOKENS.hasOwnProperty(token);
+return TOKENS.hasOwnProperty(token)
 }
 
 function obterPlanoToken(token){
-  return TOKENS[token]?.plano || "FREE";
+return TOKENS[token]?.plano || "FREE"
 }
 
 /*
@@ -322,52 +292,6 @@ return data.resultado
 
 return data
 
-}
-
-function normalizarPlaca3(api){
-  if(!api || !api.resultado) return {};
-
-  const r = api.resultado;
-
-  return {
-    detalhes_veiculo: {
-      placa: r.placa,
-      cor: r.MARCA_MODELO?.COR || r.cor || "SEM INFORMAÇÃO",
-      ano_fab: r.ANO_FABRICACAO || "SEM INFORMAÇÃO",
-      ano_mod: r.ANO_MODELO || "SEM INFORMAÇÃO",
-      combustivel: r.COMBUSTIVEL || "SEM INFORMAÇÃO",
-      potencia: r.POTENCIA || "SEM INFORMAÇÃO",
-      cilindradas: r.CILINDRADAS || "SEM INFORMAÇÃO",
-      tipo: r.TIPO_DE_VEICULO || "SEM INFORMAÇÃO",
-      especie: r.ESPECIE || "SEM INFORMAÇÃO",
-      passageiros: r.QUANTIDADE_DE_PASSAGEIROS || "SEM INFORMAÇÃO"
-    },
-    identificadores: {
-      chassi: r.CHASSI || "SEM INFORMAÇÃO",
-      renavam: r.RENAVAM || "SEM INFORMAÇÃO",
-      motor: r.NUM_MOTOR || "SEM INFORMAÇÃO",
-      origem: r.ORIGEM || "SEM INFORMAÇÃO"
-    },
-    geografia: {
-      atual: r.MUNICIPIO || "SEM INFORMAÇÃO",
-      fabricacao: r.MUNICIPIO_FAB || "SEM INFORMAÇÃO"
-    },
-    legal: {
-      situacao: r.SITUACAO || "SEM INFORMAÇÃO",
-      ultima_atualizacao: r.ULTIMA_ATUALIZACAO || "SEM INFORMAÇÃO",
-      emissao_crv: r.EMISSAO_ULTIMO_CRV || "SEM INFORMAÇÃO",
-      restricoes: [
-        r.RESTRICAO_1,
-        r.RESTRICAO_2,
-        r.RESTRICAO_3,
-        r.RESTRICAO_4
-      ].filter(x => x && x !== "SEM RESTRICAO")
-    },
-    proprietario: {
-      documento: r.PROPRIETARIO?.CPF_CNPJ || "SEM INFORMAÇÃO",
-      nome: r.PROPRIETARIO?.NOME || "SEM INFORMAÇÃO"
-    }
-  };
 }
 
 /*
@@ -729,7 +653,7 @@ pre{
 <body>
 
 <div class="header">
-  <h1>🪐 Astro <span>Search</span></h1>
+  <h1>🚀 Astro <span>Search</span></h1>
   <div id="badgeContainer" style="margin-top:8px;"></div>
 </div>
 
@@ -825,7 +749,7 @@ ${Object.keys(ENDPOINTS).map(e=>`<option>${e}</option>`).join("")}
 
 const TOKENS = {
   dragon:"VIP",
-  italoedu:"VIP",
+  italoedu7:"VIP",
   IFNastro:"VIP",
   astrofree:"FREE",
   astropro:"PRO"
@@ -895,7 +819,7 @@ function salvarToken(token){
 /* BADGE */
 function renderBadge(plano){
   const el = document.getElementById("badgeContainer")
-  el.innerHTML = \`<div class="badge \${plano.toLowerCase()}">\${plano}</div>\`
+  el.innerHTML = `<div class="badge ${plano.toLowerCase()}">${plano}</div>`
 }
 
 /* ===== EFEITOS ===== */
@@ -1110,7 +1034,7 @@ button:hover{
 <div id="panel" style="display:none">
 
 <div class="card">
-<h3>\uD83C\uDF9F\uFE0F Gerar Token</h3>
+<h3>🎟️ Gerar Token</h3>
 
 <input id="nome" placeholder="Nome do cliente">
 
@@ -1155,12 +1079,13 @@ function login(){
 function renderEndpoints(){
  const div = document.getElementById("endpoints")
 
- div.innerHTML = ENDPOINTS.map(e =>
-  "<label style='display:flex;gap:8px;margin-top:6px;font-size:12px;'>" +
-    "<input type='checkbox' value='" + e + "' checked>" +
-    e +
-  "</label>"
-).join("")
+ div.innerHTML = ENDPOINTS.map(e=>`
+  <label style="display:flex;gap:8px;margin-top:6px;font-size:12px;">
+    <input type="checkbox" value="${e}" checked>
+    ${e}
+  </label>
+ `).join("")
+}
 
 /* GERAR TOKEN */
 function gerar(){
@@ -1179,36 +1104,88 @@ function gerar(){
 
  const base = "https://astro.stherlionato.workers.dev"
 
- const mensagem = "\uD83C\uDF89 TOKEN GERADO COM SUCESSO!\n\n" +
- "\uD83D\uDD11 • Token: " + token + "\n" +
- "\uD83D\uDC8E • Plano: " + plano + "\n" +
- "\u267E\uFE0F • Limite: " + limite + "\n\n" +
- "\u26A0\uFE0F ATENÇÃO:\nSeu token é privado e intransferível.\nNÃO compartilhe com ninguém.\n\n" +
- "━━━━━━━━━━━━━━━━━━\n\n" +
- "\uD83C\uDF10 • BASE DA API:\n👉 • " + base + "\n\n" +
- "━━━━━━━━━━━━━━━━━━\n\n" +
- "\uD83D\uDE80 EXEMPLOS PRONTOS:\n\n" +
- "👤 CPF\n" + base + "/cpf?token=" + token + "&cpf=00000000000\n" +
- "👤 CPF v2\n" + base + "/cpf2?token=" + token + "&cpf=00000000000\n" +
- "👤 CPF v3\n" + base + "/cpf3?token=" + token + "&cpf=00000000000\n" +
- "📛 Nome\n" + base + "/nome?token=" + token + "&nome=Joao\n" +
- "📛 Nome v2\n" + base + "/nome2?token=" + token + "&nome=Joao\n" +
- "📞 Telefone\n" + base + "/telefone?token=" + token + "&telefone=31999999999\n" +
- "📞 Telefone v2\n" + base + "/telefone2?token=" + token + "&telefone=31999999999\n" +
- "📡 Operadora\n" + base + "/operadora?token=" + token + "&telefone=31999999999\n" +
- "📧 Email\n" + base + "/email?token=" + token + "&email=teste@gmail.com\n" +
- "📍 CEP\n" + base + "/cep?token=" + token + "&cep=00000000\n" +
- "📍 CEP v2\n" + base + "/cep2?token=" + token + "&cep=00000000\n" +
- "🚗 Placa\n" + base + "/placa?token=" + token + "&placa=ABC1234\n" +
- "🚗 Placa v2\n" + base + "/placa2?token=" + token + "&placa=ABC1234\n" +
- "🪪 RG\n" + base + "/rg?token=" + token + "&cpf=00000000000\n" +
- "🗳️ Título\n" + base + "/titulo?token=" + token + "&cpf=00000000000\n" +
- "💼 PIS\n" + base + "/pis?token=" + token + "&cpf=00000000000\n" +
- "📊 NIS\n" + base + "/nis?token=" + token + "&cpf=00000000000\n" +
- "👨‍👩‍👧 Parentes\n" + base + "/parentes?token=" + token + "&cpf=00000000000\n" +
- "🏘️ Vizinhos\n" + base + "/vizinhos?token=" + token + "&cpf=00000000000\n" +
- "━━━━━━━━━━━━━━━━━━\n\n" +
- "\uD83D\uDE80 Pronto! Só substituir os dados e começar a usar.";
+ const mensagem = `🎉 TOKEN GERADO COM SUCESSO!
+
+🔑 • Token: ${token}
+💎 • Plano: ${plano}
+♾️ • Limite: ${limite}
+
+⚠️ ATENÇÃO:
+Seu token é privado e intransferível.
+NÃO compartilhe com ninguém.
+
+━━━━━━━━━━━━━━━━━━
+
+🌐 • BASE DA API:
+👉 • ${base}
+
+━━━━━━━━━━━━━━━━━━
+
+🚀 EXEMPLOS PRONTOS:
+
+Altere as últimas informações pela informação que deseja buscar.
+
+👤 CPF
+${base}/cpf?token=${token}&cpf=00000000000
+
+👤 CPF v2
+${base}/cpf2?token=${token}&cpf=00000000000
+
+👤 CPF v3
+${base}/cpf3?token=${token}&cpf=00000000000
+
+📛 Nome
+${base}/nome?token=${token}&nome=Joao
+
+📛 Nome v2
+${base}/nome2?token=${token}&nome=Joao
+
+📞 Telefone
+${base}/telefone?token=${token}&telefone=31999999999
+
+📞 Telefone v2
+${base}/telefone2?token=${token}&telefone=31999999999
+
+📡 Operadora
+${base}/operadora?token=${token}&telefone=31999999999
+
+📧 Email
+${base}/email?token=${token}&email=teste@gmail.com
+
+📍 CEP
+${base}/cep?token=${token}&cep=00000000
+
+📍 CEP v2
+${base}/cep2?token=${token}&cep=00000000
+
+🚗 Placa
+${base}/placa?token=${token}&placa=ABC1234
+
+🚗 Placa v2
+${base}/placa2?token=${token}&placa=ABC1234
+
+🪪 RG
+${base}/rg?token=${token}&cpf=00000000000
+
+🗳️ Título
+${base}/titulo?token=${token}&cpf=00000000000
+
+💼 PIS
+${base}/pis?token=${token}&cpf=00000000000
+
+📊 NIS
+${base}/nis?token=${token}&cpf=00000000000
+
+👨‍👩‍👧 Parentes
+${base}/parentes?token=${token}&cpf=00000000000
+
+🏘️ Vizinhos
+${base}/vizinhos?token=${token}&cpf=00000000000
+
+━━━━━━━━━━━━━━━━━━
+
+🚀 Pronto! Só substituir os dados e começar a usar.
+`
 
  document.getElementById("resultado").innerText = mensagem
 
@@ -1219,7 +1196,10 @@ function gerar(){
 </html>
 
 `,{
-headers:{ "content-type":"text/html" }
+  headers: { 
+    "content-type": "text/html",
+    "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate"
+  }
 })
 
 }
