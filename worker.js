@@ -76,6 +76,13 @@ cpf4:{url:"https://knowsapi.shop/api/consulta/cpf-v3",param:"code",query:"cpf"},
 cpf5:{url:"https://knowsapi.shop/api/consulta/cpf-v4",param:"code",query:"cpf"},
 cpf6:{url:"https://knowsapi.shop/api/consulta/cpf-v5",param:"code",query:"cpf"},
 
+instagram: {
+  url: "https://knowsapi.shop/api/stalking/instagram",
+  param: "user",
+  query: "user",
+  apikey: "bigmouth"
+}
+
 nome:{url:"https://knowsapi.shop/api/consultas/nome",param:"nome",query:"nome"},
 nome2:{url:"https://knowsapi.shop/api/consulta/nome-v1",param:"nome",query:"nome"},
 
@@ -160,6 +167,21 @@ async function consultar(endpoint, request, url, ctx) {
 
   let dados = limparRespostaAPI(api);
   dados = normalizarDados(dados);
+
+if(endpoint === "instagram" && dados?.resultado){
+  const res = dados.resultado;
+  dados.normalizado = {
+    id: res.id,
+    username: res.username,
+    nome: res.nome,
+    categoria: res.categoria,
+    bio: res.bio,
+    links: res.bio_links?.map(l => ({
+      url: l.lynx_url,
+      type: l.link_type
+    })) || []
+  };
+}
 
   // Ajuste específico para placa3
   if (endpoint === "placa3" && dados?.resultado) {
