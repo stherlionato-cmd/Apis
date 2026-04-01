@@ -63,12 +63,20 @@ const APIKEY = "bigmouth"
 
 const ENDPOINTS = {
 
+cnpj:{ 
+    url: "https://api.blackaut.shop/api/dados-pessoais/cnpj", 
+    param: "cnpj", 
+    query: "cnpj", 
+    apikey: "EbmScZ0ntHf61KJz3H" 
+  },
 cpf:{url:"https://knowsapi.shop/api/consulta/cpf",param:"code",query:"cpf"},
 cpf2:{url:"https://knowsapi.shop/api/consulta/cpf-v2",param:"code",query:"cpf"},
 cpf3:{url:"https://knowsapi.shop/api/consultas/cpf",param:"cpf",query:"cpf"},
 cpf4:{url:"https://knowsapi.shop/api/consulta/cpf-v3",param:"code",query:"cpf"},
 cpf5:{url:"https://knowsapi.shop/api/consulta/cpf-v4",param:"code",query:"cpf"},
 cpf6:{url:"https://knowsapi.shop/api/consulta/cpf-v5",param:"code",query:"cpf"},
+
+
 
 nome:{url:"https://knowsapi.shop/api/consultas/nome",param:"nome",query:"nome"},
 nome2:{url:"https://knowsapi.shop/api/consulta/nome-v1",param:"nome",query:"nome"},
@@ -1367,4 +1375,3 @@ headers:{
 })
 
 }
-
