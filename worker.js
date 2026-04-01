@@ -156,6 +156,38 @@ encodeURIComponent(valor) +
 "&apikey=" +
 APIKEY
 
+const STATUS_APIS = {
+  cpf:"yellow",
+  cpf2:"yellow",
+  cpf3:"yellow",
+  cpf4:"yellow",
+  cpf5:"yellow",
+  cpf6:"yellow",
+
+  nome:"yellow",
+  nome2:"yellow",
+
+  telefone:"yellow",
+  telefone2:"yellow",
+  operadora:"yellow",
+
+  email:"yellow",
+
+  cep:"yellow",
+  cep2:"yellow",
+
+  placa:"yellow",
+  placa2:"yellow",
+
+  rg:"yellow",
+  titulo:"yellow",
+  pis:"yellow",
+  nis:"yellow",
+
+  parentes:"yellow",
+  vizinhos:"yellow"
+}
+
 /*
 |--------------------------------------------------------------------------
 | FETCH
@@ -646,6 +678,36 @@ pre{
  z-index:-1;
 }
 
+/* BADGE */
+.badge{
+ display:inline-flex;
+ align-items:center;
+ gap:6px;
+ padding:6px 12px;
+ border-radius:999px;
+ font-size:11px;
+ font-weight:600;
+}
+
+/* Todas em amarelo */
+.badge.free,
+.badge.pro,
+.badge.vip{
+ background: rgba(250,204,21,.2);
+ color: #facc15;
+}
+
+/* Partículas VIP */
+.badge.vip::after{
+ content:"";
+ position:absolute;
+ inset:-50%;
+ background:radial-gradient(circle,#facc15 1px,transparent 1px);
+ background-size:18px 18px;
+ opacity:.25;
+ animation:stars 4s linear infinite;
+}
+
 </style>
 
 </head>
@@ -809,6 +871,13 @@ btn.disabled = false
 btn.innerText = "Consultar"
 }
 
+function mostrarToast(msg){
+  const t = document.getElementById("toast")
+  t.innerText = msg
+  t.classList.add("show")
+  setTimeout(()=>t.classList.remove("show"),3000)
+}
+
 /* ===== TOKEN ===== */
 
 function salvarToken(token){
@@ -819,8 +888,20 @@ function salvarToken(token){
 /* BADGE */
 function renderBadge(plano){
   const el = document.getElementById("badgeContainer")
-el.innerHTML = '<div class="badge ' + plano.toLowerCase() + '">' + plano + '</div>'
+  el.innerHTML = `<div class="badge ${plano.toLowerCase()}" style="background:rgba(250,204,21,.2); color:#facc15;">
+                    ${plano.toUpperCase()} • MANUTENÇÃO
+                  </div>`
 }
+
+/* Ao consultar, mostra toast de manutenção */
+async function consultar(){
+  const token = document.getElementById("token").value.trim()
+  const endpoint = document.getElementById("endpoint").value
+
+  if(true){ // força manutenção
+    mostrarToast("⚠️ Endpoint em manutenção")
+    return
+  }
 
 /* ===== EFEITOS ===== */
 
