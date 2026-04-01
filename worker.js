@@ -697,27 +697,6 @@ pre{
 
 <script>
 
-const endpoint = document.getElementById("endpoint").value;
-const valor = document.getElementById("valor").value;
-const token = document.getElementById("token").value;
-
-const url = `${window.location.origin}/${endpoint}?token=${token}&${endpointParam(endpoint)}=${encodeURIComponent(valor)}`;
-
-async function endpointParam(ep) {
-  // retorna o nome do parâmetro que o Worker espera
-  const map = {
-    cpf: "cpf",
-    nome: "nome",
-    nome3: "nome2",
-    renavam: "renavam",
-    telefone3: "telefone2",
-    parentes2: "parentes",
-    cnh: "cnh",
-    cnpj: "cnpj"
-  };
-  return map[ep] || ep;
-}
-
 /* ===== TOKENS ===== */
 const TOKENS = {
   dragon: "VIP",
