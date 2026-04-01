@@ -317,6 +317,11 @@ return data
 
 }
 
+function salvarToken(token){
+  localStorage.setItem("astro_token", token);
+  renderBadge(TOKENS[token]);
+}
+
 /*
 |--------------------------------------------------------------------------
 | HOME UI
@@ -1005,58 +1010,323 @@ function adminPanel(request){
 <title>Admin Panel</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+
 <style>
-/* Seu CSS continua aqui */
+:root{--blue:#3b82f6;}
+
+*{
+ margin:0;
+ padding:0;
+ box-sizing:border-box;
+ font-family:'Inter',sans-serif;
+}
+
+body{
+ background: radial-gradient(circle at 20% 20%, #0a0f2a, #02030a);
+ color:#e2e8f0;
+ padding:20px;
+ min-height:100vh;
+}
+
+/* HEADER */
+.header{
+ text-align:center;
+ margin-bottom:20px;
+}
+
+.header h1{
+ font-size:22px;
+ font-weight:800;
+}
+
+.header span{
+ color:var(--blue);
+}
+
+/* CARD */
+.card{
+ margin-top:15px;
+ padding:16px;
+ border-radius:18px;
+ background:rgba(255,255,255,0.03);
+ border:1px solid rgba(255,255,255,0.05);
+ backdrop-filter:blur(10px);
+ transition:.3s;
+}
+
+.card:hover{
+ transform:translateY(-3px);
+ border-color:rgba(59,130,246,.4);
+}
+
+/* INPUT */
+.input-group{
+ margin-top:10px;
+}
+
+.label{
+ font-size:11px;
+ opacity:.6;
+ margin-bottom:4px;
+}
+
+input,select{
+ width:100%;
+ padding:12px;
+ border-radius:12px;
+ border:none;
+ background:#0b1228;
+ color:#fff;
+ outline:none;
+}
+
+input:focus,select:focus{
+ box-shadow:0 0 0 2px rgba(59,130,246,.3);
+}
+
+/* BUTTON */
+button{
+ width:100%;
+ padding:12px;
+ margin-top:12px;
+ border-radius:12px;
+ border:none;
+ font-weight:600;
+ background:linear-gradient(90deg,#3b82f6,#2563eb);
+ color:#fff;
+ cursor:pointer;
+ transition:.25s;
+}
+
+button:hover{
+ transform:translateY(-2px);
+ box-shadow:0 10px 25px rgba(59,130,246,.3);
+}
+
+button:active{
+ transform:scale(.96);
+}
+
+/* BOX RESULT */
+.box{
+ margin-top:12px;
+ background:#020617;
+ padding:12px;
+ border-radius:12px;
+ font-size:12px;
+ position:relative;
+}
+
+pre{
+ white-space:pre-wrap;
+ word-wrap:break-word;
+}
+
+/* COPY */
+.copy{
+ margin-top:10px;
+ background:rgba(34,197,94,.2);
+}
+
+.copy:hover{
+ box-shadow:0 0 15px rgba(34,197,94,.3);
+}
+
+/* LOADING */
+.loader{
+ height:40px;
+ border-radius:10px;
+ background:linear-gradient(90deg,#111 25%,#1a1a1a 50%,#111 75%);
+ background-size:200%;
+ animation:load 1s infinite;
+}
+
+@keyframes load{
+ 0%{background-position:200%}
+ 100%{background-position:-200%}
+}
+
+/* TOAST */
+#toast{
+ position:fixed;
+ bottom:20px;
+ left:50%;
+ transform:translateX(-50%) translateY(100px);
+ background:#111827;
+ padding:10px 20px;
+ border-radius:10px;
+ font-size:12px;
+ opacity:0;
+ transition:.3s;
+}
+
+#toast.show{
+ transform:translateX(-50%) translateY(0);
+ opacity:1;
+}
+
+/* MODAL */
+.modal{
+ position:fixed;
+ inset:0;
+ background:rgba(0,0,0,.7);
+ display:flex;
+ align-items:center;
+ justify-content:center;
+ z-index:999;
+ opacity:0;
+ pointer-events:none;
+ transition:.3s;
+}
+
+.modal.show{
+ opacity:1;
+ pointer-events:all;
+}
+
+.modal-box{
+ width:100%;
+ max-width:380px;
+ background:#020617;
+ border-radius:18px;
+ padding:20px;
+ transform:scale(.9);
+ transition:.3s;
+}
+
+.modal.show .modal-box{
+ transform:scale(1);
+}
+
+/* PLANOS */
+.plan{
+ padding:14px;
+ border-radius:16px;
+ margin-top:10px;
+ border:1px solid rgba(255,255,255,.06);
+ background:linear-gradient(145deg,rgba(255,255,255,.03),rgba(255,255,255,.01));
+ transition:.3s;
+ cursor:pointer;
+ position:relative;
+ overflow:hidden;
+}
+
+.plan:hover{
+ transform:translateY(-4px) scale(1.02);
+ border-color:rgba(59,130,246,.4);
+}
+
+/* glow */
+.plan::after{
+ content:"";
+ position:absolute;
+ inset:0;
+ background:linear-gradient(120deg,transparent,rgba(255,255,255,.1),transparent);
+ opacity:0;
+ transition:.4s;
+}
+
+.plan:hover::after{
+ opacity:1;
+}
+
+/* BADGE */
+.badge{
+ display:inline-flex;
+ align-items:center;
+ gap:6px;
+ padding:6px 12px;
+ border-radius:999px;
+ font-size:11px;
+ font-weight:600;
+ background: rgba(250,204,21,.2);
+ color: #facc15;
+ position:relative;
+ overflow:hidden;
+}
+
+.badge.vip::after{
+ content:"";
+ position:absolute;
+ inset:-50%;
+ background:radial-gradient(circle,#facc15 1px,transparent 1px);
+ background-size:18px 18px;
+ opacity:.25;
+ animation:stars 4s linear infinite;
+}
+
+@keyframes stars{
+ from{transform:translateY(0)}
+ to{transform:translateY(40px)}
+}
+
+/* SHAKE */
+@keyframes shake{
+ 0%{transform:translateX(0)}
+ 25%{transform:translateX(-5px)}
+ 50%{transform:translateX(5px)}
+ 75%{transform:translateX(-5px)}
+ 100%{transform:translateX(0)}
+}
+
+#bg{
+ position:fixed;
+ inset:0;
+ z-index:-1;
+}
 </style>
+
 </head>
 <body>
 
-<h2>🔐 Painel Admin</h2>
+<div class="header">
+  <h1>🔐 Admin <span>Panel</span></h1>
+  <div id="badgeContainer"></div>
+</div>
 
-<div class="card" id="loginBox" style="display:${valid ? "none" : "block"}">
-<input id="adminToken" placeholder="Token admin">
-<button onclick="login()">Entrar</button>
+<!-- LOGIN MODAL -->
+<div class="modal show" id="loginModal">
+  <div class="modal-box">
+    <h2 style="font-size:16px;margin-bottom:10px;">🔑 Acesso Admin</h2>
+    <input id="adminToken" placeholder="Digite token">
+    <button onclick="login()">Entrar</button>
+  </div>
 </div>
 
 <div id="panel" style="display:${valid ? "block" : "none"}">
 
 <div class="card">
 <h3>🎟️ Gerar Token</h3>
-
 <input id="nome" placeholder="Nome do cliente">
-
 <select id="plano">
 <option value="FREE">FREE</option>
 <option value="PRO">PRO</option>
 <option value="VIP">VIP</option>
 </select>
-
 <h4 style="margin-top:10px;font-size:13px;opacity:.7;">Endpoints liberados</h4>
-
 <div id="endpoints"></div>
-
 <button onclick="gerar()">Gerar Token</button>
-
 <div class="token-box" id="resultado"></div>
-
 </div>
 
 </div>
+
+<canvas id="bg"></canvas>
 
 <script>
 const ADMIN = "` + ADMIN_TOKEN + `";
 const ENDPOINTS = ${JSON.stringify(Object.keys(ENDPOINTS))};
 
-/* LOGIN */
 function login(){
  const val = document.getElementById("adminToken").value;
  if(val !== ADMIN){
   alert("Token inválido");
   return;
  }
- document.getElementById("loginBox").style.display="none";
+ document.getElementById("loginModal").classList.remove("show");
  document.getElementById("panel").style.display="block";
  renderEndpoints();
+ renderBadge("VIP");
 }
 
 // Renderiza endpoints
@@ -1077,30 +1347,79 @@ function gerar(){
   const checks = [...document.querySelectorAll("#endpoints input:checked")];
   const perms = checks.map(c=>c.value);
   const token = nome + "_" + Math.random().toString(36).slice(2,10);
+
+  // Atualiza TOKENS em memória
+  TOKENS[token] = plano;
+
+  // Salva no localStorage
+  let todosTokens = JSON.parse(localStorage.getItem("astro_tokens") || "{}");
+  todosTokens[token] = { plano, endpoints: perms };
+  localStorage.setItem("astro_tokens", JSON.stringify(todosTokens));
+
   let limite = "100 consultas";
   if(plano === "PRO") limite = "1000 consultas";
   if(plano === "VIP") limite = "Ilimitado";
 
   const mensagem = 
-    "\u{1F389} TOKEN GERADO COM SUCESSO!\n\n" +
-    "\u{1F511} • Token: " + token + "\n" +
-    "\u{1F48E} • Plano: " + plano + "\n" +
-    "♾️ • Limite: " + limite + "\n\n" +
-    "⚠️ ATENÇÃO:\n" +
-    "Endpoints liberados: " + perms.join(", ");
+    "🎉 TOKEN GERADO COM SUCESSO!\\n\\n" +
+    "🔑 • Token: " + token + "\\n" +
+    "💎 • Plano: " + plano + "\\n" +
+    "♾️ • Limite: " + limite + "\\n\\n" +
+    "⚠️ Endpoints liberados: " + perms.join(", ");
 
   document.getElementById("resultado").innerText = mensagem;
 }
 
-// Se token da URL for válido, já renderiza os endpoints
-if(${valid}){
-  renderEndpoints();
+// PARTICULAS DE FUNDO
+const canvas = document.getElementById("bg");
+const ctx = canvas.getContext("2d");
+let particles = [];
+
+function resizeCanvas(){
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
 }
 
+function createParticles(qtd=60){
+  particles = [];
+  for(let i=0;i<qtd;i++){
+    particles.push({
+      x: Math.random()*canvas.width,
+      y: Math.random()*canvas.height,
+      r: Math.random()*1.5,
+      speed: Math.random()*0.5 + 0.2
+    });
+  }
+}
+
+function drawParticles(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  particles.forEach(p=>{
+    p.y += p.speed;
+    if(p.y > canvas.height){
+      p.y = 0;
+      p.x = Math.random()*canvas.width;
+    }
+    ctx.beginPath();
+    ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+    ctx.fillStyle="rgba(255,255,255,0.6)";
+    ctx.fill();
+  });
+  requestAnimationFrame(drawParticles);
+}
+
+window.addEventListener("load", ()=>{
+  resizeCanvas();
+  createParticles();
+  drawParticles();
+});
+
+window.addEventListener("resize", resizeCanvas);
 </script>
 
 </body>
 </html>
+
 `,{
     headers: { 
       "content-type": "text/html",
