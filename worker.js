@@ -102,30 +102,96 @@ vizinhos:{url:"https://knowsapi.shop/api/consultas/vizinhos",param:"cpf",query:"
 |--------------------------------------------------------------------------
 */
 
-async function consultar(endpoint,request,url,ctx){
+async function consultar(endpoint, request, url, ctx) {
+  if (request.method !== "GET") return jsonErro("REQ_000", "Método inválido");
 
-if(request.method !== "GET"){
-return jsonErro("REQ_000","Método inválido")
+  const token = url.searchParams.get("token");
+  if (!token) return jsonErro("AUTH_002", "Token obrigatório");
+  if (!validarToken(token)) return jsonErro("AUTH_001", "Token inválido");
+
+  const config = ENDPOINTS[endpoint];
+  const valor = url.searchParams.get(config.query);
+  if (!valor) return jsonErro("REQ_001", "Parâmetro ausente");
+
+  const plano = obterPlanoToken(token);
+
+  const apiURL =
+    config.url +
+    "?" +
+    config.param +
+    "=" +
+    encodeURIComponent(valor) +
+    (config.apikey ? "&apikey=" + config.apikey : "&apikey=" + APIKEY);
+
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 30000); // 30s
+
+  let api;
+
+  try {
+    const res = await fetch(apiURL, {
+      headers: { "User-Agent": "Mozilla/5.0", Accept: "application/json" },
+      signal: controller.signal,
+      cf: { cacheTtl: 0 }
+    });
+    clearTimeout(timeoutId);
+
+    const text = await res.text();
+
+    try {
+      api = JSON.parse(text);
+    } catch {
+      return jsonErro("API_004", "API externa retornou conteúdo inesperado", text);
+    }
+  } catch (e) {
+    clearTimeout(timeoutId);
+    return jsonErro("API_001", "Erro ao conectar API", e.toString());
+  }
+
+  if (!api || Object.keys(api).length === 0) {
+    return jsonErro("DATA_404", "Nenhum dado encontrado");
+  }
+
+  let dados = limparRespostaAPI(api);
+  dados = normalizarDados(dados);
+
+  // Ajuste específico para placa3
+  if (endpoint === "placa3" && dados?.resultado) {
+    let apiDados = dados.resultado;
+    let possuidor = {};
+    const match = apiDados.match(/• POSSUIDOR\s*\n\s*• CPF\/CNPJ:\s*(.*?)\n\s*• NOME:\s*(.*?)\n/);
+    if (match) possuidor = { cpf_cnpj: match[1].trim(), nome: match[2].trim() };
+
+    apiDados = apiDados.replace(/• CPF\/CNPJ:.*?\n/gi, "")
+                       .replace(/• NOME:.*?\n/gi, "")
+                       .replace(/🔛 BY: @Skynet07Robot/gi, "");
+    dados.resultado = apiDados.trim();
+    dados.proprietario = { possuidor };
+    delete dados.meta_turbo;
+  }
+
+  const finalResponse = {
+    status: true,
+    meta: {
+      api: "Astro Search API",
+      empresa: "Astro Company",
+      plano_token: plano,
+      endpoint,
+      timestamp: new Date().toISOString()
+    },
+    consulta: { [config.query]: valor },
+    dados
+  };
+
+  const cacheKey = new Request(request.url, { method: "GET" });
+  const cache = caches.default;
+  const response = new Response(JSON.stringify(finalResponse, null, 2), {
+    headers: { "Content-Type": "application/json;charset=UTF-8", "Cache-Control": "public,max-age=3600" }
+  });
+  ctx.waitUntil(cache.put(cacheKey, response.clone()));
+
+  return response;
 }
-
-const token = url.searchParams.get("token")
-
-if(!token){
-return jsonErro("AUTH_002","Token obrigatório")
-}
-
-if(!validarToken(token)){
-return jsonErro("AUTH_001","Token inválido")
-}
-
-const config = ENDPOINTS[endpoint]
-const valor = url.searchParams.get(config.query)
-
-if(!valor){
-return jsonErro("REQ_001","Parâmetro ausente")
-}
-
-const plano = obterPlanoToken(token)
 
 /*
 |--------------------------------------------------------------------------
