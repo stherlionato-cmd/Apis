@@ -63,7 +63,11 @@ const APIKEY = "bigmouth"
 
 const ENDPOINTS = {
 
-cpf:{url:"https://knowsapi.shop/api/consulta/cpf",param:"code",query:"cpf"},
+cpf:{
+  url:"https://api.blackaut.shop/api/dados-pessoais/cpf",
+  param:"cpf",
+  query:"cpf"
+},
 cpf2:{url:"https://knowsapi.shop/api/consulta/cpf-v2",param:"code",query:"cpf"},
 cpf3:{url:"https://knowsapi.shop/api/consultas/cpf",param:"cpf",query:"cpf"},
 cpf4:{url:"https://knowsapi.shop/api/consulta/cpf-v3",param:"code",query:"cpf"},
@@ -306,22 +310,25 @@ if(!data || typeof data !== "object") return data
 const blacklist=[
 "status",
 "creator",
-"api",
 "criador",
+"api",
 "credits",
 "creditos",
 "mensagem",
 "message"
 ]
 
+// remove campos indesejados
 for(const campo of blacklist){
-delete data[campo]
+  delete data[campo]
 }
 
+// 🔥 prioridade total pro resultado
 if(data.resultado){
-return data.resultado
+  return data.resultado
 }
 
+// fallback
 return data
 
 }
