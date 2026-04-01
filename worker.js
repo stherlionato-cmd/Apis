@@ -238,22 +238,20 @@ let dados = limparRespostaAPI(api)
 dados = normalizarDados(dados)
 
 // Ajuste específico para placa3
+// Ajuste específico para placa3
 if(endpoint === "placa3" && dados?.resultado){
-  const resultado = dados.resultado
+  let texto = dados.resultado;
 
-  // Remover CPF/CNPJ, NOME e demais metadados desnecessários
-  const camposRemover = ["CPF/CNPJ", "NOME", "USUÁRIO", "BY"]
-  
-  let textoLimpo = resultado
-  for(const campo of camposRemover){
-    const regex = new RegExp(`• ${campo}:.*?(\\n|$)`, "gi")
-    textoLimpo = textoLimpo.replace(regex, "")
-  }
+  // Remove linhas indesejadas (CPF/CNPJ, NOME, USUÁRIO e créditos)
+  texto = texto
+    .replace(/• (CPF\/CNPJ|NOME|USUÁRIO):.*?(\n|$)/gi, "")
+    .replace(/🔛 BY: @Skynet07Robot/gi, "");
 
   // Atualiza o resultado limpo
-  dados.resultado = textoLimpo.trim()
+  dados.resultado = texto.trim();
+
   // Remove meta_turbo completamente
-  delete dados.meta_turbo
+  delete dados.meta_turbo;
 }
 
 /*
