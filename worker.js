@@ -1230,69 +1230,45 @@ function login(){
 
 /* CHECKBOX */
 function renderEndpoints(){
- const div = document.getElementById("endpoints")
+  const div = document.getElementById("endpoints")
+  div.innerHTML = ENDPOINTS.map(e =>
+    '<label style="display:flex;gap:8px;margin-top:6px;font-size:12px;">' +
+      '<input type="checkbox" value="' + e + '" checked>' +
+      e +
+    '</label>'
+  ).join('')
+}
 
- div.innerHTML = ENDPOINTS.map(e =>
-  '<label style="display:flex;gap:8px;margin-top:6px;font-size:12px;">' +
-    '<input type="checkbox" value="' + e + '" checked>' +
-    e +
-  '</label>'
-).join('')
-
-/* GERAR TOKEN */
-/* GERAR TOKEN */
 function gerar(){
+  const nome = document.getElementById("nome").value || "user"
+  const plano = document.getElementById("plano").value
 
- const nome = document.getElementById("nome").value || "user"
- const plano = document.getElementById("plano").value
+  const checks = [...document.querySelectorAll("#endpoints input:checked")]
+  const perms = checks.map(c=>c.value)
 
- const checks = [...document.querySelectorAll("#endpoints input:checked")]
- const perms = checks.map(c=>c.value)
+  const token = nome + "_" + Math.random().toString(36).slice(2,10)
 
- const token = nome + "_" + Math.random().toString(36).slice(2,10)
+  let limite = "100 consultas"
+  if(plano === "PRO") limite = "1000 consultas"
+  if(plano === "VIP") limite = "Ilimitado"
 
- let limite = "100 consultas"
- if(plano === "PRO") limite = "1000 consultas"
- if(plano === "VIP") limite = "Ilimitado"
+  const base = window.location.origin
 
- const base = "https://astro.stherlionato.workers.dev"
+  const mensagem = 
+    "🎉 TOKEN GERADO COM SUCESSO!\n\n" +
+    "🔑 • Token: " + token + "\n" +
+    "💎 • Plano: " + plano + "\n" +
+    "♾️ • Limite: " + limite + "\n\n" +
+    "⚠️ ATENÇÃO:\n" +
+    "Seu token é privado e intransferível.\n" +
+    "NÃO compartilhe com ninguém.\n\n" +
+    "━━━━━━━━━━━━━━━━━━\n\n" +
+    "🌐 • BASE DA API:\n" +
+    "👉 • " + base + "\n\n" +
+    "━━━━━━━━━━━━━━━━━━\n\n" +
+    "🚀 Pronto! Só substituir os dados e começar a usar."
 
- const mensagem = 
-  "🎉 TOKEN GERADO COM SUCESSO!\n\n" +
-  "🔑 • Token: " + token + "\n" +
-  "💎 • Plano: " + plano + "\n" +
-  "♾️ • Limite: " + limite + "\n\n" +
-  "⚠️ ATENÇÃO:\n" +
-  "Seu token é privado e intransferível.\n" +
-  "NÃO compartilhe com ninguém.\n\n" +
-  "━━━━━━━━━━━━━━━━━━\n\n" +
-  "🌐 • BASE DA API:\n" +
-  "👉 • " + base + "\n\n" +
-  "━━━━━━━━━━━━━━━━━━\n\n" +
-  "🚀 EXEMPLOS PRONTOS:\n\n" +
-  "👤 CPF\n" + base + "/cpf?token=" + token + "&cpf=00000000000\n" +
-  "👤 CPF v2\n" + base + "/cpf2?token=" + token + "&cpf=00000000000\n" +
-  "👤 CPF v3\n" + base + "/cpf3?token=" + token + "&cpf=00000000000\n" +
-  "📛 Nome\n" + base + "/nome?token=" + token + "&nome=Joao\n" +
-  "📛 Nome v2\n" + base + "/nome2?token=" + token + "&nome=Joao\n" +
-  "📞 Telefone\n" + base + "/telefone?token=" + token + "&telefone=31999999999\n" +
-  "📞 Telefone v2\n" + base + "/telefone2?token=" + token + "&telefone=31999999999\n" +
-  "📡 Operadora\n" + base + "/operadora?token=" + token + "&telefone=31999999999\n" +
-  "📧 Email\n" + base + "/email?token=" + token + "&email=teste@gmail.com\n" +
-  "📍 CEP\n" + base + "/cep?token=" + token + "&cep=00000000\n" +
-  "📍 CEP v2\n" + base + "/cep2?token=" + token + "&cep=00000000\n" +
-  "🚗 Placa\n" + base + "/placa?token=" + token + "&placa=ABC1234\n" +
-  "🚗 Placa v2\n" + base + "/placa2?token=" + token + "&placa=ABC1234\n" +
-  "🪪 RG\n" + base + "/rg?token=" + token + "&cpf=00000000000\n" +
-  "🗳️ Título\n" + base + "/titulo?token=" + token + "&cpf=00000000000\n" +
-  "💼 PIS\n" + base + "/pis?token=" + token + "&cpf=00000000000\n" +
-  "📊 NIS\n" + base + "/nis?token=" + token + "&cpf=00000000000\n" +
-  "👨‍👩‍👧 Parentes\n" + base + "/parentes?token=" + token + "&cpf=00000000000\n" +
-  "🏘️ Vizinhos\n" + base + "/vizinhos?token=" + token + "&cpf=00000000000\n\n" +
-  "━━━━━━━━━━━━━━━━━━\n\n" +
-  "🚀 Pronto! Só substituir os dados e começar a usar.";
-
- document.getElementById("resultado").innerText = mensagem
+  document.getElementById("resultado").innerText = mensagem
 }
 
 </script>
