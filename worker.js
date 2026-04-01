@@ -729,7 +729,7 @@ pre{
 <body>
 
 <div class="header">
-  <h1>🚀 Astro <span>Search</span></h1>
+  <h1>🪐 Astro <span>Search</span></h1>
   <div id="badgeContainer" style="margin-top:8px;"></div>
 </div>
 
