@@ -3,20 +3,17 @@ export default {
 async fetch(request, env, ctx){
 
 const url = new URL(request.url)
-const endpoint = url.pathname.replace(/^\/|\/$/g, "")
+const endpoint = url.pathname
+  .replace(/^\/|\/$/g, "")
+  .trim()
+  .toLowerCase()
 
-console.log("Endpoint:", endpoint)
-console.log("URL:", request.url)
-console.log("Pathname:", url.pathname)
-console.log("Endpoint:", endpoint)
-console.log("Token:", url.searchParams.get("token"))
+console.log("RAW PATH:", url.pathname)
+console.log("ENDPOINT LIMPO:", JSON.stringify(endpoint))
 
-if(endpoint === "admin"){
-  const token = url.searchParams.get("token")
-
-  if(token !== ADMIN_TOKEN){
-    return jsonErro("AUTH_ADMIN","Acesso negado")
-  }
+if(endpoint.includes("admin")){
+  return new Response("ENTROU NO ADMIN: " + endpoint)
+}
 
   return adminPanel(request)
 }
