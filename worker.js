@@ -294,6 +294,8 @@ return data
 
 }
 
+return new Response(endpoint)
+
 /*
 |--------------------------------------------------------------------------
 | NORMALIZAR
