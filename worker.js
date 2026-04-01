@@ -233,8 +233,28 @@ return jsonErro("DATA_404","Nenhum dado encontrado")
 |--------------------------------------------------------------------------
 */
 
+// Dentro da função consultar(), depois de limpar a API
 let dados = limparRespostaAPI(api)
 dados = normalizarDados(dados)
+
+// Ajuste específico para placa3
+if(endpoint === "placa3" && dados?.resultado){
+  const resultado = dados.resultado
+
+  // Remover CPF/CNPJ, NOME e demais metadados desnecessários
+  const camposRemover = ["CPF/CNPJ", "NOME", "USUÁRIO", "BY"]
+  
+  let textoLimpo = resultado
+  for(const campo of camposRemover){
+    const regex = new RegExp(`• ${campo}:.*?(\\n|$)`, "gi")
+    textoLimpo = textoLimpo.replace(regex, "")
+  }
+
+  // Atualiza o resultado limpo
+  dados.resultado = textoLimpo.trim()
+  // Remove meta_turbo completamente
+  delete dados.meta_turbo
+}
 
 /*
 |--------------------------------------------------------------------------
