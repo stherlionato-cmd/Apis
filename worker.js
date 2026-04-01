@@ -3,7 +3,7 @@ export default {
 async fetch(request, env, ctx){
 
 const url = new URL(request.url)
-const endpoint = url.pathname.replace("/","")
+const endpoint = url.pathname.replace(/^\/|\/$/g, "")
 
 if(endpoint === "admin"){
   const token = url.searchParams.get("token")
