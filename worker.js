@@ -554,6 +554,15 @@ pre{
  transition:.3s;
 }
 
+/* MODAIS SOBREPOSTOS */
+#maintenanceModal {
+  z-index: 900;  /* fica atrás */
+}
+
+#modal {
+  z-index: 1000; /* fica na frente */
+}
+
 .modal.show{
  opacity:1;
  pointer-events:all;
@@ -990,18 +999,20 @@ function drawParticles(){
 
 /* ===== LOAD ===== */
 window.addEventListener("load", ()=>{
-  // Modal de manutenção
+  // Primeiro: mostrar modal de manutenção
   const maintenanceModal = document.getElementById("maintenanceModal");
   maintenanceModal.classList.add("show");
 
-  // Modal de token
+  // Checar se existe token válido no localStorage
   const token = localStorage.getItem("astro_token");
   if(token && TOKENS[token]){
+    // Token válido: exibe badge e efeito premium
     document.getElementById("token").value = token;
     renderBadge(TOKENS[token]);
     efeitoPremium(token);
   } else {
-    abrirModal();
+    // Sem token ou inválido: abrir modal de token **por cima da manutenção**
+    abrirModal(); // modal de token
   }
 
   // Partículas
