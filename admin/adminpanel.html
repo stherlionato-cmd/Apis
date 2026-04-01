@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Admin Panel</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+<style>
+body {font-family:Inter, sans-serif; background:#0a0f2a; color:#fff; padding:20px;}
+.card{background:rgba(255,255,255,0.05); padding:16px; border-radius:12px; margin-top:12px;}
+input,select{width:100%; padding:10px; margin-top:6px; border-radius:8px; border:none; background:#0b1228; color:#fff;}
+button{padding:10px; margin-top:8px; border:none; border-radius:8px; background:#3b82f6; color:#fff; cursor:pointer;}
+.token-box{margin-top:10px; background:#020617; padding:10px; border-radius:10px; word-break:break-all;}
+</style>
+</head>
+<body>
+
+<h2>🔐 Painel Admin</h2>
+
+<div class="card">
+<h3>Gerar Token</h3>
+<input id="adminToken" placeholder="Token Admin">
+<input id="nome" placeholder="Nome do cliente">
+<select id="plano">
+  <option value="FREE">FREE</option>
+  <option value="PRO">PRO</option>
+  <option value="VIP">VIP</option>
+</select>
+<button onclick="gerarToken()">Gerar Token</button>
+<div class="token-box" id="resultado"></div>
+</div>
+
+<script>
+async function gerarToken(){
+  const adminToken = document.getElementById("adminToken").value;
+  const nome = document.getElementById("nome").value;
+  const plano = document.getElementById("plano").value;
+
+  const body = {adminToken, nome, plano, endpoints: []};
+
+  try {
+    const res = await fetch("/gerartoken", {
+      method:"POST",
+      headers: {"Content-Type":"application/json"},
+      body: JSON.stringify(body)
+    });
+    const data = await res.json();
+    if(data.status){
+      document.getElementById("resultado").innerText = `Token: ${data.token}\nPlano: ${data.plano}\nEndpoints: ${data.endpoints.join(", ")}`;
+    } else {
+      document.getElementById("resultado").innerText = `Erro: ${data.erro.mensagem}`;
+    }
+  } catch(e){
+    document.getElementById("resultado").innerText = "Erro ao gerar token: "+e;
+  }
+}
+</script>
+
+</body>
+</html>
