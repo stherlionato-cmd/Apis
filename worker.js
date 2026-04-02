@@ -1,325 +1,237 @@
 export default {
-
 async fetch(request, env, ctx){
 
 const url = new URL(request.url)
-const endpoint = url.pathname.replace("/","")
+let endpoint = url.pathname.replace("/","")
+
+// 🔥 ALIAS
+const ALIAS = {
+  cpf2:"cpf",
+  cpf3:"cpf",
+  cpf4:"cpf",
+  cpf5:"cpf",
+  cpf6:"cpf"
+}
+
+if(ALIAS[endpoint]){
+  endpoint = ALIAS[endpoint]
+}
 
 if(endpoint === "admin"){
   const token = url.searchParams.get("token")
-
   if(token !== ADMIN_TOKEN){
     return jsonErro("AUTH_ADMIN","Acesso negado")
   }
-
   return adminPanel(request)
 }
 
 if(endpoint === ""){
-return home(request)
+  return home(request)
 }
 
 if(!ENDPOINTS[endpoint]){
-return jsonErro("ENDPOINT_404","Endpoint não encontrado")
+  return jsonErro("ENDPOINT_404","Endpoint não encontrado")
 }
 
 return consultar(endpoint,request,url,ctx)
 
 }
-
 }
 
-/*
-|--------------------------------------------------------------------------
-| TOKENS
-|--------------------------------------------------------------------------
-*/
+/* ================= CONFIG ================= */
 
 const ADMIN_TOKEN = "dragonsubdono"
+const BASE_SARA = "https://sara-api.xyz/consulta/"
+
+/* ================= TOKENS (SEM KV) ================= */
 
 const TOKENS = {
-
-dragon:{plano:"VIP",limite:"unlimited"},
-IFNastro:{plano:"VIP",limite:"unlimited"},
-italoedu7:{plano:"VIP",limite:"unlimited"},
-astrofree:{plano:"FREE",limite:100},
-astropro:{plano:"PRO",limite:1000}
-
+  dragon:{plano:"VIP",credits:-1,endpoints:null},
+  astrofree:{plano:"FREE",credits:100,endpoints:["cpf","nome"]},
+  astropro:{plano:"PRO",credits:1000,endpoints:null}
 }
 
-/*
-|--------------------------------------------------------------------------
-| CONFIG
-|--------------------------------------------------------------------------
-*/
-
-const APIKEY = "bigmouth"
-
-/*
-|--------------------------------------------------------------------------
-| ENDPOINTS
-|--------------------------------------------------------------------------
-*/
+/* ================= ENDPOINTS ================= */
 
 const ENDPOINTS = {
 
-cnpj:{ 
-    url: "https://api.blackaut.shop/api/dados-pessoais/cnpj", 
-    param: "cnpj", 
-    query: "cnpj", 
-    apikey: "EbmScZ0ntHf61KJz3H" 
-  },
-cpf:{url:"https://knowsapi.shop/api/consulta/cpf",param:"code",query:"cpf"},
-cpf2:{url:"https://knowsapi.shop/api/consulta/cpf-v2",param:"code",query:"cpf"},
-cpf3:{url:"https://knowsapi.shop/api/consultas/cpf",param:"cpf",query:"cpf"},
-cpf4:{url:"https://knowsapi.shop/api/consulta/cpf-v3",param:"code",query:"cpf"},
-cpf5:{url:"https://knowsapi.shop/api/consulta/cpf-v4",param:"code",query:"cpf"},
-cpf6:{url:"https://knowsapi.shop/api/consulta/cpf-v5",param:"code",query:"cpf"},
-
-
-
-nome:{url:"https://knowsapi.shop/api/consultas/nome",param:"nome",query:"nome"},
-nome2:{url:"https://knowsapi.shop/api/consulta/nome-v1",param:"nome",query:"nome"},
-
-telefone:{url:"https://knowsapi.shop/api/consultas/telefone",param:"telefone",query:"telefone"},
-telefone2:{url:"https://knowsapi.shop/api/consulta/telefone-v1",param:"telefone",query:"telefone"},
-operadora:{url:"https://knowsapi.shop/api/consultas/operadora",param:"telefone",query:"telefone"},
-
-email:{url:"https://knowsapi.shop/api/consultas/email",param:"email",query:"email"},
-
-cep:{url:"https://knowsapi.shop/api/consultas/cep-v1",param:"cep",query:"cep"},
-cep2:{url:"https://knowsapi.shop/api/consulta/cep-v1",param:"cep",query:"cep"},
-
-placa:{url:"https://knowsapi.shop/api/consulta/placa-v1",param:"placa",query:"placa"},
-placa2:{url:"https://knowsapi.shop/api/consulta/placa-v2",param:"placa",query:"placa"},
-placa3: {url:"https://api.blackaut.shop/api/dados-pessoais/placa", param:"placa", query:"placa", apikey:"EbmScZ0ntHf61KJz3H"},
-
-rg:{url:"https://knowsapi.shop/api/consultas/rg",param:"cpf",query:"cpf"},
-titulo:{url:"https://knowsapi.shop/api/consultas/titulo",param:"cpf",query:"cpf"},
-pis:{url:"https://knowsapi.shop/api/consultas/pis",param:"cpf",query:"cpf"},
-nis:{url:"https://knowsapi.shop/api/consultas/nis",param:"cpf",query:"cpf"},
-
-parentes:{url:"https://knowsapi.shop/api/consultas/parentes",param:"cpf",query:"cpf"},
-vizinhos:{url:"https://knowsapi.shop/api/consultas/vizinhos",param:"cpf",query:"cpf"}
+cpf:{query:"cpf",apis:[{url:BASE_SARA+"cpf",param:"cpf",tipo:"sara"}]},
+nome:{query:"nome",apis:[{url:BASE_SARA+"nome",param:"nome",tipo:"sara"}]},
+telefone:{query:"telefone",apis:[{url:BASE_SARA+"telefone",param:"telefone",tipo:"sara"}]},
+telefone_full:{query:"telefone",apis:[{url:BASE_SARA+"telefone-full",param:"telefone",tipo:"sara"}]},
+telefone_cpf:{query:"cpf",apis:[{url:BASE_SARA+"telefone-cpf",param:"cpf",tipo:"sara"}]},
+ddd:{query:"ddd",apis:[{url:BASE_SARA+"ddd",param:"ddd",tipo:"sara"}]},
+operadora:{query:"telefone",apis:[{url:BASE_SARA+"operadora",param:"telefone",tipo:"sara"}]},
+rg:{query:"rg",apis:[{url:BASE_SARA+"rg",param:"rg",tipo:"sara"}]},
+titulo:{query:"titulo",apis:[{url:BASE_SARA+"titulo",param:"titulo",tipo:"sara"}]},
+pis:{query:"pis",apis:[{url:BASE_SARA+"pis",param:"pis",tipo:"sara"}]},
+nis:{query:"nis",apis:[{url:BASE_SARA+"nis",param:"nis",tipo:"sara"}]},
+parentes:{query:"cpf",apis:[{url:BASE_SARA+"parentes",param:"cpf",tipo:"sara"}]},
+vizinhos:{query:"cpf",apis:[{url:BASE_SARA+"vizinhos",param:"cpf",tipo:"sara"}]},
+cep:{query:"cep",apis:[{url:BASE_SARA+"cep",param:"cep",tipo:"sara"}]},
+estado:{query:"uf",apis:[{url:BASE_SARA+"estado",param:"uf",tipo:"sara"}]},
+email:{query:"email",apis:[{url:BASE_SARA+"email",param:"email",tipo:"sara"}]},
+score:{query:"cpf",apis:[{url:BASE_SARA+"score",param:"cpf",tipo:"sara"}]},
+renda:{query:"valor",apis:[{url:BASE_SARA+"renda",param:"valor",tipo:"sara"}]},
+cbo:{query:"cbo",apis:[{url:BASE_SARA+"cbo",param:"cbo",tipo:"sara"}]},
+foto_sp:{query:"cpf",apis:[{url:BASE_SARA+"foto-sp",param:"cpf",tipo:"sara"}]},
+foto_ma:{query:"cpf",apis:[{url:BASE_SARA+"foto-ma",param:"cpf",tipo:"sara"}]},
+foto_ro:{query:"cpf",apis:[{url:BASE_SARA+"foto-ro",param:"cpf",tipo:"sara"}]},
+foto_all:{query:"cpf",apis:[{url:BASE_SARA+"foto-all",param:"cpf",tipo:"sara"}]}
 
 }
 
-/*
-|--------------------------------------------------------------------------
-| CONSULTA UNIVERSAL
-|--------------------------------------------------------------------------
-*/
+/* ================= CONSULTA ================= */
 
-async function consultar(endpoint, request, url, ctx) {
-  if (request.method !== "GET") return jsonErro("REQ_000", "Método inválido");
+async function consultar(endpoint, request, url, ctx){
 
-  const token = url.searchParams.get("token");
-  if (!token) return jsonErro("AUTH_002", "Token obrigatório");
-  if (!validarToken(token)) return jsonErro("AUTH_001", "Token inválido");
+if(request.method !== "GET"){
+  return jsonErro("REQ_000","Método inválido")
+}
 
-  const config = ENDPOINTS[endpoint];
-  const valor = url.searchParams.get(config.query);
-  if (!valor) return jsonErro("REQ_001", "Parâmetro ausente");
+const token = url.searchParams.get("token")
+if(!token) return jsonErro("AUTH_002","Token obrigatório")
 
-  const plano = obterPlanoToken(token);
+const tokenData = TOKENS[token]
+if(!tokenData) return jsonErro("AUTH_001","Token inválido")
+
+// 🔒 BLOQUEIO POR ENDPOINT
+if(tokenData.endpoints && !tokenData.endpoints.includes(endpoint)){
+  return jsonErro("AUTH_003","Endpoint não liberado")
+}
+
+// 💰 CRÉDITOS
+if(tokenData.plano !== "VIP"){
+  if(tokenData.credits <= 0){
+    return jsonErro("LIMIT_001","Créditos esgotados")
+  }
+  tokenData.credits -= 1
+}
+
+const config = ENDPOINTS[endpoint]
+const valor = url.searchParams.get(config.query)
+
+if(!valor){
+  return jsonErro("REQ_001","Parâmetro ausente")
+}
+
+let respostaFinal = null
+
+for(const apiConfig of config.apis){
 
   const apiURL =
-    config.url +
-    "?" +
-    config.param +
-    "=" +
-    encodeURIComponent(valor) +
-    (config.apikey ? "&apikey=" + config.apikey : "&apikey=" + APIKEY);
+    apiConfig.url + "?" +
+    apiConfig.param + "=" + encodeURIComponent(valor)
 
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 30000); // 30s
+  try{
 
-  let api;
+    const controller = new AbortController()
+    const timeout = setTimeout(()=>controller.abort(),10000)
 
-  try {
-    const res = await fetch(apiURL, {
-      headers: { "User-Agent": "Mozilla/5.0", Accept: "application/json" },
+    const res = await fetch(apiURL,{
       signal: controller.signal,
-      cf: { cacheTtl: 0 }
-    });
-    clearTimeout(timeoutId);
+      headers:{
+        "User-Agent":"Mozilla/5.0",
+        "Accept":"application/json"
+      }
+    })
 
-    const text = await res.text();
+    clearTimeout(timeout)
 
-    try {
-      api = JSON.parse(text);
-    } catch {
-      return jsonErro("API_004", "API externa retornou conteúdo inesperado", text);
+    const text = await res.text()
+
+    let json
+    try{
+      json = JSON.parse(text)
+    }catch{
+      continue
     }
-  } catch (e) {
-    clearTimeout(timeoutId);
-    return jsonErro("API_001", "Erro ao conectar API", e.toString());
+
+    let dados = apiConfig.tipo === "sara"
+      ? tratarSara(json)
+      : json
+
+    if(!dados || (typeof dados === "object" && Object.keys(dados).length === 0)){
+      continue
+    }
+
+    respostaFinal = dados
+    break
+
+  }catch(e){
+    continue
   }
+}
 
-  if (!api || Object.keys(api).length === 0) {
-    return jsonErro("DATA_404", "Nenhum dado encontrado");
+if(!respostaFinal){
+  return jsonErro("DATA_404","Nenhuma API retornou resultado")
+}
+
+let dados = limparRespostaAPI(respostaFinal)
+dados = normalizarDados(dados)
+
+return new Response(JSON.stringify({
+  status:true,
+  meta:{
+    api:"Astro Ultra",
+    plano: tokenData.plano,
+    creditos_restantes: tokenData.plano === "VIP" ? "ilimitado" : tokenData.credits,
+    endpoint,
+    timestamp:new Date().toISOString()
+  },
+  consulta:{[config.query]:valor},
+  dados
+},null,2),{
+  headers:{
+    "Content-Type":"application/json;charset=UTF-8"
   }
+})
 
-  let dados = limparRespostaAPI(api);
-  dados = normalizarDados(dados);
-
-  // Ajuste específico para placa3
-  if (endpoint === "placa3" && dados?.resultado) {
-    let apiDados = dados.resultado;
-    let possuidor = {};
-    const match = apiDados.match(/• POSSUIDOR\s*\n\s*• CPF\/CNPJ:\s*(.*?)\n\s*• NOME:\s*(.*?)\n/);
-    if (match) possuidor = { cpf_cnpj: match[1].trim(), nome: match[2].trim() };
-
-    apiDados = apiDados.replace(/• CPF\/CNPJ:.*?\n/gi, "")
-                       .replace(/• NOME:.*?\n/gi, "")
-                       .replace(/🔛 BY: @Skynet07Robot/gi, "");
-    dados.resultado = apiDados.trim();
-    dados.proprietario = { possuidor };
-    delete dados.meta_turbo;
-  }
-
-  const finalResponse = {
-    status: true,
-    meta: {
-      api: "Astro Search API",
-      empresa: "Astro Company",
-      plano_token: plano,
-      endpoint,
-      timestamp: new Date().toISOString()
-    },
-    consulta: { [config.query]: valor },
-    dados
-  };
-
-  const cacheKey = new Request(request.url, { method: "GET" });
-  const cache = caches.default;
-  const response = new Response(JSON.stringify(finalResponse, null, 2), {
-    headers: { "Content-Type": "application/json;charset=UTF-8", "Cache-Control": "public,max-age=3600" }
-  });
-  ctx.waitUntil(cache.put(cacheKey, response.clone()));
-
-  return response;
 }
 
-const STATUS_APIS = {
-  cpf:"yellow",
-  cpf2:"yellow",
-  cpf3:"yellow",
-  cpf4:"yellow",
-  cpf5:"yellow",
-  cpf6:"yellow",
+/* ================= TRATAR SARA ================= */
 
-  nome:"yellow",
-  nome2:"yellow",
-
-  telefone:"yellow",
-  telefone2:"yellow",
-  operadora:"yellow",
-
-  email:"yellow",
-
-  cep:"yellow",
-  cep2:"yellow",
-
-  placa:"yellow",
-  placa2:"yellow",
-
-  rg:"yellow",
-  titulo:"yellow",
-  pis:"yellow",
-  nis:"yellow",
-
-  parentes:"yellow",
-  vizinhos:"yellow"
+function tratarSara(api){
+if(api?.resultado?.body){
+  return api.resultado.body
+}
+return api
 }
 
-/*
-|--------------------------------------------------------------------------
-| TOKENS
-|--------------------------------------------------------------------------
-*/
-
-function validarToken(token){
-return TOKENS.hasOwnProperty(token)
-}
-
-function obterPlanoToken(token){
-return TOKENS[token]?.plano || "FREE"
-}
-
-/*
-|--------------------------------------------------------------------------
-| LIMPAR API
-|--------------------------------------------------------------------------
-*/
+/* ================= LIMPAR ================= */
 
 function limparRespostaAPI(data){
-
 if(!data || typeof data !== "object") return data
-
-const blacklist=[
-"status",
-"creator",
-"api",
-"criador",
-"credits",
-"creditos",
-"mensagem",
-"message"
-]
-
-for(const campo of blacklist){
-delete data[campo]
-}
-
-if(data.resultado){
-return data.resultado
-}
-
+delete data.creator
+delete data.status
 return data
-
 }
 
-/*
-|--------------------------------------------------------------------------
-| NORMALIZAR
-|--------------------------------------------------------------------------
-*/
+/* ================= NORMALIZAR ================= */
 
 function normalizarDados(data){
-
 if(Array.isArray(data)){
-return data.map(normalizarDados)
+  return data.map(normalizarDados)
 }
-
 if(data !== null && typeof data === "object"){
-
-const novo={}
-
-for(const k in data){
-novo[k]=normalizarDados(data[k])
+  const novo={}
+  for(const k in data){
+    novo[k]=normalizarDados(data[k])
+  }
+  return novo
 }
-
-return novo
-}
-
-if(typeof data === "string"){
-
-try{
-return new TextDecoder().decode(new TextEncoder().encode(data))
-}catch{
 return data
 }
 
-}
+/* ================= ERRO ================= */
 
-return data
-
-}
-
-function salvarToken(token){
-  localStorage.setItem("astro_token", token);
-  renderBadge(TOKENS[token]);
+function jsonErro(code,msg,extra=null){
+return new Response(JSON.stringify({
+  status:false,
+  erro:{code,msg,extra}
+},null,2),{
+  headers:{"Content-Type":"application/json"}
+})
 }
 
 /*
