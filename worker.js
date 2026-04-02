@@ -808,7 +808,33 @@ async function consultar(){
   salvarToken(token);
   efeitoPremium(token);
 
-  const param = endpoint.replace(/[0-9]/g,'');
+const PARAMS = {
+  cpf:"cpf",
+  nome:"nome",
+  telefone:"telefone",
+  telefone_full:"telefone",
+  telefone_cpf:"cpf",
+  ddd:"ddd",
+  operadora:"telefone",
+  rg:"rg",
+  titulo:"titulo",
+  pis:"pis",
+  nis:"nis",
+  parentes:"cpf",
+  vizinhos:"cpf",
+  cep:"cep",
+  estado:"uf",
+  email:"email",
+  score:"cpf",
+  renda:"valor",
+  cbo:"cbo",
+  foto_sp:"cpf",
+  foto_ma:"cpf",
+  foto_ro:"cpf",
+  foto_all:"cpf"
+}
+
+const param = PARAMS[endpoint];
   const url = window.location.origin + "/" + endpoint +
               "?token=" + token + "&" + param + "=" + valor;
 
