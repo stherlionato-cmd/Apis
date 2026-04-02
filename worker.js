@@ -46,6 +46,7 @@ const BASE_SARA = "https://sara-api.xyz/consulta/"
 /* ================= TOKENS (SEM KV) ================= */
 
 const TOKENS = {
+ IFNastro:{plano:"VIP",credits:-1,endpoints:null},
   dragon:{plano:"VIP",credits:-1,endpoints:null},
   astrofree:{plano:"FREE",credits:100,endpoints:["cpf","nome"]},
   astropro:{plano:"PRO",credits:1000,endpoints:null}
