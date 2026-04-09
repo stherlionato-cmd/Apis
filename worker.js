@@ -64,6 +64,11 @@ const ENDPOINTS = {
     query: "cpf",
     url: "https://obitostore.shop/api/consulta/cpf",
     param: "cpf"
+  },
+  telefone: {
+    query: "telefone",
+    url: "https://obitostore.shop/api/consulta/telefone",
+    param: "telefone"
   }
 }
 /* ================= CONSULTA ================= */
