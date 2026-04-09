@@ -128,19 +128,28 @@ delete dados.status
 function formatarResultado(dados){
   if(!dados || !dados.resultado) return dados;
 
-  // Se resultado for objeto/array, transforma em JSON bonito
-  if(typeof dados.resultado === "object"){
-    dados.resultado = JSON.stringify(dados.resultado, null, 2);
+  // Limpeza básica
+  let resultado = dados.resultado;
+
+  if(typeof resultado === "string"){
+    resultado = resultado
+      .replace(/©.*HydraCore/gi,"")
+      .replace(/══════════════════════════/g,"")
+      .replace(/\r/g,"")
+      .replace(/\n{2,}/g,"\n\n")
+      .trim();
+
+    // Separar seções pelo título
+    const seções = resultado.split(/\n\n(?=[A-ZÀ-Ú ]{3,}:)/g).map(sec => {
+      const [titulo, ...conteudo] = sec.split("\n");
+      return { titulo: titulo.trim(), conteudo: conteudo.join("\n").trim() };
+    });
+
+    dados.resultado = seções;
   }
 
-  // Se resultado for string, limpa e padroniza
-  if(typeof dados.resultado === "string"){
-    dados.resultado = dados.resultado
-      .replace(/©.*HydraCore/gi,"")           // remove copyright
-      .replace(/══════════════════════════/g,"") // remove linhas inúteis
-      .replace(/\r/g,"")                       // remove \r
-      .replace(/\n{2,}/g,"\n\n")              // padroniza múltiplas quebras de linha
-      .trim();
+  if(typeof resultado === "object" && !Array.isArray(resultado)){
+    dados.resultado = normalizarDados(resultado);
   }
 
   return dados;
