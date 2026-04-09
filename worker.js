@@ -119,35 +119,74 @@ try{
 
   // 🔥 LIMPEZA PADRÃO ASTRO
 // 🔥 LIMPEZA PADRÃO ASTRO
-let dados = json
-
-delete dados.criador
-delete dados.status
-
 /* ==================== PADRONIZAR RESULTADO ==================== */
-function formatarResultado(dados){
-  if(!dados || !dados.resultado) return dados;
+function formatarResultado(dados) {
+  if (!dados) return dados;
 
-  // Se resultado for objeto/array, transforma em JSON bonito
-  if(typeof dados.resultado === "object"){
-    dados.resultado = JSON.stringify(dados.resultado, null, 2);
-  }
+  // Limpar campos desnecessários
+  delete dados.criador;
+  delete dados.status;
 
-  // Se resultado for string, limpa e padroniza
-  if(typeof dados.resultado === "string"){
-    dados.resultado = dados.resultado
-      .replace(/©.*HydraCore/gi,"")           // remove copyright
-      .replace(/══════════════════════════/g,"") // remove linhas inúteis
-      .replace(/\r/g,"")                       // remove \r
-      .replace(/\n{2,}/g,"\n\n")              // padroniza múltiplas quebras de linha
-      .trim();
+  // Se resultado existe
+  if (dados.resultado) {
+
+    // Se for objeto ou array, normaliza e retorna JSON bonito
+    if (typeof dados.resultado === "object") {
+      dados.resultado = normalizarDados(dados.resultado);
+    }
+
+    // Se for string, limpa e organiza
+    if (typeof dados.resultado === "string") {
+      // Remove linhas inúteis, copyright, excesso de quebras de linha
+      let r = dados.resultado
+        .replace(/©.*HydraCore/gi, "")
+        .replace(/══════════════════════════/g, "")
+        .replace(/\r/g, "")
+        .replace(/\n{2,}/g, "\n\n")
+        .trim();
+
+      // Transforma blocos de seções (ex: "PROPRIETÁRIO") em objetos
+      const seções = r.split(/\n\n(?=[A-Z\s]+$)/m); // separa por título em caixa alta
+      const resultadoObj = {};
+      seções.forEach(sec => {
+        const linhas = sec.split("\n").map(l => l.trim()).filter(Boolean);
+        if (linhas.length === 0) return;
+
+        // Título da seção
+        const titulo = linhas[0].toLowerCase().replace(/\s+/g, "_");
+        const conteúdo = {};
+
+        // Cada linha como chave: valor
+        linhas.slice(1).forEach(l => {
+          const [chave, ...resto] = l.split(":");
+          if (!chave || !resto) return;
+          conteúdo[chave.trim().toLowerCase().replace(/\s+/g, "_")] = resto.join(":").trim();
+        });
+
+        resultadoObj[titulo] = conteúdo;
+      });
+
+      dados.resultado = resultadoObj;
+    }
   }
 
   return dados;
 }
 
-// Aplica a formatação antes de retornar
-dados = formatarResultado(dados);
+/* ==================== NORMALIZAR DADOS OBJETO ==================== */
+function normalizarDados(data) {
+  if (Array.isArray(data)) {
+    return data.map(normalizarDados);
+  }
+  if (data !== null && typeof data === "object") {
+    const novo = {};
+    for (const k in data) {
+      novo[k.toLowerCase()] = normalizarDados(data[k]);
+    }
+    return novo;
+  }
+  return data;
+}
 
   return new Response(JSON.stringify({
     status:true,
