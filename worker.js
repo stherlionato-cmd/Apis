@@ -597,35 +597,6 @@ pre{
  animation:stars 4s linear infinite;
 }
 
-.result-section{
-  border-left:3px solid #3b82f6;
-  padding:10px 12px;
-  margin-bottom:10px;
-  background:rgba(59,130,246,0.05);
-  border-radius:12px;
-  transition:.3s;
-}
-
-.result-section:hover{
-  background:rgba(59,130,246,0.1);
-}
-
-.result-title{
-  font-weight:700;
-  margin-bottom:6px;
-  color:#3b82f6;
-}
-
-.result-content{
-  font-size:13px;
-  line-height:1.4;
-  color:#e2e8f0;
-}
-
-.result-line{
-  margin-bottom:4px;
-}
-
 </style>
 
 </head>
@@ -884,24 +855,7 @@ const param = PARAMS[endpoint];
   try{
     const r = await fetch(url);
     const j = await r.json();
-// Função helper para criar HTML do resultado
-function formatResultadoHTML(dados){
-  if(!dados?.dados?.resultado) return "<pre>Nenhum resultado</pre>";
-
-  const seções = dados.dados.resultado;
-  if(!Array.isArray(seções)) return "<pre>"+JSON.stringify(dados.dados,null,2)+"</pre>";
-
-  return seções.map(sec => {
-    return '<div class="result-section">' +
-             '<div class="result-title">' + sec.titulo + '</div>' +
-             '<div class="result-content">' +
-               sec.conteudo.split("\n").map(l => '<div class="result-line">'+l+'</div>').join('') +
-             '</div>' +
-           '</div>';
-  }).join('');
-}
-// Substituir o innerHTML
-resBox.innerHTML = formatResultadoHTML(j);
+    resBox.innerHTML = "<pre id='resposta'>"+JSON.stringify(j,null,2)+"</pre>";
     mostrarToast("Consulta feita com sucesso 🚀");
   } catch {
     resBox.innerHTML = "<pre>Erro ao consultar</pre>";
