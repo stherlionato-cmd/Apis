@@ -778,6 +778,7 @@ const PARAMS = {
   telefone:"telefone",
   telefone_full:"telefone",
   telefone_cpf:"cpf",
+  placa:"placa",  
   ddd:"ddd",
   operadora:"telefone",
   rg:"rg",
