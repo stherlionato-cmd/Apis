@@ -597,20 +597,33 @@ pre{
  animation:stars 4s linear infinite;
 }
 
-.box{
-  margin-top:8px;
-  background:rgba(59,130,246,.05);
-  border-left:4px solid #3b82f6;
-  padding:12px;
-  border-radius:8px;
+.result-section{
+  border-left:3px solid #3b82f6;
+  padding:10px 12px;
+  margin-bottom:10px;
+  background:rgba(59,130,246,0.05);
+  border-radius:12px;
+  transition:.3s;
+}
+
+.result-section:hover{
+  background:rgba(59,130,246,0.1);
+}
+
+.result-title{
+  font-weight:700;
+  margin-bottom:6px;
+  color:#3b82f6;
+}
+
+.result-content{
   font-size:13px;
   line-height:1.4;
-  max-height:300px;
-  overflow:auto;
+  color:#e2e8f0;
 }
-.box strong{
-  display:block;
-  margin-bottom:2px;
+
+.result-line{
+  margin-bottom:4px;
 }
 
 </style>
@@ -871,42 +884,25 @@ const param = PARAMS[endpoint];
   try{
     const r = await fetch(url);
     const j = await r.json();
-resBox.innerHTML = ""; // limpa
-if(j.dados && j.dados.resultado){
-  const resultado = j.dados.resultado;
+// Função helper para criar HTML do resultado
+function formatResultadoHTML(dados){
+  if(!dados?.dados?.resultado) return "<pre>Nenhum resultado</pre>";
 
-  // Se for array de seções
-  if(Array.isArray(resultado)){
-    resultado.forEach(sec => {
-      const card = document.createElement("div");
-      card.className = "box";
-      card.style.marginBottom = "8px";
-      card.innerHTML = `<strong style="color:#facc15;">${sec.titulo}</strong><br>${sec.conteudo.replace(/\n/g,"<br>")}`;
-      resBox.appendChild(card);
-    });
-  } else if(typeof resultado === "object") {
-    // objetos simples
-    const card = document.createElement("div");
-    card.className = "box";
-    card.style.marginBottom = "8px";
-    card.innerHTML = Object.entries(resultado).map(([k,v])=>{
-      if(typeof v === "object") v = JSON.stringify(v,null,2).replace(/\n/g,"<br>");
-      return `<strong style="color:#3b82f6;">${k}:</strong> ${v}`;
-    }).join("<br>");
-    resBox.appendChild(card);
-  } else {
-    // string pura
-    const card = document.createElement("div");
-    card.className = "box";
-    card.textContent = resultado;
-    resBox.appendChild(card);
-  }
-} else {
-  const card = document.createElement("div");
-  card.className = "box";
-  card.textContent = JSON.stringify(j,null,2);
-  resBox.appendChild(card);
+  const seções = dados.dados.resultado;
+  if(!Array.isArray(seções)) return "<pre>"+JSON.stringify(dados.dados,null,2)+"</pre>";
+
+  return seções.map(sec => `
+    <div class="result-section">
+      <div class="result-title">${sec.titulo}</div>
+      <div class="result-content">
+        ${sec.conteudo.split("\n").map(l => `<div class="result-line">${l}</div>`).join("")}
+      </div>
+    </div>
+  `).join("");
 }
+
+// Substituir o innerHTML
+resBox.innerHTML = formatResultadoHTML(j);
     mostrarToast("Consulta feita com sucesso 🚀");
   } catch {
     resBox.innerHTML = "<pre>Erro ao consultar</pre>";
