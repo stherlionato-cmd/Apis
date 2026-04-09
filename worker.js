@@ -597,6 +597,22 @@ pre{
  animation:stars 4s linear infinite;
 }
 
+.box{
+  margin-top:8px;
+  background:rgba(59,130,246,.05);
+  border-left:4px solid #3b82f6;
+  padding:12px;
+  border-radius:8px;
+  font-size:13px;
+  line-height:1.4;
+  max-height:300px;
+  overflow:auto;
+}
+.box strong{
+  display:block;
+  margin-bottom:2px;
+}
+
 </style>
 
 </head>
@@ -855,7 +871,42 @@ const param = PARAMS[endpoint];
   try{
     const r = await fetch(url);
     const j = await r.json();
-    resBox.innerHTML = "<pre id='resposta'>"+JSON.stringify(j,null,2)+"</pre>";
+resBox.innerHTML = ""; // limpa
+if(j.dados && j.dados.resultado){
+  const resultado = j.dados.resultado;
+
+  // Se for array de seções
+  if(Array.isArray(resultado)){
+    resultado.forEach(sec => {
+      const card = document.createElement("div");
+      card.className = "box";
+      card.style.marginBottom = "8px";
+      card.innerHTML = `<strong style="color:#facc15;">${sec.titulo}</strong><br>${sec.conteudo.replace(/\n/g,"<br>")}`;
+      resBox.appendChild(card);
+    });
+  } else if(typeof resultado === "object") {
+    // objetos simples
+    const card = document.createElement("div");
+    card.className = "box";
+    card.style.marginBottom = "8px";
+    card.innerHTML = Object.entries(resultado).map(([k,v])=>{
+      if(typeof v === "object") v = JSON.stringify(v,null,2).replace(/\n/g,"<br>");
+      return `<strong style="color:#3b82f6;">${k}:</strong> ${v}`;
+    }).join("<br>");
+    resBox.appendChild(card);
+  } else {
+    // string pura
+    const card = document.createElement("div");
+    card.className = "box";
+    card.textContent = resultado;
+    resBox.appendChild(card);
+  }
+} else {
+  const card = document.createElement("div");
+  card.className = "box";
+  card.textContent = JSON.stringify(j,null,2);
+  resBox.appendChild(card);
+}
     mostrarToast("Consulta feita com sucesso 🚀");
   } catch {
     resBox.innerHTML = "<pre>Erro ao consultar</pre>";
