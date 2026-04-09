@@ -46,8 +46,8 @@ const BASE_SARA = "https://sara-api.xyz/consulta/"
 /* ================= TOKENS (SEM KV) ================= */
 
 const TOKENS = {
- IFNastro:{plano:"VIP",credits:-1,endpoints:null},
-  dragon:{plano:"VIP",credits:-1,endpoints:null},
+ ifnvipilimitado:{plano:"VIP",credits:-1,endpoints:null},
+  bocadass:{plano:"VIP",credits:-1,endpoints:null},
   astrofree:{plano:"FREE",credits:100,endpoints:["cpf","nome"]},
   astropro:{plano:"PRO",credits:1000,endpoints:null}
 }
@@ -56,29 +56,11 @@ const TOKENS = {
 
 const ENDPOINTS = {
 
-cpf:{query:"cpf",apis:[{url:BASE_SARA+"cpf",param:"cpf",tipo:"sara"}]},
-nome:{query:"nome",apis:[{url:BASE_SARA+"nome",param:"nome",tipo:"sara"}]},
-telefone:{query:"telefone",apis:[{url:BASE_SARA+"telefone",param:"telefone",tipo:"sara"}]},
-telefone_full:{query:"telefone",apis:[{url:BASE_SARA+"telefone-full",param:"telefone",tipo:"sara"}]},
-telefone_cpf:{query:"cpf",apis:[{url:BASE_SARA+"telefone-cpf",param:"cpf",tipo:"sara"}]},
-ddd:{query:"ddd",apis:[{url:BASE_SARA+"ddd",param:"ddd",tipo:"sara"}]},
-operadora:{query:"telefone",apis:[{url:BASE_SARA+"operadora",param:"telefone",tipo:"sara"}]},
-rg:{query:"rg",apis:[{url:BASE_SARA+"rg",param:"rg",tipo:"sara"}]},
-titulo:{query:"titulo",apis:[{url:BASE_SARA+"titulo",param:"titulo",tipo:"sara"}]},
-pis:{query:"pis",apis:[{url:BASE_SARA+"pis",param:"pis",tipo:"sara"}]},
-nis:{query:"nis",apis:[{url:BASE_SARA+"nis",param:"nis",tipo:"sara"}]},
-parentes:{query:"cpf",apis:[{url:BASE_SARA+"parentes",param:"cpf",tipo:"sara"}]},
-vizinhos:{query:"cpf",apis:[{url:BASE_SARA+"vizinhos",param:"cpf",tipo:"sara"}]},
-cep:{query:"cep",apis:[{url:BASE_SARA+"cep",param:"cep",tipo:"sara"}]},
-estado:{query:"uf",apis:[{url:BASE_SARA+"estado",param:"uf",tipo:"sara"}]},
-email:{query:"email",apis:[{url:BASE_SARA+"email",param:"email",tipo:"sara"}]},
-score:{query:"cpf",apis:[{url:BASE_SARA+"score",param:"cpf",tipo:"sara"}]},
-renda:{query:"valor",apis:[{url:BASE_SARA+"renda",param:"valor",tipo:"sara"}]},
-cbo:{query:"cbo",apis:[{url:BASE_SARA+"cbo",param:"cbo",tipo:"sara"}]},
-foto_sp:{query:"cpf",apis:[{url:BASE_SARA+"foto-sp",param:"cpf",tipo:"sara"}]},
-foto_ma:{query:"cpf",apis:[{url:BASE_SARA+"foto-ma",param:"cpf",tipo:"sara"}]},
-foto_ro:{query:"cpf",apis:[{url:BASE_SARA+"foto-ro",param:"cpf",tipo:"sara"}]},
-foto_all:{query:"cpf",apis:[{url:BASE_SARA+"foto-all",param:"cpf",tipo:"sara"}]}
+placa:{
+  query:"placa",
+  url:"https://obitostore.shop/api/consulta/placa2",
+  param:"placa"
+}
 
 }
 
@@ -96,7 +78,7 @@ if(!token) return jsonErro("AUTH_002","Token obrigatório")
 const tokenData = TOKENS[token]
 if(!tokenData) return jsonErro("AUTH_001","Token inválido")
 
-// 🔒 BLOQUEIO POR ENDPOINT
+// 🔒 BLOQUEIO
 if(tokenData.endpoints && !tokenData.endpoints.includes(endpoint)){
   return jsonErro("AUTH_003","Endpoint não liberado")
 }
@@ -116,77 +98,58 @@ if(!valor){
   return jsonErro("REQ_001","Parâmetro ausente")
 }
 
-let respostaFinal = null
+try{
 
-for(const apiConfig of config.apis){
+  const apiURL = config.url + "?" +
+    config.param + "=" + encodeURIComponent(valor) +
+    "&apikey=bigmouthh"
 
-  const apiURL =
-    apiConfig.url + "?" +
-    apiConfig.param + "=" + encodeURIComponent(valor)
-
-  try{
-
-    const controller = new AbortController()
-    const timeout = setTimeout(()=>controller.abort(),10000)
-
-    const res = await fetch(apiURL,{
-      signal: controller.signal,
-      headers:{
-        "User-Agent":"Mozilla/5.0",
-        "Accept":"application/json"
-      }
-    })
-
-    clearTimeout(timeout)
-
-    const text = await res.text()
-
-    let json
-    try{
-      json = JSON.parse(text)
-    }catch{
-      continue
+  const res = await fetch(apiURL,{
+    headers:{
+      "User-Agent":"Mozilla/5.0",
+      "Accept":"application/json"
     }
+  })
 
-    let dados = apiConfig.tipo === "sara"
-      ? tratarSara(json)
-      : json
+  const json = await res.json()
 
-    if(!dados || (typeof dados === "object" && Object.keys(dados).length === 0)){
-      continue
+  if(!json || json.status !== "ok"){
+    return jsonErro("API_001","Erro na API")
+  }
+
+  // 🔥 LIMPEZA PADRÃO ASTRO
+  let dados = json
+
+  delete dados.criador
+  delete dados.status
+
+  if(dados.resultado){
+    dados.resultado = dados.resultado
+      .replace(/©.*HydraCore/gi,"")
+      .replace(/══════════════════════════/g,"")
+      .trim()
+  }
+
+  return new Response(JSON.stringify({
+    status:true,
+    meta:{
+      api:"Astro Ultra",
+      plano: tokenData.plano,
+      creditos_restantes: tokenData.plano === "VIP" ? "ilimitado" : tokenData.credits,
+      endpoint,
+      timestamp:new Date().toISOString()
+    },
+    consulta:{[config.query]:valor},
+    dados
+  },null,2),{
+    headers:{
+      "Content-Type":"application/json;charset=UTF-8"
     }
+  })
 
-    respostaFinal = dados
-    break
-
-  }catch(e){
-    continue
-  }
+}catch(e){
+  return jsonErro("API_500","Erro interno")
 }
-
-if(!respostaFinal){
-  return jsonErro("DATA_404","Nenhuma API retornou resultado")
-}
-
-let dados = limparRespostaAPI(respostaFinal)
-dados = normalizarDados(dados)
-
-return new Response(JSON.stringify({
-  status:true,
-  meta:{
-    api:"Astro Ultra",
-    plano: tokenData.plano,
-    creditos_restantes: tokenData.plano === "VIP" ? "ilimitado" : tokenData.credits,
-    endpoint,
-    timestamp:new Date().toISOString()
-  },
-  consulta:{[config.query]:valor},
-  dados
-},null,2),{
-  headers:{
-    "Content-Type":"application/json;charset=UTF-8"
-  }
-})
 
 }
 
