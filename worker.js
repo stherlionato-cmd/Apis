@@ -55,15 +55,17 @@ const TOKENS = {
 /* ================= ENDPOINTS ================= */
 
 const ENDPOINTS = {
-
-placa:{
-  query:"placa",
-  url:"https://obitostore.shop/api/consulta/placa2",
-  param:"placa"
+  placa:{
+    query:"placa",
+    url:"https://obitostore.shop/api/consulta/placa2",
+    param:"placa"
+  },
+  cpf: {
+    query: "cpf",
+    url: "https://obitostore.shop/api/consulta/cpf",
+    param: "cpf"
+  }
 }
-
-}
-
 /* ================= CONSULTA ================= */
 
 async function consultar(endpoint, request, url, ctx){
