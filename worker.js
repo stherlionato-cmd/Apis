@@ -118,17 +118,36 @@ try{
   }
 
   // 🔥 LIMPEZA PADRÃO ASTRO
-  let dados = json
+// 🔥 LIMPEZA PADRÃO ASTRO
+let dados = json
 
-  delete dados.criador
-  delete dados.status
+delete dados.criador
+delete dados.status
 
-  if(dados.resultado){
-    dados.resultado = dados.resultado
-      .replace(/©.*HydraCore/gi,"")
-      .replace(/══════════════════════════/g,"")
-      .trim()
+/* ==================== PADRONIZAR RESULTADO ==================== */
+function formatarResultado(dados){
+  if(!dados || !dados.resultado) return dados;
+
+  // Se resultado for objeto/array, transforma em JSON bonito
+  if(typeof dados.resultado === "object"){
+    dados.resultado = JSON.stringify(dados.resultado, null, 2);
   }
+
+  // Se resultado for string, limpa e padroniza
+  if(typeof dados.resultado === "string"){
+    dados.resultado = dados.resultado
+      .replace(/©.*HydraCore/gi,"")           // remove copyright
+      .replace(/══════════════════════════/g,"") // remove linhas inúteis
+      .replace(/\r/g,"")                       // remove \r
+      .replace(/\n{2,}/g,"\n\n")              // padroniza múltiplas quebras de linha
+      .trim();
+  }
+
+  return dados;
+}
+
+// Aplica a formatação antes de retornar
+dados = formatarResultado(dados);
 
   return new Response(JSON.stringify({
     status:true,
