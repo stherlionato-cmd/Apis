@@ -891,16 +891,15 @@ function formatResultadoHTML(dados){
   const seções = dados.dados.resultado;
   if(!Array.isArray(seções)) return "<pre>"+JSON.stringify(dados.dados,null,2)+"</pre>";
 
-  return seções.map(sec => `
-    <div class="result-section">
-      <div class="result-title">${sec.titulo}</div>
-      <div class="result-content">
-        ${sec.conteudo.split("\n").map(l => `<div class="result-line">${l}</div>`).join("")}
-      </div>
-    </div>
-  `).join("");
+  return seções.map(sec => {
+    return '<div class="result-section">' +
+             '<div class="result-title">' + sec.titulo + '</div>' +
+             '<div class="result-content">' +
+               sec.conteudo.split("\n").map(l => '<div class="result-line">'+l+'</div>').join('') +
+             '</div>' +
+           '</div>';
+  }).join('');
 }
-
 // Substituir o innerHTML
 resBox.innerHTML = formatResultadoHTML(j);
     mostrarToast("Consulta feita com sucesso 🚀");
