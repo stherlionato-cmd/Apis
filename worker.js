@@ -55,10 +55,10 @@ const TOKENS = {
 /* ================= ENDPOINTS ================= */
 
 const ENDPOINTS = {
-  placa:{
-    query:"placa",
-    url:"https://obitostore.shop/api/consulta/placa2",
-    param:"placa"
+  placa: {
+    query: "placa",
+    url: "https://obitostore.shop/api/consulta/placa2",
+    param: "placa"
   },
   cpf: {
     query: "cpf",
@@ -69,6 +69,16 @@ const ENDPOINTS = {
     query: "telefone",
     url: "https://obitostore.shop/api/consulta/telefone",
     param: "telefone"
+  },
+  cnpj: {
+    query: "query",
+    url: "https://obitostore.shop/api/consulta/cnpj",
+    param: "query"
+  },
+  cep: {
+    query: "cep",
+    url: "https://obitostore.shop/api/consulta/cep",
+    param: "cep"
   }
 }
 /* ================= CONSULTA ================= */
