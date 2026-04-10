@@ -230,16 +230,27 @@ try{
 
 const text = await res.text()
 
+// 🔥 resposta vazia
+if(!text || text.trim() === ""){
+  return jsonErro("API_002","API retornou vazio")
+}
+
+// 🔥 erro conhecido da API
+if(text.includes("error code")){
+  return jsonErro("API_003","Erro na API externa", text)
+}
+
 let json
 try{
   json = JSON.parse(text)
-}catch{
-  return jsonErro("API_002","Resposta inválida da API", text.slice(0,200))
+}catch(e){
+  return jsonErro("API_002","Resposta não é JSON", text.slice(0,300))
 }
 
-  if(!json || json.status !== "ok"){
-    return jsonErro("API_001","Erro na API")
-  }
+// 🔥 valida estrutura esperada
+if(!json || json.status !== true || !json.dados){
+  return jsonErro("API_001","Resposta inesperada da API", json)
+}
 
   // 🔥 LIMPEZA PADRÃO ASTRO
 // 🔥 LIMPEZA PADRÃO ASTRO
