@@ -4,6 +4,7 @@ async fetch(request, env, ctx){
 const url = new URL(request.url)
 let endpoint = url.pathname.replace("/","")
 
+// 🔥 ALIAS
 const ALIAS = {
   cpf2:"cpf",
   cpf3:"cpf",
@@ -17,33 +18,47 @@ if(ALIAS[endpoint]){
 }
 
 if(endpoint === "admin"){
-  return new Response("OK")
+  const token = url.searchParams.get("token")
+  if(token !== ADMIN_TOKEN){
+    return jsonErro("AUTH_ADMIN","Acesso negado")
+  }
+  return adminPanel(request)
 }
 
-return consultar(endpoint, request, url, ctx)
+if(endpoint === ""){
+  return home(request)
+}
+
+if(!ENDPOINTS[endpoint]){
+  return jsonErro("ENDPOINT_404","Endpoint não encontrado")
+}
+
+return consultar(endpoint,request,url,ctx)
 
 }
 }
 
 /* ================= CONFIG ================= */
 
+const ADMIN_TOKEN = "dragonsubdono"
+const BASE_SARA = "https://sara-api.xyz/consulta/"
+
+/* ================= TOKENS (SEM KV) ================= */
+
 const TOKENS = {
-  "astropro": {
-    plano: "VIP",
-    credits: 999999,
-    endpoints: ["cpf","telefone","placa","nome","parentes"]
-  }
+ ifnvipilimitado:{plano:"VIP",credits:-1,endpoints:null},
+  bocadass:{plano:"VIP",credits:-1,endpoints:null},
+  astrofree:{plano:"FREE",credits:100,endpoints:["cpf","nome"]},
+  astropro:{plano:"PRO",credits:1000,endpoints:null}
 }
+
+/* ================= ENDPOINTS ================= */
 
 const ENDPOINTS = {
   placa: {
     query: "placa",
     url: "https://obitostore.shop/api/consulta/placa2",
     param: "placa"
-  },
-  parentes: {
-    tipo: "interno",
-    query: "cpf"
   },
   cpf: {
     query: "cpf",
@@ -66,7 +81,6 @@ const ENDPOINTS = {
     param: "cep"
   }
 }
-
 /* ================= CONSULTA ================= */
 
 async function consultar(endpoint, request, url, ctx){
@@ -81,10 +95,12 @@ if(!token) return jsonErro("AUTH_002","Token obrigatório")
 const tokenData = TOKENS[token]
 if(!tokenData) return jsonErro("AUTH_001","Token inválido")
 
+// 🔒 BLOQUEIO
 if(tokenData.endpoints && !tokenData.endpoints.includes(endpoint)){
   return jsonErro("AUTH_003","Endpoint não liberado")
 }
 
+// 💰 CRÉDITOS
 if(tokenData.plano !== "VIP"){
   if(tokenData.credits <= 0){
     return jsonErro("LIMIT_001","Créditos esgotados")
@@ -93,57 +109,6 @@ if(tokenData.plano !== "VIP"){
 }
 
 const config = ENDPOINTS[endpoint]
-
-/* ================= PARENTES ================= */
-
-if(config.tipo === "interno" && endpoint === "parentes"){
-
-  const cpf = url.searchParams.get("cpf")
-  if(!cpf){
-    return jsonErro("REQ_001","CPF obrigatório")
-  }
-
-  try{
-
-    const apiURL = "https://astro.stherlionato.workers.dev/cpf?token=astropro&cpf=" + encodeURIComponent(cpf)
-
-    const res = await fetch(apiURL)
-    const buffer = await res.arrayBuffer()
-    const text = new TextDecoder("utf-8").decode(buffer)
-
-    let json
-    try{
-      json = JSON.parse(text)
-    }catch{
-      return jsonErro("API_002","Resposta inválida da API CPF", text.slice(0,200))
-    }
-
-    if(!json){
-      return jsonErro("API_001","Erro ao buscar CPF base", json)
-    }
-
-    const lista = extrairParentes(json)
-
-    return new Response(JSON.stringify({
-      status: true,
-      base: "Astro API",
-      credits: "Astro Company | @puxardados5",
-      result: {
-        parentes: lista
-      }
-    }, null, 2), {
-      headers: {
-        "Content-Type": "application/json;charset=UTF-8"
-      }
-    })
-
-  }catch(e){
-    return jsonErro("API_500","Erro interno ao processar parentes", String(e))
-  }
-}
-
-/* ================= OUTROS ================= */
-
 const valor = url.searchParams.get(config.query)
 
 if(!valor){
@@ -163,197 +128,119 @@ try{
     }
   })
 
-  const buffer = await res.arrayBuffer()
-  const text = new TextDecoder("utf-8").decode(buffer)
+  const json = await res.json()
 
-  if(!text || text.trim() === ""){
-    return jsonErro("API_002","API retornou vazio")
+  if(!json || json.status !== "ok"){
+    return jsonErro("API_001","Erro na API")
   }
 
-  if(text.includes("error code")){
-    return jsonErro("API_003","Erro na API externa", text)
+  // 🔥 LIMPEZA PADRÃO ASTRO
+// 🔥 LIMPEZA PADRÃO ASTRO
+let dados = json
+
+delete dados.criador
+delete dados.status
+
+/* ==================== PADRONIZAR RESULTADO ==================== */
+function formatarResultado(dados){
+  if(!dados || !dados.resultado) return dados;
+
+  // Limpeza básica
+  let resultado = dados.resultado;
+
+  if(typeof resultado === "string"){
+    resultado = resultado
+      .replace(/©.*HydraCore/gi,"")
+      .replace(/══════════════════════════/g,"")
+      .replace(/\r/g,"")
+      .replace(/\n{2,}/g,"\n\n")
+      .trim();
+
+    // Separar seções pelo título
+    const seções = resultado.split(/\n\n(?=[A-ZÀ-Ú ]{3,}:)/g).map(sec => {
+      const [titulo, ...conteudo] = sec.split("\n");
+      return { titulo: titulo.trim(), conteudo: conteudo.join("\n").trim() };
+    });
+
+    dados.resultado = seções;
   }
 
-  let json
-  try{
-    json = JSON.parse(text)
-  }catch{
-    json = text
+  if(typeof resultado === "object" && !Array.isArray(resultado)){
+    dados.resultado = normalizarDados(resultado);
   }
 
-  let parsed = parseUniversal(json)
+  return dados;
+}
 
-  if(!parsed || Object.keys(parsed).length === 0){
-    parsed = json
-  }
+// Aplica a formatação antes de retornar
+dados = formatarResultado(dados);
 
   return new Response(JSON.stringify({
-    status: true,
-    base: "Astro API",
-    credits: "Astro Company | @puxardados5",
-    result: parsed
-  }, null, 2), {
-    headers: {
-      "Content-Type": "application/json;charset=UTF-8"
-    }
-  })
-
-}catch(e){
-  return jsonErro("API_500","Erro interno", String(e))
-}
-
-}
-
-/* ================= PARSER UNIVERSAL ================= */
-
-function parseUniversal(apiResponse){
-
-  if(!apiResponse) return null;
-
-  if(typeof apiResponse === "object"){
-    delete apiResponse.criador;
-    delete apiResponse.creator;
-    delete apiResponse.status;
-  }
-
-  let raw = "";
-
-  if(typeof apiResponse === "string"){
-    raw = apiResponse;
-  }
-  else if(apiResponse?.resultado && typeof apiResponse.resultado === "string"){
-    raw = apiResponse.resultado;
-  }
-  else if(apiResponse?.dados?.resultado){
-    raw = apiResponse.dados.resultado;
-  }
-
-  if(!raw){
-    return apiResponse;
-  }
-
-  raw = raw
-    .replace(/©.*HydraCore/gi,"")
-    .replace(/═+/g,"")
-    .replace(/[🔍📞🕵️]/g,"")
-    .replace(/\r/g,"")
-    .trim();
-
-  try{
-    raw = decodeURIComponent(escape(raw));
-  }catch{}
-
-  const linhas = raw.split("\n").map(l=>l.trim()).filter(Boolean);
-
-  let resultado = {};
-  let secaoAtual = null;
-  let objetoAtual = {};
-
-  function normalizarKey(k){
-    return k
-      .toLowerCase()
-      .normalize("NFD").replace(/[\u0300-\u036f]/g,"")
-      .replace(/[^a-z0-9]+/g,"_")
-      .replace(/^_|_$/g,"");
-  }
-
-  function salvarObjeto(){
-    if(!secaoAtual || Object.keys(objetoAtual).length === 0) return;
-
-    if(!resultado[secaoAtual]){
-      resultado[secaoAtual] = [];
-    }
-
-    resultado[secaoAtual].push(objetoAtual);
-    objetoAtual = {};
-  }
-
-  for(let linha of linhas){
-
-    if(linha.match(/^REGISTRO\s+\d+/i)){
-      salvarObjeto();
-      secaoAtual = normalizarKey(linha);
-      continue;
-    }
-
-    if(linha.includes("RESUMO DA CONSULTA")){
-      salvarObjeto();
-      secaoAtual = "resumo_da_consulta";
-      continue;
-    }
-
-    if(linha.includes("RESULTADO DA CONSULTA")){
-      secaoAtual = "_resultado_da_consulta_telefone_";
-      resultado[secaoAtual] = [];
-      continue;
-    }
-
-    if(linha.includes(":")){
-      const [k,...v] = linha.split(":");
-      let key = normalizarKey(k);
-      let value = v.join(":").trim();
-
-      if(!value || value.toLowerCase().includes("sem informa")){
-        value = "[empty]";
-      }
-
-      objetoAtual[key] = value;
-    }
-    else{
-      if(secaoAtual){
-        objetoAtual["info_extra"] = linha;
-      }
-    }
-  }
-
-  salvarObjeto();
-
-  return resultado;
-}
-
-/* ================= PARENTES ================= */
-
-function extrairParentes(data){
-
-  let lista = []
-
-  function buscar(obj){
-    if(typeof obj !== "object" || obj === null) return
-
-    for(let k in obj){
-
-      const v = obj[k]
-
-      if(typeof v === "object"){
-        buscar(v)
-      }
-
-      if(typeof v === "string"){
-        if(k.toLowerCase().includes("nome") && v.length > 5){
-          lista.push({
-            nome: v
-          })
-        }
-      }
-    }
-  }
-
-  buscar(data)
-
-  return lista
-}
-
-/* ================= ERRO ================= */
-
-function jsonErro(code,msg,extra=null){
-  return new Response(JSON.stringify({
-    status:false,
-    erro:{code,msg,extra}
+    status:true,
+    meta:{
+      api:"Astro Ultra",
+      plano: tokenData.plano,
+      creditos_restantes: tokenData.plano === "VIP" ? "ilimitado" : tokenData.credits,
+      endpoint,
+      timestamp:new Date().toISOString()
+    },
+    consulta:{[config.query]:valor},
+    dados
   },null,2),{
     headers:{
       "Content-Type":"application/json;charset=UTF-8"
     }
   })
+
+}catch(e){
+  return jsonErro("API_500","Erro interno")
+}
+
+}
+
+/* ================= TRATAR SARA ================= */
+
+function tratarSara(api){
+if(api?.resultado?.body){
+  return api.resultado.body
+}
+return api
+}
+
+/* ================= LIMPAR ================= */
+
+function limparRespostaAPI(data){
+if(!data || typeof data !== "object") return data
+delete data.creator
+delete data.status
+return data
+}
+
+/* ================= NORMALIZAR ================= */
+
+function normalizarDados(data){
+if(Array.isArray(data)){
+  return data.map(normalizarDados)
+}
+if(data !== null && typeof data === "object"){
+  const novo={}
+  for(const k in data){
+    novo[k]=normalizarDados(data[k])
+  }
+  return novo
+}
+return data
+}
+
+/* ================= ERRO ================= */
+
+function jsonErro(code,msg,extra=null){
+return new Response(JSON.stringify({
+  status:false,
+  erro:{code,msg,extra}
+},null,2),{
+  headers:{"Content-Type":"application/json"}
+})
 }
 
 /*
@@ -1488,3 +1375,4 @@ window.addEventListener("resize", resizeCanvas);
     }
   })
 }
+
