@@ -60,6 +60,10 @@ const ENDPOINTS = {
     url: "https://obitostore.shop/api/consulta/placa2",
     param: "placa"
   },
+  parentes: {
+  query: "cpf",
+  tipo: "interno"
+},
   cpf: {
     query: "cpf",
     url: "https://obitostore.shop/api/consulta/cpf",
@@ -81,6 +85,83 @@ const ENDPOINTS = {
     param: "cep"
   }
 }
+
+// 🔥 ENDPOINT INTERNO (PARENTES)
+if(config.tipo === "interno" && endpoint === "parentes"){
+
+  const cpf = url.searchParams.get("cpf")
+  if(!cpf){
+    return jsonErro("REQ_001","CPF obrigatório")
+  }
+
+  try{
+
+    const apiURL = "https://astro.stherlionato.workers.dev/cpf?token=astropro&cpf=" + encodeURIComponent(cpf)
+
+    const res = await fetch(apiURL)
+    const json = await res.json()
+
+    if(!json || !json.status){
+      return jsonErro("API_001","Erro ao buscar CPF base")
+    }
+
+    const dados = extrairParentes(json.dados)
+
+    return new Response(JSON.stringify({
+      status:true,
+      meta:{
+        api:"Astro Ultra",
+        plano: tokenData.plano,
+        creditos_restantes: tokenData.plano === "VIP" ? "ilimitado" : tokenData.credits,
+        endpoint:"parentes",
+        timestamp:new Date().toISOString()
+      },
+      consulta:{cpf},
+      parentes:dados
+    },null,2),{
+      headers:{
+        "Content-Type":"application/json;charset=UTF-8"
+      }
+    })
+
+  }catch(e){
+    return jsonErro("API_500","Erro interno ao processar parentes")
+  }
+}
+
+function extrairParentes(dados){
+
+  if(!dados || !dados.resultado) return []
+
+  let lista = []
+
+  for(const sec of dados.resultado){
+
+    if(!sec.titulo) continue
+
+    // 🔥 detecta seção de parentes
+    if(sec.conteudo && sec.conteudo.toUpperCase().includes("PARENTES")){
+      continue
+    }
+
+    if(sec.titulo.startsWith("NOME:")){
+
+      const nome = sec.titulo.replace("NOME:","").trim()
+
+      const cpfMatch = sec.conteudo.match(/CPF:\s*([0-9]+)/i)
+      const grauMatch = sec.conteudo.match(/GRAU DE PARENTESCO:\s*(.*)/i)
+
+      lista.push({
+        nome,
+        cpf: cpfMatch ? cpfMatch[1] : null,
+        parentesco: grauMatch ? grauMatch[1].trim() : null
+      })
+    }
+  }
+
+  return lista
+}
+
 /* ================= CONSULTA ================= */
 
 async function consultar(endpoint, request, url, ctx){
