@@ -60,16 +60,16 @@ const ENDPOINTS = {
     url: "https://obitostore.shop/api/consulta/placa2",
     param: "placa"
   },
-  parentes: {
-  query: "cpf",
-  url: "https://obitostore.shop/api/consulta/cpf",
-  param: "cpf"
-},
   cpf: {
     query: "cpf",
     url: "https://obitostore.shop/api/consulta/cpf",
     param: "cpf"
   },
+  parentes: {
+  query: "cpf",
+  url: "https://obitostore.shop/api/consulta/cpf",
+  param: "cpf"
+},
   telefone: {
     query: "telefone",
     url: "https://obitostore.shop/api/consulta/telefone",
@@ -143,17 +143,17 @@ try{
 // 🔥 LIMPEZA PADRÃO ASTRO
 let dados = json
 
-// 🔥 EXTRAIR PARENTES
-if(endpoint === "parentes"){
-  dados = extrairParentes(json)
-}
-
 delete dados.criador
 delete dados.status
 
 /* ==================== PADRONIZAR RESULTADO ==================== */
 function formatarResultado(dados){
   if(!dados || !dados.resultado) return dados;
+
+// 🔥 EXTRAÇÃO DE PARENTES
+if(endpoint === "parentes"){
+  dados = extrairParentes(dados);
+}
 
   // Limpeza básica
   let resultado = dados.resultado;
@@ -242,99 +242,47 @@ if(data !== null && typeof data === "object"){
 return data
 }
 
-function extrairParentes(api){
+function extrairParentes(dados){
+  if(!dados || !dados.resultado) return { parentes: [] }
 
-  if(!api || !api.resultado){
-    return { parentes: [] }
-  }
+  let lista = []
 
-  let resultado = api.resultado
+  if(Array.isArray(dados.resultado)){
+    for(const item of dados.resultado){
 
-  // Se vier string, transforma igual seu padrão
-  if(typeof resultado === "string"){
-    resultado = resultado
-      .replace(/©.*HydraCore/gi,"")
-      .replace(/══════════════════════════/g,"")
-      .replace(/\r/g,"")
-      .trim()
-  }
+      if(!item.titulo) continue
 
-  // Se já estiver formatado em seções
-  if(Array.isArray(resultado)){
-    return parseParentesFromSections(resultado)
-  }
+      if(item.titulo.startsWith("NOME:")){
 
-  // Se ainda for string, quebra manual
-  const linhas = resultado.split("\n")
+        const nome = item.titulo.replace("NOME:","").trim()
 
-  const parentes = []
-  let atual = null
+        let cpf = null
+        let grau = null
 
-  for(let linha of linhas){
+        if(item.conteudo){
+          const cpfMatch = item.conteudo.match(/CPF:\s*(\d+)/i)
+          const grauMatch = item.conteudo.match(/GRAU DE PARENTESCO:\s*(.+)/i)
 
-    linha = linha.trim()
+          if(cpfMatch) cpf = cpfMatch[1]
+          if(grauMatch) grau = grauMatch[1].trim()
+        }
 
-    if(linha.startsWith("NOME:")){
-      if(atual) parentes.push(atual)
+        lista.push({
+          nome,
+          cpf,
+          grau_parentesco: grau
+        })
+      }
 
-      atual = {
-        nome: linha.replace("NOME:","").trim(),
-        cpf: null,
-        parentesco: null
+      if(item.conteudo && item.conteudo.includes("EMPRESAS")){
+        break
       }
     }
-
-    if(linha.startsWith("CPF:") && atual){
-      atual.cpf = linha.replace("CPF:","").trim()
-    }
-
-    if(linha.includes("GRAU DE PARENTESCO") && atual){
-      atual.parentesco = linha.split(":")[1]?.trim()
-    }
-
-    // Para quando entrar em outra seção tipo EMPRESAS
-    if(linha.includes("EMPRESAS") || linha.includes("IRPF")){
-      break
-    }
-  }
-
-  if(atual) parentes.push(atual)
-
-  return {
-    total: parentes.length,
-    parentes
-  }
-}
-
-function parseParentesFromSections(sections){
-
-  const parentes = []
-
-  for(const sec of sections){
-
-    if(sec.titulo.startsWith("NOME:")){
-
-      const nome = sec.titulo.replace("NOME:","").trim()
-
-      const cpfMatch = sec.conteudo.match(/CPF:\s*(\d+)/)
-      const grauMatch = sec.conteudo.match(/GRAU DE PARENTESCO:\s*(.+)/)
-
-      parentes.push({
-        nome,
-        cpf: cpfMatch ? cpfMatch[1] : null,
-        parentesco: grauMatch ? grauMatch[1].trim() : null
-      })
-    }
-
-    // parar quando chegar em empresas
-    if(sec.conteudo.includes("EMPRESAS")){
-      break
-    }
   }
 
   return {
-    total: parentes.length,
-    parentes
+    total: lista.length,
+    parentes: lista
   }
 }
 
@@ -1038,7 +986,7 @@ function efeitoParticulasModal(){
       }
       ctx.beginPath();
       ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
-      ctx.fillStyle = "rgba(250,204,21," + p.alpha + ")";
+      ctx.fillStyle = `rgba(250,204,21,${p.alpha})`;
       ctx.fill();
     });
     requestAnimationFrame(draw);
