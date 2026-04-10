@@ -75,9 +75,9 @@ parentes: {
     param: "telefone"
   },
   cnpj: {
-    query: "query",
+    query: "cnpj",
     url: "https://obitostore.shop/api/consulta/cnpj",
-    param: "query"
+    param: "cnpj"
   },
   cep: {
     query: "cep",
