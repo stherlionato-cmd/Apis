@@ -60,6 +60,12 @@ const ENDPOINTS = {
     url: "https://obitostore.shop/api/consulta/placa2",
     param: "placa"
   },
+nome: {
+  query: "nome",
+  url: BASE_SARA + "nome",
+  param: "nome",
+  tipo: "sara"
+}
   cpf: {
     query: "cpf",
     url: "https://obitostore.shop/api/consulta/cpf",
@@ -130,13 +136,18 @@ try{
 
   const json = await res.json()
 
-  if(!json || json.status !== "ok"){
-    return jsonErro("API_001","Erro na API")
-  }
+if(!json){
+  return jsonErro("API_001","Erro na API")
+}
 
   // 🔥 LIMPEZA PADRÃO ASTRO
 // 🔥 LIMPEZA PADRÃO ASTRO
 let dados = json
+
+// 🔥 TRATAMENTO ESPECÍFICO SARA
+if(config.tipo === "sara"){
+  dados = tratarSara(dados)
+}
 
 delete dados.criador
 delete dados.status
@@ -201,10 +212,28 @@ dados = formatarResultado(dados);
 /* ================= TRATAR SARA ================= */
 
 function tratarSara(api){
-if(api?.resultado?.body){
-  return api.resultado.body
-}
-return api
+  if(!api) return api;
+
+  // remove lixo
+  delete api.criador;
+  delete api.status;
+
+  if(api.resultado){
+
+    // pega o body direto
+    if(api.resultado.body){
+      return {
+        resultado: normalizarDados(api.resultado.body)
+      };
+    }
+
+    // fallback caso não tenha body
+    return {
+      resultado: normalizarDados(api.resultado)
+    };
+  }
+
+  return api;
 }
 
 /* ================= LIMPAR ================= */
