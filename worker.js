@@ -91,17 +91,28 @@ function extrairParentes(dados){
   if(!dados || !dados.resultado) return []
 
   let lista = []
+  let dentroParentes = false
 
   for(const sec of dados.resultado){
 
-    if(!sec.titulo) continue
+    if(!sec || !sec.titulo) continue
 
-    // 🔥 detecta seção de parentes
-    if(sec.conteudo && sec.conteudo.toUpperCase().includes("PARENTES")){
+    const titulo = sec.titulo.toUpperCase()
+    const conteudo = (sec.conteudo || "").toUpperCase()
+
+    // 🔥 Detecta início da seção
+    if(conteudo.includes("PARENTES")){
+      dentroParentes = true
       continue
     }
 
-    if(sec.titulo.startsWith("NOME:")){
+    // 🔥 Sai da seção quando começa outra
+    if(dentroParentes && conteudo.includes("EMPRESAS")){
+      break
+    }
+
+    // 🔥 Só processa dentro da seção
+    if(dentroParentes && titulo.startsWith("NOME:")){
 
       const nome = sec.titulo.replace("NOME:","").trim()
 
