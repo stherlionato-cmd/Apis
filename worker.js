@@ -932,7 +932,7 @@ function efeitoParticulasModal(){
       }
       ctx.beginPath();
       ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
-      ctx.fillStyle = `rgba(250,204,21,${p.alpha})`;
+ctx.fillStyle = "rgba(250,204,21," + p.alpha + ")";
       ctx.fill();
     });
     requestAnimationFrame(draw);
