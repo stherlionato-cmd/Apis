@@ -75,26 +75,11 @@ const ENDPOINTS = {
     url: "https://obitostore.shop/api/consulta/cnpj",
     param: "query"
   },
-  const ENDPOINTS = {
-
-cpf: {
-  query: "cpf",
-  url: BASE_SARA + "cpf",
-  param: "cpf",
-  tipo: "sara"
-},
 
 nome: {
   query: "nome",
   url: BASE_SARA + "nome",
   param: "nome",
-  tipo: "sara"
-},
-
-telefone: {
-  query: "telefone",
-  url: BASE_SARA + "telefone",
-  param: "telefone",
   tipo: "sara"
 },
 
@@ -165,13 +150,6 @@ vizinhos: {
   query: "cpf",
   url: BASE_SARA + "vizinhos",
   param: "cpf",
-  tipo: "sara"
-},
-
-cep: {
-  query: "cep",
-  url: BASE_SARA + "cep",
-  param: "cep",
   tipo: "sara"
 },
 
