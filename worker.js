@@ -46,11 +46,11 @@ const BASE_SARA = "https://sara-api.xyz/consulta/"
 /* ================= TOKENS (SEM KV) ================= */
 
 const TOKENS = {
-  ifnvipilimitado:{plano:"VIP", credits:-1, endpoints:null},
-  bocadass:{plano:"VIP", credits:-1, endpoints:null},
-  astrofree:{plano:"FREE", credits:100, endpoints:["cpf","nome"]},
-  astropro:{plano:"PRO", credits:1000, endpoints:null}
-};
+ ifnvipilimitado:{plano:"VIP",credits:-1,endpoints:null},
+  bocadass:{plano:"VIP",credits:-1,endpoints:null},
+  astrofree:{plano:"FREE",credits:100,endpoints:["cpf","nome"]},
+  astropro:{plano:"PRO",credits:1000,endpoints:null}
+}
 
 /* ================= ENDPOINTS ================= */
 
@@ -297,89 +297,6 @@ body{
 .header span{
  color:var(--blue);
 }
-
-.modal{
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,.75);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  z-index:999;
-  opacity:0;
-  pointer-events:none;
-  transition:.3s;
-}
-.modal.show{
-  opacity:1;
-  pointer-events:all;
-}
-.modal-box{
-  width:90%;
-  max-width:380px;
-  background:#0f1225;
-  border-radius:20px;
-  padding:25px;
-  transform:scale(.9);
-  transition:.3s;
-  box-shadow:0 10px 30px rgba(0,0,0,.5);
-}
-.modal.show .modal-box{
-  transform:scale(1);
-}
-
-/* PLANOS */
-.plan{
-  padding:16px;
-  border-radius:16px;
-  margin-top:12px;
-  border:1px solid rgba(255,255,255,.06);
-  background:linear-gradient(145deg,rgba(255,255,255,.02),rgba(255,255,255,.01));
-  transition:.3s;
-  cursor:pointer;
-  position:relative;
-  overflow:hidden;
-}
-.plan:hover{
-  transform:translateY(-4px) scale(1.02);
-  border-color:rgba(59,130,246,.4);
-}
-.plan::after{
-  content:"";
-  position:absolute;
-  inset:0;
-  background:linear-gradient(120deg,transparent,rgba(255,255,255,.05),transparent);
-  opacity:0;
-  transition:.4s;
-}
-.plan:hover::after{
-  opacity:1;
-}
-.plan b{
-  font-size:14px;
-}
-.plan span{
-  font-size:12px;
-}
-
-/* BADGES */
-.badge{
-  display:inline-flex;
-  align-items:center;
-  gap:6px;
-  padding:5px 10px;
-  border-radius:999px;
-  font-size:11px;
-  font-weight:600;
-  position:absolute;
-  top:12px;
-  right:12px;
-  color:#fff;
-  text-transform:uppercase;
-}
-.badge.free{background:#22c55e;}
-.badge.pro{background:#3b82f6;}
-.badge.vip{background:#facc15;color:#111;}
 
 /* CARD */
 .card{
@@ -751,88 +668,67 @@ ${Object.keys(ENDPOINTS).map(e=>`<option>${e}</option>`).join("")}
 <!-- MODAL TOKEN -->
 <div class="modal" id="modal">
   <div class="modal-box">
-    <h2 style="font-size:16px;margin-bottom:10px;text-align:center;">🔐 Acesso</h2>
 
-    <input id="tokenInput" placeholder="Digite seu token" style="width:100%;padding:10px;border-radius:12px;border:none;margin-bottom:10px;background:#1a1d36;color:#fff;outline:none;">
+    <h2 style="font-size:16px;margin-bottom:10px;">🔐 Acesso</h2>
 
-    <button onclick="salvarTokenModal()" style="width:100%;padding:10px;border:none;border-radius:12px;background:#3b82f6;color:#fff;font-weight:600;cursor:pointer;margin-bottom:15px;">Entrar</button>
+    <input id="tokenInput" placeholder="Digite seu token">
 
-    <div style="margin-top:10px;font-size:12px;opacity:.6;text-align:center;">
+<button onclick="salvarTokenModal()">Entrar</button>
+
+    <div style="margin-top:15px;font-size:12px;opacity:.6;">
       Planos disponíveis:
     </div>
 
-    <div class="plan" onclick="preencherToken('FREE')">
+    <div class="plan">
       <b>FREE</b><br>
       100 consultas<br>
-      <span style="opacity:.7;">Grátis</span>
-      <div class="badge free">Free</div>
+      <span style="opacity:.6;">Grátis</span>
     </div>
 
-    <div class="plan" onclick="preencherToken('PRO')">
+    <div class="plan">
       <b>PRO</b><br>
       1000 consultas<br>
-      <span style="opacity:.7;">R$30 mensal</span>
-      <div class="badge pro">Pro</div>
+      <span style="opacity:.6;">R$30 mensal</span>
     </div>
 
-    <div class="plan" onclick="preencherToken('VIP')">
+    <div class="plan">
       <b>VIP</b><br>
       Ilimitado<br>
-      <span style="opacity:.7;">R$50 vitalício</span>
-      <div class="badge vip">VIP</div>
+      <span style="opacity:.6;">R$50 vitalício</span>
     </div>
 
-    <div class="plan" onclick="preencherToken('DIARIO')">
+    <div class="plan">
       <b>DIÁRIO</b><br>
       Acesso 24h<br>
-      <span style="opacity:.7;">R$5</span>
-      <div class="badge vip">Diário</div>
+      <span style="opacity:.6;">R$5</span>
     </div>
 
   </div>
 </div>
 
 <canvas id="bg"></canvas>
+
 <script>
 /* ===== TOKENS ===== */
 const TOKENS = {
-  ifnvipilimitado:{plano:"VIP", credits:-1, endpoints:null},
-  bocadass:{plano:"VIP", credits:-1, endpoints:null},
-  astrofree:{plano:"FREE", credits:100, endpoints:["cpf","nome"]},
-  astropro:{plano:"PRO", credits:1000, endpoints:null}
+  dragon: "VIP",
+  italoedu7: "VIP",
+  IFNastro: "VIP",
+  astrofree: "FREE",
+  astropro: "PRO"
 };
 
 /* ===== MODAIS ===== */
 function abrirModal(){
-  document.getElementById('modal').classList.add('show');
+  document.getElementById("modal").classList.add("show");
 }
+
 function fecharModal(){
-  document.getElementById('modal').classList.remove('show');
+  document.getElementById("modal").classList.remove("show");
 }
 
-// Função que preenche token conforme plano
-function preencherToken(plano){
-  const tokens = {
-    'FREE':'tokenfree123',
-    'PRO':'tokenpro123',
-    'VIP':'tokenvip123',
-    'DIARIO':'tokendiario123'
-  };
-  document.getElementById('tokenInput').value = tokens[plano];
-  salvarTokenModal();
-}
-
-// Função ao clicar em Entrar
-function salvarTokenModal(){
-  const token = document.getElementById('tokenInput').value.trim();
-  if(!token){
-    alert('Digite seu token!');
-    return;
-  }
-  // Aqui você pode validar token, fechar modal e iniciar efeitos
-  console.log('Token enviado:', token);
-  fecharModal();
-  // Chame funções de efeito, partículas etc
+function fecharMaintenanceModal(){
+  document.getElementById("maintenanceModal").classList.remove("show");
 }
 
 /* ===== BADGE ===== */
@@ -875,18 +771,14 @@ function salvarTokenModal(){
 
   if(!TOKENS[token]){
     input.style.border = "1px solid red";
-    efeitoErro(); // shake
+    efeitoErro();
     return;
   }
 
-  // Token correto
-  input.style.border = "1px solid #22c55e"; // verde
-  efeitoParticulasModal(); // partículas minimalistas
   document.getElementById("token").value = token;
-  salvarToken(token);          // atualiza localStorage
-  efeitoPremium(token);        // efeito premium no body
-  renderBadge(TOKENS[token]);  // atualiza badge no topo
-  setTimeout(fecharModal, 1000); // fecha modal depois de 1s
+  salvarToken(token);
+  efeitoPremium(token);
+  fecharModal();
 }
 
 /* ===== TOAST ===== */
@@ -895,51 +787,6 @@ function mostrarToast(msg){
   t.innerText = msg;
   t.classList.add("show");
   setTimeout(()=>t.classList.remove("show"),3000);
-}
-
-function efeitoParticulasModal(){
-  const modalBox = document.querySelector("#modal .modal-box");
-  const canvas = document.createElement("canvas");
-  canvas.style.position = "absolute";
-  canvas.style.inset = "0";
-  canvas.style.pointerEvents = "none";
-  canvas.width = modalBox.offsetWidth;
-  canvas.height = modalBox.offsetHeight;
-  modalBox.appendChild(canvas);
-  const ctx = canvas.getContext("2d");
-  const particles = [];
-  
-  for(let i=0;i<30;i++){
-    particles.push({
-      x: Math.random()*canvas.width,
-      y: Math.random()*canvas.height,
-      r: Math.random()*2 + 1,
-      speed: Math.random()*1 + 0.5,
-      alpha: Math.random()*0.5+0.5
-    });
-  }
-
-  function draw(){
-    ctx.clearRect(0,0,canvas.width,canvas.height);
-    particles.forEach(p=>{
-      p.y -= p.speed;
-      p.alpha -= 0.01;
-      if(p.alpha <= 0){
-        p.x = Math.random()*canvas.width;
-        p.y = canvas.height;
-        p.alpha = Math.random()*0.5+0.5;
-        p.r = Math.random()*2+1;
-      }
-      ctx.beginPath();
-      ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
-ctx.fillStyle = "rgba(250,204,21," + p.alpha + ")";
-      ctx.fill();
-    });
-    requestAnimationFrame(draw);
-  }
-  draw();
-
-  setTimeout(()=>canvas.remove(),1200); // remove após 1.2s
 }
 
 /* ===== CONSULTAR ===== */
