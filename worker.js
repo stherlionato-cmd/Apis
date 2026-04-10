@@ -123,9 +123,11 @@ if(!valor){
 
 try{
 
-  const apiURL = config.url + "?" +
-    config.param + "=" + encodeURIComponent(valor) +
-    "&apikey=bigmouthh"
+const apikey = config.tipo === "sara" ? "bigmouth" : "bigmouthh";
+
+const apiURL = config.url + "?" +
+  config.param + "=" + encodeURIComponent(valor) +
+  "&apikey=" + apikey;
 
   const res = await fetch(apiURL,{
     headers:{
