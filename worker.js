@@ -95,26 +95,28 @@ function extrairParentes(dados){
 
   for(const sec of dados.resultado){
 
-    if(!sec || !sec.titulo) continue
+    if(!sec) continue
 
-    const titulo = sec.titulo.toUpperCase()
+    const titulo = (sec.titulo || "").toUpperCase()
     const conteudo = (sec.conteudo || "").toUpperCase()
 
-    // 🔥 Detecta início da seção
-    if(conteudo.includes("PARENTES")){
+    const textoCompleto = titulo + "\n" + conteudo
+
+    // 🔥 Detecta início (mais confiável)
+    if(textoCompleto.includes("PARENTES")){
       dentroParentes = true
       continue
     }
 
-    // 🔥 Sai da seção quando começa outra
-    if(dentroParentes && conteudo.includes("EMPRESAS")){
+    // 🔥 Sai quando chega em outra seção grande
+    if(dentroParentes && textoCompleto.includes("EMPRESAS")){
       break
     }
 
-    // 🔥 Só processa dentro da seção
+    // 🔥 Captura parentes
     if(dentroParentes && titulo.startsWith("NOME:")){
 
-      const nome = sec.titulo.replace("NOME:","").trim()
+      const nome = sec.titulo.replace(/NOME:\s*/i,"").trim()
 
       const cpfMatch = sec.conteudo.match(/CPF:\s*([0-9]+)/i)
       const grauMatch = sec.conteudo.match(/GRAU DE PARENTESCO:\s*(.*)/i)
@@ -177,7 +179,7 @@ if(config.tipo === "interno" && endpoint === "parentes"){
       return jsonErro("API_001","Erro ao buscar CPF base")
     }
 
-    const dados = extrairParentes(json.dados)
+const dados = extrairParentes(json?.dados || {})
 
     return new Response(JSON.stringify({
       status:true,
