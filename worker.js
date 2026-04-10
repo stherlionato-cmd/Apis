@@ -49,6 +49,7 @@ const TOKENS = {
  ifnvipilimitado:{plano:"VIP",credits:-1,endpoints:null},
   bocadass:{plano:"VIP",credits:-1,endpoints:null},
   astrofree:{plano:"FREE",credits:100,endpoints:["cpf","nome"]},
+  fxckbuscas:{plano:"PRO",credits:500000,endpoints:null},
   astropro:{plano:"PRO",credits:1000,endpoints:null}
 }
 
