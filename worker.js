@@ -91,7 +91,7 @@ function extrairParentes(dados){
   if(!dados || !dados.resultado) return []
 
   let lista = []
-  let dentroParentes = false
+  let dentro = false
 
   for(const sec of dados.resultado){
 
@@ -100,31 +100,28 @@ function extrairParentes(dados){
     const titulo = (sec.titulo || "").toUpperCase()
     const conteudo = (sec.conteudo || "").toUpperCase()
 
-    const textoCompleto = titulo + "\n" + conteudo
-
-    // 🔥 Detecta início (mais confiável)
-    if(textoCompleto.includes("PARENTES")){
-      dentroParentes = true
+    // 🔥 Detecta início (vem no EMAILS → PARENTES)
+    if(conteudo.includes("PARENTES")){
+      dentro = true
       continue
     }
 
-    // 🔥 Sai quando chega em outra seção grande
-    if(dentroParentes && textoCompleto.includes("EMPRESAS")){
+    // 🔥 Sai quando acaba
+    if(dentro && conteudo.includes("EMPRESAS")){
       break
     }
 
-    // 🔥 Captura parentes
-    if(dentroParentes && titulo.startsWith("NOME:")){
+    if(dentro && titulo.startsWith("NOME:")){
 
       const nome = sec.titulo.replace(/NOME:\s*/i,"").trim()
 
-      const cpfMatch = sec.conteudo.match(/CPF:\s*([0-9]+)/i)
-      const grauMatch = sec.conteudo.match(/GRAU DE PARENTESCO:\s*(.*)/i)
+      const cpf = sec.conteudo.match(/CPF:\s*(\d+)/i)?.[1] || null
+      const parentesco = sec.conteudo.match(/GRAU DE PARENTESCO:\s*(.*)/i)?.[1]?.trim() || null
 
       lista.push({
         nome,
-        cpf: cpfMatch ? cpfMatch[1] : null,
-        parentesco: grauMatch ? grauMatch[1].trim() : null
+        cpf,
+        parentesco
       })
     }
   }
@@ -161,6 +158,7 @@ if(tokenData.plano !== "VIP"){
 
 const config = ENDPOINTS[endpoint]
 // 🔥 ENDPOINT INTERNO (PARENTES)
+// 🔥 ENDPOINT INTERNO (PARENTES)
 if(config.tipo === "interno" && endpoint === "parentes"){
 
   const cpf = url.searchParams.get("cpf")
@@ -173,13 +171,22 @@ if(config.tipo === "interno" && endpoint === "parentes"){
     const apiURL = "https://astro.stherlionato.workers.dev/cpf?token=astropro&cpf=" + encodeURIComponent(cpf)
 
     const res = await fetch(apiURL)
-    const json = await res.json()
 
-    if(!json || !json.status){
-      return jsonErro("API_001","Erro ao buscar CPF base")
+    // 🔥 PEGA TEXTO PRIMEIRO (ANTI-ERRO JSON)
+    const text = await res.text()
+
+    let json
+    try{
+      json = JSON.parse(text)
+    }catch{
+      return jsonErro("API_002","Resposta inválida da API CPF", text.slice(0,200))
     }
 
-const dados = extrairParentes(json?.dados || {})
+    if(!json || !json.status || !json.dados){
+      return jsonErro("API_001","Erro ao buscar CPF base", json)
+    }
+
+    const dados = extrairParentes(json.dados)
 
     return new Response(JSON.stringify({
       status:true,
@@ -198,9 +205,9 @@ const dados = extrairParentes(json?.dados || {})
       }
     })
 
-}catch(e){
-  return jsonErro("API_500","Erro interno ao processar parentes", String(e))
-}
+  }catch(e){
+    return jsonErro("API_500","Erro interno ao processar parentes", String(e))
+  }
 }
 const valor = url.searchParams.get(config.query)
 
