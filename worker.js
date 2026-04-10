@@ -65,11 +65,6 @@ const ENDPOINTS = {
     url: "https://obitostore.shop/api/consulta/cpf",
     param: "cpf"
   },
-  parentes: {
-  query: "cpf",
-  url: "https://obitostore.shop/api/consulta/cpf",
-  param: "cpf"
-},
   telefone: {
     query: "telefone",
     url: "https://obitostore.shop/api/consulta/telefone",
@@ -149,11 +144,6 @@ delete dados.status
 /* ==================== PADRONIZAR RESULTADO ==================== */
 function formatarResultado(dados){
   if(!dados || !dados.resultado) return dados;
-
-// 🔥 EXTRAÇÃO DE PARENTES
-if(endpoint === "parentes"){
-  dados = extrairParentes(dados);
-}
 
   // Limpeza básica
   let resultado = dados.resultado;
@@ -240,50 +230,6 @@ if(data !== null && typeof data === "object"){
   return novo
 }
 return data
-}
-
-function extrairParentes(dados){
-  if(!dados || !dados.resultado) return { parentes: [] }
-
-  let lista = []
-
-  if(Array.isArray(dados.resultado)){
-    for(const item of dados.resultado){
-
-      if(!item.titulo) continue
-
-      if(item.titulo.startsWith("NOME:")){
-
-        const nome = item.titulo.replace("NOME:","").trim()
-
-        let cpf = null
-        let grau = null
-
-        if(item.conteudo){
-          const cpfMatch = item.conteudo.match(/CPF:\s*(\d+)/i)
-          const grauMatch = item.conteudo.match(/GRAU DE PARENTESCO:\s*(.+)/i)
-
-          if(cpfMatch) cpf = cpfMatch[1]
-          if(grauMatch) grau = grauMatch[1].trim()
-        }
-
-        lista.push({
-          nome,
-          cpf,
-          grau_parentesco: grau
-        })
-      }
-
-      if(item.conteudo && item.conteudo.includes("EMPRESAS")){
-        break
-      }
-    }
-  }
-
-  return {
-    total: lista.length,
-    parentes: lista
-  }
 }
 
 /* ================= ERRO ================= */
@@ -986,7 +932,7 @@ function efeitoParticulasModal(){
       }
       ctx.beginPath();
       ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
-ctx.fillStyle = "rgba(250,204,21," + p.alpha + ")";
+      ctx.fillStyle = `rgba(250,204,21,${p.alpha})`;
       ctx.fill();
     });
     requestAnimationFrame(draw);
