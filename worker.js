@@ -4,7 +4,6 @@ async fetch(request, env, ctx){
 const url = new URL(request.url)
 let endpoint = url.pathname.replace("/","")
 
-// 🔥 ALIAS
 const ALIAS = {
   cpf2:"cpf",
   cpf3:"cpf",
@@ -18,52 +17,34 @@ if(ALIAS[endpoint]){
 }
 
 if(endpoint === "admin"){
-  const token = url.searchParams.get("token")
-  if(token !== ADMIN_TOKEN){
-    return jsonErro("AUTH_ADMIN","Acesso negado")
-  }
-  return adminPanel(request)
+  return new Response("OK")
 }
 
-if(endpoint === ""){
-  return home(request)
-}
-
-if(!ENDPOINTS[endpoint]){
-  return jsonErro("ENDPOINT_404","Endpoint não encontrado")
-}
-
-return consultar(endpoint,request,url,ctx)
+return consultar(endpoint, request, url, ctx)
 
 }
 }
 
 /* ================= CONFIG ================= */
 
-const ADMIN_TOKEN = "dragonsubdono"
-const BASE_SARA = "https://sara-api.xyz/consulta/"
-
-/* ================= TOKENS (SEM KV) ================= */
-
 const TOKENS = {
- ifnvipilimitado:{plano:"VIP",credits:-1,endpoints:null},
-  bocadass:{plano:"VIP",credits:-1,endpoints:null},
-  astrofree:{plano:"FREE",credits:100,endpoints:["cpf","nome"]},
-  astropro:{plano:"PRO",credits:1000,endpoints:null}
+  "astropro": {
+    plano: "VIP",
+    credits: 999999,
+    endpoints: ["cpf","telefone","placa","nome","parentes"]
+  }
 }
-
-/* ================= ENDPOINTS ================= */
 
 const ENDPOINTS = {
   placa: {
     query: "placa",
     url: "https://obitostore.shop/api/consulta/placa2",
     param: "placa"
-},
-parentes: {
-  tipo: "interno",
-  query: "cpf"
-},
+  },
+  parentes: {
+    tipo: "interno",
+    query: "cpf"
+  },
   cpf: {
     query: "cpf",
     url: "https://obitostore.shop/api/consulta/cpf",
@@ -86,49 +67,6 @@ parentes: {
   }
 }
 
-function extrairParentes(dados){
-
-  if(!dados || !dados.resultado) return []
-
-  let lista = []
-  let dentro = false
-
-  for(const sec of dados.resultado){
-
-    if(!sec) continue
-
-    const titulo = (sec.titulo || "").toUpperCase()
-    const conteudo = (sec.conteudo || "").toUpperCase()
-
-    // 🔥 Detecta início (vem no EMAILS → PARENTES)
-    if(conteudo.includes("PARENTES")){
-      dentro = true
-      continue
-    }
-
-    // 🔥 Sai quando acaba
-    if(dentro && conteudo.includes("EMPRESAS")){
-      break
-    }
-
-    if(dentro && titulo.startsWith("NOME:")){
-
-      const nome = sec.titulo.replace(/NOME:\s*/i,"").trim()
-
-      const cpf = sec.conteudo.match(/CPF:\s*(\d+)/i)?.[1] || null
-      const parentesco = sec.conteudo.match(/GRAU DE PARENTESCO:\s*(.*)/i)?.[1]?.trim() || null
-
-      lista.push({
-        nome,
-        cpf,
-        parentesco
-      })
-    }
-  }
-
-  return lista
-}
-
 /* ================= CONSULTA ================= */
 
 async function consultar(endpoint, request, url, ctx){
@@ -143,12 +81,10 @@ if(!token) return jsonErro("AUTH_002","Token obrigatório")
 const tokenData = TOKENS[token]
 if(!tokenData) return jsonErro("AUTH_001","Token inválido")
 
-// 🔒 BLOQUEIO
 if(tokenData.endpoints && !tokenData.endpoints.includes(endpoint)){
   return jsonErro("AUTH_003","Endpoint não liberado")
 }
 
-// 💰 CRÉDITOS
 if(tokenData.plano !== "VIP"){
   if(tokenData.credits <= 0){
     return jsonErro("LIMIT_001","Créditos esgotados")
@@ -157,8 +93,9 @@ if(tokenData.plano !== "VIP"){
 }
 
 const config = ENDPOINTS[endpoint]
-// 🔥 ENDPOINT INTERNO (PARENTES)
-// 🔥 ENDPOINT INTERNO (PARENTES)
+
+/* ================= PARENTES ================= */
+
 if(config.tipo === "interno" && endpoint === "parentes"){
 
   const cpf = url.searchParams.get("cpf")
@@ -171,9 +108,8 @@ if(config.tipo === "interno" && endpoint === "parentes"){
     const apiURL = "https://astro.stherlionato.workers.dev/cpf?token=astropro&cpf=" + encodeURIComponent(cpf)
 
     const res = await fetch(apiURL)
-
-    // 🔥 PEGA TEXTO PRIMEIRO (ANTI-ERRO JSON)
-    const text = await res.text()
+    const buffer = await res.arrayBuffer()
+    const text = new TextDecoder("utf-8").decode(buffer)
 
     let json
     try{
@@ -182,26 +118,22 @@ if(config.tipo === "interno" && endpoint === "parentes"){
       return jsonErro("API_002","Resposta inválida da API CPF", text.slice(0,200))
     }
 
-    if(!json || !json.status || !json.dados){
+    if(!json){
       return jsonErro("API_001","Erro ao buscar CPF base", json)
     }
 
-    const dados = extrairParentes(json.dados)
+    const lista = extrairParentes(json)
 
     return new Response(JSON.stringify({
-      status:true,
-      meta:{
-        api:"Astro Ultra",
-        plano: tokenData.plano,
-        creditos_restantes: tokenData.plano === "VIP" ? "ilimitado" : tokenData.credits,
-        endpoint:"parentes",
-        timestamp:new Date().toISOString()
-      },
-      consulta:{cpf},
-      parentes:dados
-    },null,2),{
-      headers:{
-        "Content-Type":"application/json;charset=UTF-8"
+      status: true,
+      base: "Astro API",
+      credits: "Astro Company | @puxardados5",
+      result: {
+        parentes: lista
+      }
+    }, null, 2), {
+      headers: {
+        "Content-Type": "application/json;charset=UTF-8"
       }
     })
 
@@ -209,6 +141,9 @@ if(config.tipo === "interno" && endpoint === "parentes"){
     return jsonErro("API_500","Erro interno ao processar parentes", String(e))
   }
 }
+
+/* ================= OUTROS ================= */
+
 const valor = url.searchParams.get(config.query)
 
 if(!valor){
@@ -222,143 +157,203 @@ try{
     "&apikey=bigmouthh"
 
   const res = await fetch(apiURL,{
-  headers:{
-    "User-Agent":"Mozilla/5.0",
-    "Accept":"application/json"
-  }
-})
+    headers:{
+      "User-Agent":"Mozilla/5.0",
+      "Accept":"application/json"
+    }
+  })
 
-const text = await res.text()
+  const buffer = await res.arrayBuffer()
+  const text = new TextDecoder("utf-8").decode(buffer)
 
-// 🔥 resposta vazia
-if(!text || text.trim() === ""){
-  return jsonErro("API_002","API retornou vazio")
-}
-
-// 🔥 erro conhecido da API
-if(text.includes("error code")){
-  return jsonErro("API_003","Erro na API externa", text)
-}
-
-let json
-try{
-  json = JSON.parse(text)
-}catch(e){
-  return jsonErro("API_002","Resposta não é JSON", text.slice(0,300))
-}
-
-// 🔥 valida estrutura esperada
-if(!json || json.status !== true || !json.dados){
-  return jsonErro("API_001","Resposta inesperada da API", json)
-}
-
-  // 🔥 LIMPEZA PADRÃO ASTRO
-// 🔥 LIMPEZA PADRÃO ASTRO
-let dados = json
-
-delete dados.criador
-delete dados.status
-
-/* ==================== PADRONIZAR RESULTADO ==================== */
-function formatarResultado(dados){
-  if(!dados || !dados.resultado) return dados;
-
-  // Limpeza básica
-  let resultado = dados.resultado;
-
-  if(typeof resultado === "string"){
-    resultado = resultado
-      .replace(/©.*HydraCore/gi,"")
-      .replace(/══════════════════════════/g,"")
-      .replace(/\r/g,"")
-      .replace(/\n{2,}/g,"\n\n")
-      .trim();
-
-    // Separar seções pelo título
-    const seções = resultado.split(/\n\n(?=[A-ZÀ-Ú ]{3,}:)/g).map(sec => {
-      const [titulo, ...conteudo] = sec.split("\n");
-      return { titulo: titulo.trim(), conteudo: conteudo.join("\n").trim() };
-    });
-
-    dados.resultado = seções;
+  if(!text || text.trim() === ""){
+    return jsonErro("API_002","API retornou vazio")
   }
 
-  if(typeof resultado === "object" && !Array.isArray(resultado)){
-    dados.resultado = normalizarDados(resultado);
+  if(text.includes("error code")){
+    return jsonErro("API_003","Erro na API externa", text)
   }
 
-  return dados;
-}
+  let json
+  try{
+    json = JSON.parse(text)
+  }catch{
+    json = text
+  }
 
-// Aplica a formatação antes de retornar
-dados = formatarResultado(dados);
+  let parsed = parseUniversal(json)
+
+  if(!parsed || Object.keys(parsed).length === 0){
+    parsed = json
+  }
 
   return new Response(JSON.stringify({
-    status:true,
-    meta:{
-      api:"Astro Ultra",
-      plano: tokenData.plano,
-      creditos_restantes: tokenData.plano === "VIP" ? "ilimitado" : tokenData.credits,
-      endpoint,
-      timestamp:new Date().toISOString()
-    },
-    consulta:{[config.query]:valor},
-    dados
-  },null,2),{
-    headers:{
-      "Content-Type":"application/json;charset=UTF-8"
+    status: true,
+    base: "Astro API",
+    credits: "Astro Company | @puxardados5",
+    result: parsed
+  }, null, 2), {
+    headers: {
+      "Content-Type": "application/json;charset=UTF-8"
     }
   })
 
 }catch(e){
-  return jsonErro("API_500","Erro interno")
+  return jsonErro("API_500","Erro interno", String(e))
 }
 
 }
 
-/* ================= TRATAR SARA ================= */
+/* ================= PARSER UNIVERSAL ================= */
 
-function tratarSara(api){
-if(api?.resultado?.body){
-  return api.resultado.body
-}
-return api
-}
+function parseUniversal(apiResponse){
 
-/* ================= LIMPAR ================= */
+  if(!apiResponse) return null;
 
-function limparRespostaAPI(data){
-if(!data || typeof data !== "object") return data
-delete data.creator
-delete data.status
-return data
-}
-
-/* ================= NORMALIZAR ================= */
-
-function normalizarDados(data){
-if(Array.isArray(data)){
-  return data.map(normalizarDados)
-}
-if(data !== null && typeof data === "object"){
-  const novo={}
-  for(const k in data){
-    novo[k]=normalizarDados(data[k])
+  if(typeof apiResponse === "object"){
+    delete apiResponse.criador;
+    delete apiResponse.creator;
+    delete apiResponse.status;
   }
-  return novo
+
+  let raw = "";
+
+  if(typeof apiResponse === "string"){
+    raw = apiResponse;
+  }
+  else if(apiResponse?.resultado && typeof apiResponse.resultado === "string"){
+    raw = apiResponse.resultado;
+  }
+  else if(apiResponse?.dados?.resultado){
+    raw = apiResponse.dados.resultado;
+  }
+
+  if(!raw){
+    return apiResponse;
+  }
+
+  raw = raw
+    .replace(/©.*HydraCore/gi,"")
+    .replace(/═+/g,"")
+    .replace(/[🔍📞🕵️]/g,"")
+    .replace(/\r/g,"")
+    .trim();
+
+  try{
+    raw = decodeURIComponent(escape(raw));
+  }catch{}
+
+  const linhas = raw.split("\n").map(l=>l.trim()).filter(Boolean);
+
+  let resultado = {};
+  let secaoAtual = null;
+  let objetoAtual = {};
+
+  function normalizarKey(k){
+    return k
+      .toLowerCase()
+      .normalize("NFD").replace(/[\u0300-\u036f]/g,"")
+      .replace(/[^a-z0-9]+/g,"_")
+      .replace(/^_|_$/g,"");
+  }
+
+  function salvarObjeto(){
+    if(!secaoAtual || Object.keys(objetoAtual).length === 0) return;
+
+    if(!resultado[secaoAtual]){
+      resultado[secaoAtual] = [];
+    }
+
+    resultado[secaoAtual].push(objetoAtual);
+    objetoAtual = {};
+  }
+
+  for(let linha of linhas){
+
+    if(linha.match(/^REGISTRO\s+\d+/i)){
+      salvarObjeto();
+      secaoAtual = normalizarKey(linha);
+      continue;
+    }
+
+    if(linha.includes("RESUMO DA CONSULTA")){
+      salvarObjeto();
+      secaoAtual = "resumo_da_consulta";
+      continue;
+    }
+
+    if(linha.includes("RESULTADO DA CONSULTA")){
+      secaoAtual = "_resultado_da_consulta_telefone_";
+      resultado[secaoAtual] = [];
+      continue;
+    }
+
+    if(linha.includes(":")){
+      const [k,...v] = linha.split(":");
+      let key = normalizarKey(k);
+      let value = v.join(":").trim();
+
+      if(!value || value.toLowerCase().includes("sem informa")){
+        value = "[empty]";
+      }
+
+      objetoAtual[key] = value;
+    }
+    else{
+      if(secaoAtual){
+        objetoAtual["info_extra"] = linha;
+      }
+    }
+  }
+
+  salvarObjeto();
+
+  return resultado;
 }
-return data
+
+/* ================= PARENTES ================= */
+
+function extrairParentes(data){
+
+  let lista = []
+
+  function buscar(obj){
+    if(typeof obj !== "object" || obj === null) return
+
+    for(let k in obj){
+
+      const v = obj[k]
+
+      if(typeof v === "object"){
+        buscar(v)
+      }
+
+      if(typeof v === "string"){
+        if(k.toLowerCase().includes("nome") && v.length > 5){
+          lista.push({
+            nome: v
+          })
+        }
+      }
+    }
+  }
+
+  buscar(data)
+
+  return lista
 }
 
 /* ================= ERRO ================= */
 
 function jsonErro(code,msg,extra=null){
-return new Response(JSON.stringify({
-  status:false,
-  erro:{code,msg,extra}
-},null,2),{
-  headers:{"Content-Type":"application/json"}
-})
+  return new Response(JSON.stringify({
+    status:false,
+    erro:{code,msg,extra}
+  },null,2),{
+    headers:{
+      "Content-Type":"application/json;charset=UTF-8"
+    }
+  })
 }
 
 /*
