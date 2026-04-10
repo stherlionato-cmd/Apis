@@ -198,9 +198,9 @@ const dados = extrairParentes(json?.dados || {})
       }
     })
 
-  }catch(e){
-    return jsonErro("API_500","Erro interno ao processar parentes")
-  }
+}catch(e){
+  return jsonErro("API_500","Erro interno ao processar parentes", String(e))
+}
 }
 const valor = url.searchParams.get(config.query)
 
