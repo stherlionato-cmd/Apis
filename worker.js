@@ -222,13 +222,20 @@ try{
     "&apikey=bigmouthh"
 
   const res = await fetch(apiURL,{
-    headers:{
-      "User-Agent":"Mozilla/5.0",
-      "Accept":"application/json"
-    }
-  })
+  headers:{
+    "User-Agent":"Mozilla/5.0",
+    "Accept":"application/json"
+  }
+})
 
-  const json = await res.json()
+const text = await res.text()
+
+let json
+try{
+  json = JSON.parse(text)
+}catch{
+  return jsonErro("API_002","Resposta inválida da API", text.slice(0,200))
+}
 
   if(!json || json.status !== "ok"){
     return jsonErro("API_001","Erro na API")
