@@ -41,7 +41,7 @@ return consultar(endpoint,request,url,ctx)
 /* ================= CONFIG ================= */
 
 const ADMIN_TOKEN = "dragonsubdono"
-const BASE_SARA = "https://sara-api.xyz/consulta/"
+const BASE_SARA = "https://sara-api.xyz/api/consulta/"
 
 /* ================= TOKENS (SEM KV) ================= */
 
@@ -65,7 +65,7 @@ nome: {
   url: BASE_SARA + "nome",
   param: "nome",
   tipo: "sara"
-}
+},
   cpf: {
     query: "cpf",
     url: "https://obitostore.shop/api/consulta/cpf",
