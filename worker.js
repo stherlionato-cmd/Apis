@@ -60,6 +60,11 @@ const ENDPOINTS = {
     url: "https://obitostore.shop/api/consulta/placa2",
     param: "placa"
   },
+  parentes: {
+  query: "cpf",
+  url: "https://obitostore.shop/api/consulta/cpf",
+  param: "cpf"
+},
   cpf: {
     query: "cpf",
     url: "https://obitostore.shop/api/consulta/cpf",
@@ -137,6 +142,11 @@ try{
   // 🔥 LIMPEZA PADRÃO ASTRO
 // 🔥 LIMPEZA PADRÃO ASTRO
 let dados = json
+
+// 🔥 EXTRAIR PARENTES
+if(endpoint === "parentes"){
+  dados = extrairParentes(json)
+}
 
 delete dados.criador
 delete dados.status
@@ -230,6 +240,102 @@ if(data !== null && typeof data === "object"){
   return novo
 }
 return data
+}
+
+function extrairParentes(api){
+
+  if(!api || !api.resultado){
+    return { parentes: [] }
+  }
+
+  let resultado = api.resultado
+
+  // Se vier string, transforma igual seu padrão
+  if(typeof resultado === "string"){
+    resultado = resultado
+      .replace(/©.*HydraCore/gi,"")
+      .replace(/══════════════════════════/g,"")
+      .replace(/\r/g,"")
+      .trim()
+  }
+
+  // Se já estiver formatado em seções
+  if(Array.isArray(resultado)){
+    return parseParentesFromSections(resultado)
+  }
+
+  // Se ainda for string, quebra manual
+  const linhas = resultado.split("\n")
+
+  const parentes = []
+  let atual = null
+
+  for(let linha of linhas){
+
+    linha = linha.trim()
+
+    if(linha.startsWith("NOME:")){
+      if(atual) parentes.push(atual)
+
+      atual = {
+        nome: linha.replace("NOME:","").trim(),
+        cpf: null,
+        parentesco: null
+      }
+    }
+
+    if(linha.startsWith("CPF:") && atual){
+      atual.cpf = linha.replace("CPF:","").trim()
+    }
+
+    if(linha.includes("GRAU DE PARENTESCO") && atual){
+      atual.parentesco = linha.split(":")[1]?.trim()
+    }
+
+    // Para quando entrar em outra seção tipo EMPRESAS
+    if(linha.includes("EMPRESAS") || linha.includes("IRPF")){
+      break
+    }
+  }
+
+  if(atual) parentes.push(atual)
+
+  return {
+    total: parentes.length,
+    parentes
+  }
+}
+
+function parseParentesFromSections(sections){
+
+  const parentes = []
+
+  for(const sec of sections){
+
+    if(sec.titulo.startsWith("NOME:")){
+
+      const nome = sec.titulo.replace("NOME:","").trim()
+
+      const cpfMatch = sec.conteudo.match(/CPF:\s*(\d+)/)
+      const grauMatch = sec.conteudo.match(/GRAU DE PARENTESCO:\s*(.+)/)
+
+      parentes.push({
+        nome,
+        cpf: cpfMatch ? cpfMatch[1] : null,
+        parentesco: grauMatch ? grauMatch[1].trim() : null
+      })
+    }
+
+    // parar quando chegar em empresas
+    if(sec.conteudo.includes("EMPRESAS")){
+      break
+    }
+  }
+
+  return {
+    total: parentes.length,
+    parentes
+  }
 }
 
 /* ================= ERRO ================= */
