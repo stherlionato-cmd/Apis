@@ -60,6 +60,10 @@ const ENDPOINTS = {
     url: "https://obitostore.shop/api/consulta/placa2",
     param: "placa"
 },
+parentes: {
+  tipo: "interno",
+  query: "cpf"
+},
   cpf: {
     query: "cpf",
     url: "https://obitostore.shop/api/consulta/cpf",
@@ -79,49 +83,6 @@ const ENDPOINTS = {
     query: "cep",
     url: "https://obitostore.shop/api/consulta/cep",
     param: "cep"
-  }
-}
-
-// 🔥 ENDPOINT INTERNO (PARENTES)
-if(config.tipo === "interno" && endpoint === "parentes"){
-
-  const cpf = url.searchParams.get("cpf")
-  if(!cpf){
-    return jsonErro("REQ_001","CPF obrigatório")
-  }
-
-  try{
-
-    const apiURL = "https://astro.stherlionato.workers.dev/cpf?token=astropro&cpf=" + encodeURIComponent(cpf)
-
-    const res = await fetch(apiURL)
-    const json = await res.json()
-
-    if(!json || !json.status){
-      return jsonErro("API_001","Erro ao buscar CPF base")
-    }
-
-    const dados = extrairParentes(json.dados)
-
-    return new Response(JSON.stringify({
-      status:true,
-      meta:{
-        api:"Astro Ultra",
-        plano: tokenData.plano,
-        creditos_restantes: tokenData.plano === "VIP" ? "ilimitado" : tokenData.credits,
-        endpoint:"parentes",
-        timestamp:new Date().toISOString()
-      },
-      consulta:{cpf},
-      parentes:dados
-    },null,2),{
-      headers:{
-        "Content-Type":"application/json;charset=UTF-8"
-      }
-    })
-
-  }catch(e){
-    return jsonErro("API_500","Erro interno ao processar parentes")
   }
 }
 
