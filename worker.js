@@ -60,12 +60,6 @@ const ENDPOINTS = {
     url: "https://obitostore.shop/api/consulta/placa2",
     param: "placa"
   },
-nome: {
-  query: "nome",
-  url: BASE_SARA + "nome",
-  param: "nome",
-  tipo: "sara"
-},
   cpf: {
     query: "cpf",
     url: "https://obitostore.shop/api/consulta/cpf",
@@ -81,6 +75,175 @@ nome: {
     url: "https://obitostore.shop/api/consulta/cnpj",
     param: "query"
   },
+  const ENDPOINTS = {
+
+cpf: {
+  query: "cpf",
+  url: BASE_SARA + "cpf",
+  param: "cpf",
+  tipo: "sara"
+},
+
+nome: {
+  query: "nome",
+  url: BASE_SARA + "nome",
+  param: "nome",
+  tipo: "sara"
+},
+
+telefone: {
+  query: "telefone",
+  url: BASE_SARA + "telefone",
+  param: "telefone",
+  tipo: "sara"
+},
+
+telefone_full: {
+  query: "telefone",
+  url: BASE_SARA + "telefone-full",
+  param: "telefone",
+  tipo: "sara"
+},
+
+telefone_cpf: {
+  query: "cpf",
+  url: BASE_SARA + "telefone-cpf",
+  param: "cpf",
+  tipo: "sara"
+},
+
+ddd: {
+  query: "ddd",
+  url: BASE_SARA + "ddd",
+  param: "ddd",
+  tipo: "sara"
+},
+
+operadora: {
+  query: "telefone",
+  url: BASE_SARA + "operadora",
+  param: "telefone",
+  tipo: "sara"
+},
+
+rg: {
+  query: "rg",
+  url: BASE_SARA + "rg",
+  param: "rg",
+  tipo: "sara"
+},
+
+titulo: {
+  query: "titulo",
+  url: BASE_SARA + "titulo",
+  param: "titulo",
+  tipo: "sara"
+},
+
+pis: {
+  query: "pis",
+  url: BASE_SARA + "pis",
+  param: "pis",
+  tipo: "sara"
+},
+
+nis: {
+  query: "nis",
+  url: BASE_SARA + "nis",
+  param: "nis",
+  tipo: "sara"
+},
+
+parentes: {
+  query: "cpf",
+  url: BASE_SARA + "parentes",
+  param: "cpf",
+  tipo: "sara"
+},
+
+vizinhos: {
+  query: "cpf",
+  url: BASE_SARA + "vizinhos",
+  param: "cpf",
+  tipo: "sara"
+},
+
+cep: {
+  query: "cep",
+  url: BASE_SARA + "cep",
+  param: "cep",
+  tipo: "sara"
+},
+
+estado: {
+  query: "uf",
+  url: BASE_SARA + "estado",
+  param: "uf",
+  tipo: "sara"
+},
+
+email: {
+  query: "email",
+  url: BASE_SARA + "email",
+  param: "email",
+  tipo: "sara"
+},
+
+score: {
+  query: "cpf",
+  url: BASE_SARA + "score",
+  param: "cpf",
+  tipo: "sara"
+},
+
+renda: {
+  query: "valor",
+  url: BASE_SARA + "renda",
+  param: "valor",
+  tipo: "sara"
+},
+
+cbo: {
+  query: "cbo",
+  url: BASE_SARA + "cbo",
+  param: "cbo",
+  tipo: "sara"
+},
+
+bin: {
+  query: "bin",
+  url: BASE_SARA + "bin",
+  param: "bin",
+  tipo: "sara"
+},
+
+foto_sp: {
+  query: "cpf",
+  url: BASE_SARA + "foto-sp",
+  param: "cpf",
+  tipo: "sara"
+},
+
+foto_ro: {
+  query: "cpf",
+  url: BASE_SARA + "foto-ro",
+  param: "cpf",
+  tipo: "sara"
+},
+
+foto_ma: {
+  query: "cpf",
+  url: BASE_SARA + "foto-ma",
+  param: "cpf",
+  tipo: "sara"
+},
+
+foto_all: {
+  query: "cpf",
+  url: BASE_SARA + "foto-all",
+  param: "cpf",
+  tipo: "sara"
+},
   cep: {
     query: "cep",
     url: "https://obitostore.shop/api/consulta/cep",
