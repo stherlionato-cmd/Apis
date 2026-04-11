@@ -87,7 +87,7 @@ nome: {
 telefone_full: {
   query: "telefone",
   url: BASE_SARA + "telefone-full",
-  param: "telefone",
+  param: "phone",
   tipo: "sara"
 },
 
