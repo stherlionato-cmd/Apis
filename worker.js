@@ -61,11 +61,12 @@ const ENDPOINTS = {
     url: "https://obitostore.shop/api/consulta/placa2",
     param: "placa"
   },
-  cpf: {
-    query: "cpf",
-    url: "https://obitostore.shop/api/consulta/cpf",
-    param: "cpf"
-  },
+cpf: {
+  query: "cpf",
+  url: BASE_SARA + "cpf",
+  param: "cpf",
+  tipo: "sara"
+},
   telefone: {
     query: "telefone",
     url: "https://obitostore.shop/api/consulta/telefone",
