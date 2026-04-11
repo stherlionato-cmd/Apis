@@ -74,7 +74,7 @@ const ENDPOINTS = {
   cnpj: {
     query: "query",
     url: "https://obitostore.shop/api/consulta/cnpj",
-    param: "cnpj"
+    param: "query"
   },
 
 nome: {
