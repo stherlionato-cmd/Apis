@@ -746,7 +746,8 @@ pre{
 #bg{
  position:fixed;
  inset:0;
- z-index:-1;
+ z-index:0;
+ pointer-events:none;
 }
 
 /* BADGE */
@@ -928,6 +929,13 @@ button:hover::after{
 
 <body>
 
+body > *:not(#bg){
+ position:relative;
+ z-index:1;
+}
+
+<canvas id="bg"></canvas>
+
 <!-- MODAL MANUTENÇÃO -->
 <div class="modal" id="maintenanceModal">
   <div class="modal-box">
@@ -1077,8 +1085,9 @@ function fecharMaintenanceModal(){
 function renderBadge(plano){
   const el = document.getElementById("badgeContainer");
   const classe = plano.toLowerCase();
-  const texto = plano.toUpperCase() + " • MANUTENÇÃO";
-  el.innerHTML = '<div class="badge ' + classe + '" style="background:rgba(250,204,21,.2); color:#facc15;">' + texto + '</div>';
+  const texto = plano.toUpperCase();
+
+  el.innerHTML = '<div class="badge ' + classe + '">' + texto + '</div>';
 }
 
 /* ===== PREMIUM EFFECT ===== */
