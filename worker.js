@@ -760,12 +760,20 @@ pre{
  font-weight:600;
 }
 
-/* Todas em amarelo */
-.badge.free,
-.badge.pro,
-.badge.vip{
- background: rgba(250,204,21,.2);
- color: #facc15;
+.plan.vip{
+ position:relative;
+ overflow:hidden;
+}
+
+.plan.vip::after{
+ content:"";
+ position:absolute;
+ inset:-50%;
+ background:radial-gradient(circle,#facc15 1px,transparent 1px);
+ background-size:18px 18px;
+ opacity:.15;
+ animation:stars 6s linear infinite;
+ pointer-events:none;
 }
 
 /* Partículas VIP */
@@ -853,17 +861,6 @@ button:hover::after{
 .plan.featured{
  border:1px solid rgba(59,130,246,.6);
  box-shadow:0 10px 25px rgba(59,130,246,.12);
-}
-
-.plan.vip::after{
- content:"";
- position:absolute;
- inset:-50%;
- background:radial-gradient(circle,#facc15 1px,transparent 1px);
- background-size:18px 18px;
- opacity:.15;
- animation:stars 6s linear infinite;
- pointer-events:none;
 }
 
 /* BADGE */
