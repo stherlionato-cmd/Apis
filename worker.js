@@ -25,6 +25,15 @@ if(endpoint === "admin"){
   return adminPanel(request)
 }
 
+if(endpoint === "style.css"){
+  return new Response(getCSS(), {
+    headers: {
+      "Content-Type": "text/css",
+      "Cache-Control": "public, max-age=86400"
+    }
+  })
+}
+
 if(endpoint === ""){
   return home(request)
 }
@@ -46,11 +55,11 @@ const BASE_SARA = "https://sara-api.xyz/api/consulta/"
 /* ================= TOKENS (SEM KV) ================= */
 
 const TOKENS = {
- ifnvipilimitado:{plano:"VIP",credits:-1,endpoints:null},
-  bocadass:{plano:"VIP",credits:-1,endpoints:null},
+ ifnvipilimitado:{plano:"VITALICIO",credits:-1,endpoints:null},
+  bocadass:{plano:"VITALICIO",credits:-1,endpoints:null},
   astrofree:{plano:"FREE",credits:100,endpoints:["cpf","nome"]},
-  fxckbuscas:{plano:"PRO",credits:500000,endpoints:null},
-  astropro:{plano:"PRO",credits:1000,endpoints:null}
+  fxckbuscas:{plano:"VITALICIO",credits:500000,endpoints:null},
+  astropro:{plano:"VITALICIO",credits:1000,endpoints:null}
 }
 
 /* ================= ENDPOINTS ================= */
@@ -250,7 +259,7 @@ if(tokenData.endpoints && !tokenData.endpoints.includes(endpoint)){
 }
 
 // 💰 CRÉDITOS
-if(tokenData.plano !== "VIP"){
+if(tokenData.plano !== "VITALICIO"){
   if(tokenData.credits <= 0){
     return jsonErro("LIMIT_001","Créditos esgotados")
   }
@@ -336,7 +345,7 @@ dados = formatarResultado(dados);
     meta:{
       api:"Astro Ultra",
       plano: tokenData.plano,
-      creditos_restantes: tokenData.plano === "VIP" ? "ilimitado" : tokenData.credits,
+      creditos_restantes: tokenData.plano === "VITALICIO" ? "ilimitado" : tokenData.credits,
       endpoint,
       timestamp:new Date().toISOString()
     },
@@ -417,31 +426,8 @@ return new Response(JSON.stringify({
 })
 }
 
-/*
-|--------------------------------------------------------------------------
-| HOME UI
-|--------------------------------------------------------------------------
-*/
-
-function home(request){
-
-const base = new URL(request.url).origin
-
-return new Response(`
-
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-
-<title>Astro Search API</title>
-
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
-
-<style>
-
+function getCSS(){
+return `
 :root{--blue:#3b82f6;}
 
 *{
@@ -699,35 +685,9 @@ pre{
  color:#3b82f6;
 }
 
-/* VIP */
-.badge.vip{
+.badge.vitalicio{
  background:rgba(168,85,247,.15);
  color:#a855f7;
- position:relative;
- overflow:hidden;
-}
-
-/* PARTÍCULAS VIP */
-/* FREE partículas leves */
-.badge.free::after{
- content:"";
- position:absolute;
- inset:0;
- background:radial-gradient(circle,#22c55e 1px,transparent 1px);
- background-size:16px 16px;
- opacity:.15;
- animation:stars 10s linear infinite;
-}
-
-/* VIP mais forte */
-.badge.vip::after{
- content:"";
- position:absolute;
- inset:-50%;
- background:radial-gradient(circle,#fff 1px,transparent 1px);
- background-size:18px 18px;
- opacity:.25;
- animation:stars 4s linear infinite;
 }
 
 @keyframes stars{
@@ -908,38 +868,50 @@ button:hover::after{
  color:#3b82f6;
 }
 
-/* VIP SUTIL */
-.plan.vip{
- border:1px solid rgba(168,85,247,.6);
- box-shadow:
-   0 10px 30px rgba(168,85,247,.15),
-   inset 0 0 0 1px rgba(255,255,255,.05);
- position:relative;
-}
-
-/* glow roxo animado */
-.plan.vip::before{
- content:"";
- position:absolute;
- inset:0;
- border-radius:inherit;
- background:linear-gradient(120deg,transparent,rgba(168,85,247,.2),transparent);
- opacity:.4;
- pointer-events:none;
-}
-
-/* título roxo */
-.plan.vip .plan-top span:first-child{
- color:#a855f7;
-}
-
 /* SELEÇÃO */
 .plan.selected{
  border-color:#3b82f6;
  background:linear-gradient(145deg,rgba(59,130,246,.15),rgba(255,255,255,.02));
 }
 
-</style>
+.plan[data-plan="VITALICIO"]{
+ border:1px solid rgba(168,85,247,.5);
+}
+
+.plan[data-plan="VITALICIO"]:hover{
+ box-shadow:0 10px 30px rgba(168,85,247,.2);
+}
+
+.plan[data-plan="VITALICIO"] .plan-top span:first-child{
+ color:#a855f7;
+}
+`
+}
+
+/*
+|--------------------------------------------------------------------------
+| HOME UI
+|--------------------------------------------------------------------------
+*/
+
+function home(request){
+
+const base = new URL(request.url).origin
+
+return new Response(`
+
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+
+<title>Astro Search API</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="/style.css">
 
 </head>
 
@@ -1025,7 +997,6 @@ ${Object.keys(ENDPOINTS).map(e=>`<option>${e}</option>`).join("")}
 
 <div class="plans">
 
-  <!-- DIÁRIO -->
   <div class="plan" data-plan="DIARIO">
     <div class="plan-top">
       <span>DIÁRIO</span>
@@ -1036,10 +1007,9 @@ ${Object.keys(ENDPOINTS).map(e=>`<option>${e}</option>`).join("")}
     </div>
   </div>
 
-  <!-- MENSAL (PRO) -->
   <div class="plan featured" data-plan="PRO">
     <div class="plan-top">
-      <span>MENSAL</span>
+      <span>PRO</span>
       <span class="price">R$30/mês</span>
     </div>
     <div class="plan-info">
@@ -1047,27 +1017,15 @@ ${Object.keys(ENDPOINTS).map(e=>`<option>${e}</option>`).join("")}
     </div>
   </div>
 
-  <!-- VITALÍCIO -->
-  <div class="plan" data-plan="VITALICIO">
-    <div class="plan-top">
-      <span>VITALÍCIO</span>
-      <span class="price">R$50</span>
-    </div>
-    <div class="plan-info">
-      Acesso permanente
-    </div>
+<div class="plan" data-plan="VITALICIO">
+  <div class="plan-top">
+    <span>VITALÍCIO</span>
+    <span class="price">R$50 único</span>
   </div>
-
-  <!-- VIP -->
-  <div class="plan vip" data-plan="VIP">
-    <div class="plan-top">
-      <span>VIP</span>
-      <span class="price">Roxa</span>
-    </div>
-    <div class="plan-info">
-      Ilimitado
-    </div>
+  <div class="plan-info">
+    Ilimitado
   </div>
+</div>
 
 </div>
 
@@ -1076,11 +1034,10 @@ ${Object.keys(ENDPOINTS).map(e=>`<option>${e}</option>`).join("")}
 <script>
 /* ===== TOKENS ===== */
 const TOKENS = {
-  dragon: "VIP",
-  italoedu7: "VIP",
-  IFNastro: "VIP",
-  astrofree: "FREE",
-  astropro: "PRO"
+  omaigd: "VITALICIO",
+  italoedu7: "VITALICIO",
+  IFNastro: "VITALICIO",
+  astropro: "VITALICIO"
 };
 
 /* ===== MODAIS ===== */
@@ -1110,9 +1067,9 @@ function efeitoPremium(token){
   const plano = TOKENS[token];
   const body = document.body;
 
-  if(plano === "VIP"){
-    body.style.boxShadow = "inset 0 0 120px rgba(168,85,247,.3)";
-  } else if(plano === "FREE"){
+if(plano === "VITALICIO"){
+  body.style.boxShadow = "inset 0 0 120px rgba(168,85,247,.3)";
+} else if(plano === "FREE"){
     body.style.boxShadow = "inset 0 0 80px rgba(34,197,94,.2)";
   }
 }
