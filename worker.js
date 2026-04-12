@@ -478,14 +478,22 @@ body{
  padding:16px;
  border-radius:18px;
  background:rgba(255,255,255,0.03);
- border:1px solid rgba(255,255,255,0.05);
- backdrop-filter:blur(10px);
+ border:1px solid rgba(255,255,255,0.06);
+ backdrop-filter:blur(14px);
+
+ box-shadow:
+   inset 0 1px 0 rgba(255,255,255,.05),
+   0 10px 40px rgba(0,0,0,.6);
+
  transition:.3s;
 }
 
 .card:hover{
- transform:translateY(-3px);
- border-color:rgba(59,130,246,.4);
+ transform:translateY(-4px) scale(1.01);
+ border-color:rgba(59,130,246,.5);
+ box-shadow:
+   inset 0 1px 0 rgba(255,255,255,.08),
+   0 20px 60px rgba(59,130,246,.15);
 }
 
 /* INPUT */
@@ -771,6 +779,141 @@ pre{
  animation:stars 4s linear infinite;
 }
 
+button{
+ position:relative;
+ overflow:hidden;
+}
+
+button::after{
+ content:"";
+ position:absolute;
+ inset:0;
+ background:linear-gradient(120deg,transparent,rgba(255,255,255,.4),transparent);
+ transform:translateX(-100%);
+}
+
+button:hover::after{
+ transform:translateX(100%);
+ transition:.6s;
+}
+
+@keyframes ripple{
+ to{
+  transform:scale(2);
+  opacity:0;
+ }
+}
+
+.plans{
+ display:flex;
+ flex-direction:column;
+ gap:10px;
+ margin-top:10px;
+}
+
+/* CARD BASE */
+.plan{
+ position:relative;
+ padding:12px 14px;
+ border-radius:14px;
+ border:1px solid rgba(255,255,255,.06);
+ background:linear-gradient(145deg,rgba(255,255,255,.04),rgba(255,255,255,.01));
+ cursor:pointer;
+ transition:.25s;
+}
+
+/* HOVER LIMPO */
+.plan:hover{
+ transform:translateY(-2px);
+ border-color:rgba(59,130,246,.4);
+}
+
+/* HEADER */
+.plan-top{
+ display:flex;
+ justify-content:space-between;
+ font-size:13px;
+ font-weight:600;
+}
+
+/* INFO */
+.plan-info{
+ font-size:12px;
+ opacity:.6;
+ margin-top:4px;
+}
+
+/* PREÇO */
+.price{
+ opacity:.8;
+ font-weight:500;
+}
+
+/* PRO DESTAQUE */
+.plan.featured{
+ border:1px solid rgba(59,130,246,.6);
+ box-shadow:0 10px 25px rgba(59,130,246,.12);
+}
+
+/* BADGE */
+.badge-plan{
+ position:absolute;
+ top:10px;
+ right:10px;
+
+ background:linear-gradient(135deg,#3b82f6,#2563eb);
+ color:#fff;
+
+ font-size:10px;
+ font-weight:600;
+ padding:4px 10px;
+ border-radius:999px;
+
+ box-shadow:
+   0 4px 12px rgba(59,130,246,.3),
+   inset 0 1px 0 rgba(255,255,255,.2);
+
+ letter-spacing:.3px;
+}
+
+.plan.featured{
+ border:1px solid rgba(59,130,246,.6);
+ box-shadow:
+   0 10px 30px rgba(59,130,246,.15),
+   inset 0 0 0 1px rgba(255,255,255,.05);
+ position:relative;
+}
+
+/* glow suave animado */
+.plan.featured::before{
+ content:"";
+ position:absolute;
+ inset:0;
+ border-radius:inherit;
+ background:linear-gradient(120deg,transparent,rgba(59,130,246,.2),transparent);
+ opacity:.4;
+ pointer-events:none;
+}
+
+.plan.featured .plan-top span:first-child{
+ color:#3b82f6;
+}
+
+/* VIP SUTIL */
+.plan.vip{
+ border-color:rgba(168,85,247,.3);
+}
+
+.plan.vip:hover{
+ box-shadow:0 10px 30px rgba(168,85,247,.15);
+}
+
+/* SELEÇÃO */
+.plan.selected{
+ border-color:#3b82f6;
+ background:linear-gradient(145deg,rgba(59,130,246,.15),rgba(255,255,255,.02));
+}
+
 </style>
 
 </head>
@@ -849,35 +992,52 @@ ${Object.keys(ENDPOINTS).map(e=>`<option>${e}</option>`).join("")}
 
 <button onclick="salvarTokenModal()">Entrar</button>
 
-    <div style="margin-top:15px;font-size:12px;opacity:.6;">
-      Planos disponíveis:
-    </div>
+<div style="margin-top:15px;font-size:12px;opacity:.6;">
+  Planos disponíveis:
+</div>
 
-    <div class="plan">
-      <b>FREE</b><br>
-      100 consultas<br>
-      <span style="opacity:.6;">Grátis</span>
-    </div>
+<div class="plans">
 
-    <div class="plan">
-      <b>PRO</b><br>
-      1000 consultas<br>
-      <span style="opacity:.6;">R$30 mensal</span>
+  <div class="plan" data-plan="FREE">
+    <div class="plan-top">
+      <span>FREE</span>
+      <span class="price">Grátis</span>
     </div>
-
-    <div class="plan">
-      <b>VIP</b><br>
-      Ilimitado<br>
-      <span style="opacity:.6;">R$50 vitalício</span>
+    <div class="plan-info">
+      100 consultas
     </div>
-
-    <div class="plan">
-      <b>DIÁRIO</b><br>
-      Acesso 24h<br>
-      <span style="opacity:.6;">R$5</span>
-    </div>
-
   </div>
+
+  <div class="plan featured" data-plan="PRO">
+    <div class="plan-top">
+      <span>PRO</span>
+      <span class="price">R$30/mês</span>
+    </div>
+    <div class="plan-info">
+      1000 consultas
+    </div>
+  </div>
+
+  <div class="plan vip" data-plan="VIP">
+    <div class="plan-top">
+      <span>VIP</span>
+      <span class="price">R$50 vitalício</span>
+    </div>
+    <div class="plan-info">
+      Ilimitado
+    </div>
+  </div>
+
+  <div class="plan" data-plan="DIARIO">
+    <div class="plan-top">
+      <span>DIÁRIO</span>
+      <span class="price">R$5</span>
+    </div>
+    <div class="plan-info">
+      Acesso 24h
+    </div>
+  </div>
+
 </div>
 
 <canvas id="bg"></canvas>
@@ -1029,7 +1189,14 @@ const param = PARAMS[endpoint];
   try{
     const r = await fetch(url);
     const j = await r.json();
-    resBox.innerHTML = "<pre id='resposta'>"+JSON.stringify(j,null,2)+"</pre>";
+resBox.innerHTML = "<pre id='resposta' style='opacity:0;transform:translateY(10px)'>"+JSON.stringify(j,null,2)+"</pre>";
+
+setTimeout(()=>{
+  const el = document.getElementById("resposta");
+  el.style.transition=".4s";
+  el.style.opacity="1";
+  el.style.transform="translateY(0)";
+},50);
     mostrarToast("Consulta feita com sucesso 🚀");
   } catch {
     resBox.innerHTML = "<pre>Erro ao consultar</pre>";
@@ -1039,6 +1206,39 @@ const param = PARAMS[endpoint];
   btn.disabled = false;
   btn.innerText = "Consultar";
 }
+
+document.querySelectorAll("button").forEach(btn=>{
+  btn.addEventListener("click", e=>{
+    const ripple = document.createElement("span");
+    ripple.style.position="absolute";
+    ripple.style.borderRadius="50%";
+    ripple.style.background="rgba(255,255,255,.4)";
+    ripple.style.transform="scale(0)";
+    ripple.style.animation="ripple .6s linear";
+
+    const rect = btn.getBoundingClientRect();
+    ripple.style.width = ripple.style.height = rect.width + "px";
+    ripple.style.left = e.clientX - rect.left - rect.width/2 + "px";
+    ripple.style.top = e.clientY - rect.top - rect.width/2 + "px";
+
+    btn.appendChild(ripple);
+
+    setTimeout(()=>ripple.remove(),600);
+  });
+});
+
+document.querySelectorAll(".plan").forEach(plan=>{
+  plan.addEventListener("click", ()=>{
+
+    document.querySelectorAll(".plan").forEach(p=>p.classList.remove("selected"));
+    plan.classList.add("selected");
+
+    // micro feedback
+    plan.style.transform = "scale(.97)";
+    setTimeout(()=>plan.style.transform="",100);
+
+  });
+});
 
 /* ===== PARTICULAS DE FUNDO ===== */
 const canvas = document.getElementById("bg");
