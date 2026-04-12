@@ -855,6 +855,17 @@ button:hover::after{
  box-shadow:0 10px 25px rgba(59,130,246,.12);
 }
 
+.plan.vip::after{
+ content:"";
+ position:absolute;
+ inset:-50%;
+ background:radial-gradient(circle,#facc15 1px,transparent 1px);
+ background-size:18px 18px;
+ opacity:.15;
+ animation:stars 6s linear infinite;
+ pointer-events:none;
+}
+
 /* BADGE */
 .badge-plan{
  position:absolute;
