@@ -910,11 +910,27 @@ button:hover::after{
 
 /* VIP SUTIL */
 .plan.vip{
- border-color:rgba(168,85,247,.3);
+ border:1px solid rgba(168,85,247,.6);
+ box-shadow:
+   0 10px 30px rgba(168,85,247,.15),
+   inset 0 0 0 1px rgba(255,255,255,.05);
+ position:relative;
 }
 
-.plan.vip:hover{
- box-shadow:0 10px 30px rgba(168,85,247,.15);
+/* glow roxo animado */
+.plan.vip::before{
+ content:"";
+ position:absolute;
+ inset:0;
+ border-radius:inherit;
+ background:linear-gradient(120deg,transparent,rgba(168,85,247,.2),transparent);
+ opacity:.4;
+ pointer-events:none;
+}
+
+/* título roxo */
+.plan.vip .plan-top span:first-child{
+ color:#a855f7;
 }
 
 /* SELEÇÃO */
@@ -1009,36 +1025,7 @@ ${Object.keys(ENDPOINTS).map(e=>`<option>${e}</option>`).join("")}
 
 <div class="plans">
 
-  <div class="plan" data-plan="FREE">
-    <div class="plan-top">
-      <span>FREE</span>
-      <span class="price">Grátis</span>
-    </div>
-    <div class="plan-info">
-      100 consultas
-    </div>
-  </div>
-
-  <div class="plan featured" data-plan="PRO">
-    <div class="plan-top">
-      <span>PRO</span>
-      <span class="price">R$30/mês</span>
-    </div>
-    <div class="plan-info">
-      1000 consultas
-    </div>
-  </div>
-
-  <div class="plan vip" data-plan="VIP">
-    <div class="plan-top">
-      <span>VIP</span>
-      <span class="price">R$50 vitalício</span>
-    </div>
-    <div class="plan-info">
-      Ilimitado
-    </div>
-  </div>
-
+  <!-- DIÁRIO -->
   <div class="plan" data-plan="DIARIO">
     <div class="plan-top">
       <span>DIÁRIO</span>
@@ -1046,6 +1033,39 @@ ${Object.keys(ENDPOINTS).map(e=>`<option>${e}</option>`).join("")}
     </div>
     <div class="plan-info">
       Acesso 24h
+    </div>
+  </div>
+
+  <!-- MENSAL (PRO) -->
+  <div class="plan featured" data-plan="PRO">
+    <div class="plan-top">
+      <span>MENSAL</span>
+      <span class="price">R$30/mês</span>
+    </div>
+    <div class="plan-info">
+      1000 consultas
+    </div>
+  </div>
+
+  <!-- VITALÍCIO -->
+  <div class="plan" data-plan="VITALICIO">
+    <div class="plan-top">
+      <span>VITALÍCIO</span>
+      <span class="price">R$50</span>
+    </div>
+    <div class="plan-info">
+      Acesso permanente
+    </div>
+  </div>
+
+  <!-- VIP -->
+  <div class="plan vip" data-plan="VIP">
+    <div class="plan-top">
+      <span>VIP</span>
+      <span class="price">Roxa</span>
+    </div>
+    <div class="plan-info">
+      Ilimitado
     </div>
   </div>
 
