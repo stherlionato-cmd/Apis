@@ -929,11 +929,6 @@ button:hover::after{
 
 <body>
 
-body > *:not(#bg){
- position:relative;
- z-index:1;
-}
-
 <canvas id="bg"></canvas>
 
 <!-- MODAL MANUTENÇÃO -->
