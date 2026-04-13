@@ -66,7 +66,7 @@ const TOKENS = {
   // 🧪 PLANO DE TESTE (3 BUSCAS)
     santanateste:{ 
     plano:"TESTE",
-    credits:3,
+    credits:5,
     endpoints:null
   }
 }
