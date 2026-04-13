@@ -55,13 +55,20 @@ const BASE_SARA = "https://sara-api.xyz/api/consulta/"
 /* ================= TOKENS (SEM KV) ================= */
 
 const TOKENS = {
- ifnvipilimitado:{plano:"VITALICIO",credits:-1,endpoints:null},
+  ifnvipilimitado:{plano:"VITALICIO",credits:-1,endpoints:null},
   bocadass:{plano:"VITALICIO",credits:-1,endpoints:null},
   astrofree:{plano:"FREE",credits:100,endpoints:["cpf","nome"]},
   fxckbuscas:{plano:"VITALICIO",credits:500000,endpoints:null},
   douglasvip:{plano:"VITALICIO",credits:1000,endpoints:null},
   Zontra88:{plano:"VITALICIO",credits:1000,endpoints:null},
-  astropro:{plano:"VITALICIO",credits:1000,endpoints:null}
+  astropro:{plano:"VITALICIO",credits:1000,endpoints:null},
+
+  // 🧪 PLANO DE TESTE (3 BUSCAS)
+    santanateste:{ 
+    plano:"TESTE",
+    credits:3,
+    endpoints:null
+  }
 }
 
 /* ================= ENDPOINTS ================= */
@@ -1042,7 +1049,8 @@ const TOKENS = {
   Zontra88: "VITALICIO",
   fxckbuscas: "VITALICIO",
   douglasvip: "VITALICIO",
-  astropro: "VITALICIO"
+  astropro: "VITALICIO",
+  santanateste: "TESTE"
 };
 
 /* ===== MODAIS ===== */
