@@ -62,7 +62,7 @@ const TOKENS = {
   douglasvip:{plano:"VITALICIO",credits:1000,endpoints:null},
   Zontra88:{plano:"VITALICIO",credits:1000,endpoints:null},
   astropro:{plano:"VITALICIO",credits:1000,endpoints:null},
-
+  santanavip:{plano:"VITALICIO",credits:1000,endpoints:null},
   // 🧪 PLANO DE TESTE (3 BUSCAS)
     santanateste:{ 
     plano:"TESTE",
@@ -1050,6 +1050,7 @@ const TOKENS = {
   fxckbuscas: "VITALICIO",
   douglasvip: "VITALICIO",
   astropro: "VITALICIO",
+  santanavip: "VITALICIO",
   santanateste: "TESTE"
 };
 
