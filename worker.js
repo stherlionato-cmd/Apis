@@ -1038,6 +1038,7 @@ const TOKENS = {
   omaigd: "VITALICIO",
   italoedu7: "VITALICIO",
   IFNastro: "VITALICIO",
+  douglasvip: "VITALICIO",
   astropro: "VITALICIO"
 };
 
