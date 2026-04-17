@@ -284,7 +284,7 @@ if(!valor){
 
 try{
 
-const apikey = config.tipo === "sara" ? "artigo#171_b" : "bigmouthh";
+const apikey = config.tipo === "sara" ? "artigo%23171_b" : "bigmouthh";
 
 const apiURL = config.url + "?" +
   config.param + "=" + encodeURIComponent(valor) +
