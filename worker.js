@@ -1126,6 +1126,68 @@ function mostrarToast(msg){
   setTimeout(()=>t.classList.remove("show"),3000);
 }
 
+function renderResultadoUI(data){
+  if(!data || !data.dados){
+    return "<pre>Sem dados</pre>";
+  }
+
+  const resultado = data.dados.resultado;
+
+  if(!resultado) return "<pre>Sem resultado</pre>";
+
+  let html = "";
+
+  // 🔥 CASO SEJA ARRAY DE SEÇÕES
+  if(Array.isArray(resultado)){
+    resultado.forEach(sec=>{
+      html += `
+        <div class="card">
+          <div class="label" style="font-weight:600;margin-bottom:8px;">
+            ${sec.titulo}
+          </div>
+          ${sec.conteudo.split("\n").map(linha=>{
+            if(!linha.includes(":")) return "";
+            const [k,v] = linha.split(":");
+            return `
+              <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
+                <span style="opacity:.6">${k}</span>
+                <span onclick="copiarTexto('${v.trim()}')" style="cursor:pointer">
+                  ${v.trim()} 📋
+                </span>
+              </div>
+            `;
+          }).join("")}
+        </div>
+      `;
+    });
+  }
+
+  // 🔥 CASO SEJA OBJETO
+  else if(typeof resultado === "object"){
+    html += `<div class="card">`;
+
+    Object.entries(resultado).forEach(([k,v])=>{
+      html += `
+        <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
+          <span style="opacity:.6">${k}</span>
+          <span onclick="copiarTexto('${v}')" style="cursor:pointer">
+            ${v} 📋
+          </span>
+        </div>
+      `;
+    });
+
+    html += `</div>`;
+  }
+
+  return html;
+}
+
+function copiarTexto(txt){
+  navigator.clipboard.writeText(txt);
+  mostrarToast("Copiado!");
+}
+
 /* ===== CONSULTAR ===== */
 async function consultar(){
   const btn = document.getElementById("btnConsultar");
@@ -1192,7 +1254,7 @@ const param = PARAMS[endpoint];
   try{
     const r = await fetch(url);
     const j = await r.json();
-resBox.innerHTML = "<pre id='resposta' style='opacity:0;transform:translateY(10px)'>"+JSON.stringify(j,null,2)+"</pre>";
+resBox.innerHTML = renderResultadoUI(j);
 
 setTimeout(()=>{
   const el = document.getElementById("resposta");
