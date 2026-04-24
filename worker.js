@@ -17,6 +17,10 @@ if(ALIAS[endpoint]){
   endpoint = ALIAS[endpoint]
 }
 
+if(endpoint === "view"){
+  return viewPage(url)
+}
+
 if(endpoint === "admin"){
   const token = url.searchParams.get("token")
   if(token !== ADMIN_TOKEN){
@@ -1061,6 +1065,268 @@ const TOKENS = {
   brendavip: "VITALICIO",
   LA_MUERTE: "VITALICIO"
 };
+
+function viewPage(url){
+
+  const data = url.searchParams.get("data");
+
+  if(!data){
+    return new Response("Sem dados",{status:400});
+  }
+
+  const decoded = JSON.parse(atob(data));
+
+  const { titulo, dados } = decoded;
+
+  function renderSecoes(){
+    let html = "";
+
+    for(const secao in dados){
+
+      html += `
+      <div class="card">
+        <div class="secao-title">${secao.toUpperCase()}</div>
+      `;
+
+      for(const campo in dados[secao]){
+        html += `
+        <div class="item">
+          <span class="label">${campo}</span>
+          <span class="value">${dados[secao][campo] || "NÃO ENCONTRADO"}</span>
+        </div>
+        `;
+      }
+
+      html += `</div>`;
+    }
+
+    return html;
+  }
+
+  return new Response(`
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>${titulo}</title>
+
+<style>
+body{
+ margin:0;
+ font-family:'Inter',sans-serif;
+ background: radial-gradient(circle at 20% 20%, #0a0f2a, #02030a);
+ color:#e2e8f0;
+ overflow-x:hidden;
+}
+
+/* PARTICULAS */
+canvas{
+ position:fixed;
+ inset:0;
+ z-index:0;
+}
+
+/* CONTAINER */
+.container{
+ position:relative;
+ z-index:2;
+ max-width:420px;
+ margin:30px auto;
+ padding:20px;
+}
+
+/* HEADER */
+.header{
+ text-align:center;
+ margin-bottom:20px;
+}
+
+.header h1{
+ font-size:20px;
+ font-weight:800;
+}
+
+/* CARD */
+.card{
+ margin-top:12px;
+ padding:14px;
+ border-radius:16px;
+ background:rgba(255,255,255,0.03);
+ border:1px solid rgba(255,255,255,0.08);
+ backdrop-filter:blur(14px);
+ transition:.3s;
+}
+
+.card:hover{
+ transform:translateY(-3px);
+ border-color:rgba(59,130,246,.5);
+}
+
+/* SEÇÃO */
+.secao-title{
+ font-size:12px;
+ font-weight:700;
+ margin-bottom:8px;
+ color:#3b82f6;
+}
+
+/* ITEM */
+.item{
+ display:flex;
+ justify-content:space-between;
+ margin-bottom:6px;
+ font-size:13px;
+}
+
+.label{
+ opacity:.6;
+}
+
+.value{
+ font-weight:600;
+}
+
+/* BOTÕES */
+.actions{
+ margin-top:20px;
+ display:flex;
+ gap:10px;
+}
+
+button{
+ flex:1;
+ padding:10px;
+ border-radius:10px;
+ border:none;
+ background:linear-gradient(90deg,#3b82f6,#2563eb);
+ color:#fff;
+ font-weight:600;
+ cursor:pointer;
+}
+
+/* TOAST */
+#toast{
+ position:fixed;
+ bottom:20px;
+ left:50%;
+ transform:translateX(-50%);
+ background:#111;
+ padding:10px 20px;
+ border-radius:10px;
+ opacity:0;
+ transition:.3s;
+}
+
+#toast.show{
+ opacity:1;
+}
+</style>
+</head>
+
+<body>
+
+<canvas id="bg"></canvas>
+
+<div class="container">
+
+<div class="header">
+  <h1>🔍 ${titulo}</h1>
+</div>
+
+${renderSecoes()}
+
+<div class="actions">
+  <button onclick="copiar()">📋 Copiar</button>
+  <button onclick="compartilhar()">📤 Compartilhar</button>
+</div>
+
+</div>
+
+<div id="toast">Copiado!</div>
+
+<script>
+const dados = ${JSON.stringify(dados)};
+
+/* COPIAR */
+function copiar(){
+  let texto = "";
+
+  for(const s in dados){
+    texto += s.toUpperCase() + "\\n";
+    for(const c in dados[s]){
+      texto += c + ": " + dados[s][c] + "\\n";
+    }
+    texto += "\\n";
+  }
+
+  navigator.clipboard.writeText(texto);
+
+  const t = document.getElementById("toast");
+  t.classList.add("show");
+  setTimeout(()=>t.classList.remove("show"),2000);
+}
+
+/* COMPARTILHAR */
+function compartilhar(){
+  if(navigator.share){
+    navigator.share({
+      title: "Consulta",
+      text: "Olha isso aqui",
+      url: window.location.href
+    });
+  }
+}
+
+/* PARTICULAS */
+const canvas = document.getElementById("bg");
+const ctx = canvas.getContext("2d");
+let particles = [];
+
+function resize(){
+  canvas.width = innerWidth;
+  canvas.height = innerHeight;
+}
+
+function create(){
+  particles = [];
+  for(let i=0;i<60;i++){
+    particles.push({
+      x: Math.random()*canvas.width,
+      y: Math.random()*canvas.height,
+      r: Math.random()*1.5,
+      speed: Math.random()*0.5
+    });
+  }
+}
+
+function draw(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  particles.forEach(p=>{
+    p.y += p.speed;
+    if(p.y > canvas.height){
+      p.y = 0;
+      p.x = Math.random()*canvas.width;
+    }
+    ctx.beginPath();
+    ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+    ctx.fillStyle="rgba(255,255,255,0.6)";
+    ctx.fill();
+  });
+  requestAnimationFrame(draw);
+}
+
+resize();
+create();
+draw();
+window.addEventListener("resize", resize);
+</script>
+
+</body>
+</html>
+`,{
+    headers:{ "Content-Type":"text/html" }
+  })
+}
 
 /* ===== MODAIS ===== */
 function abrirModal(){
