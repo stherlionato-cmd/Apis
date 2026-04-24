@@ -61,6 +61,7 @@ const TOKENS = {
   fxckbuscas:{plano:"VITALICIO",credits:500000,endpoints:null},
   name123:{plano:"VITALICIO",credits:500000,endpoints:null},
 LA_MUERTE:{plano:"VITALICIO",credits:500000,endpoints:null},
+brendavip:{plano:"VITALICIO",credits:500000,endpoints:null},
   douglasvip:{plano:"VITALICIO",credits:1000,endpoints:null},
   Zontra88:{plano:"VITALICIO",credits:1000,endpoints:null},
   astropro:{plano:"VITALICIO",credits:1000,endpoints:null},
@@ -1057,6 +1058,7 @@ const TOKENS = {
   digapony: "VITALICIO",
   name123: "VITALICIO",
   santanateste: "TESTE",
+  brendavip: "VITALICIO",
   LA_MUERTE: "VITALICIO"
 };
 
