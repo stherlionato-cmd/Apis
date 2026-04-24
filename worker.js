@@ -1075,6 +1075,67 @@ function fecharMaintenanceModal(){
   document.getElementById("maintenanceModal").classList.remove("show");
 }
 
+function viewPage(url){
+
+  const data = url.searchParams.get("data");
+
+  if(!data){
+    return new Response("Sem dados",{status:400});
+  }
+
+  const decoded = JSON.parse(atob(data));
+
+  const { nome, cpf, telefone, cidade, uf } = decoded;
+
+  return new Response(`
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Consulta</title>
+
+<style>
+body {
+  margin:0;
+  background:#050505;
+  color:#fff;
+  font-family:-apple-system;
+}
+
+.card {
+  width:350px;
+  margin:10% auto;
+  padding:25px;
+  border-radius:18px;
+  background:rgba(255,255,255,0.03);
+  backdrop-filter: blur(20px);
+  border:1px solid rgba(255,255,255,0.08);
+}
+
+.line {margin-bottom:10px;}
+.label {color:#888;font-size:11px;}
+</style>
+</head>
+
+<body>
+
+<div class="card">
+<h2>🔍 Consulta</h2>
+
+<div class="line"><span class="label">Nome</span><br>${nome}</div>
+<div class="line"><span class="label">CPF</span><br>${cpf}</div>
+<div class="line"><span class="label">Telefone</span><br>${telefone}</div>
+<div class="line"><span class="label">Local</span><br>${cidade} - ${uf}</div>
+
+</div>
+
+</body>
+</html>
+`,{
+    headers: { "Content-Type":"text/html" }
+  })
+}
+
 /* ===== BADGE ===== */
 function renderBadge(plano){
   const el = document.getElementById("badgeContainer");
