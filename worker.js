@@ -17,10 +17,6 @@ if(ALIAS[endpoint]){
   endpoint = ALIAS[endpoint]
 }
 
-if(endpoint === "view"){
-  return viewPage(url)
-}
-
 if(endpoint === "admin"){
   const token = url.searchParams.get("token")
   if(token !== ADMIN_TOKEN){
@@ -40,6 +36,10 @@ if(endpoint === "style.css"){
 
 if(endpoint === ""){
   return home(request)
+}
+
+if(endpoint === "view"){
+  return viewPage(url)
 }
 
 if(!ENDPOINTS[endpoint]){
