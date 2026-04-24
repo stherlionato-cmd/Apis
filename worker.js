@@ -2,7 +2,7 @@ export default {
 async fetch(request, env, ctx){
 
 const url = new URL(request.url)
-let endpoint = url.pathname.replace("/","")
+let endpoint = url.pathname.split("/").filter(Boolean)[0] || ""
 
 // 🔥 ALIAS
 const ALIAS = {
