@@ -1017,7 +1017,7 @@ ${Object.keys(ENDPOINTS).map(e=>`<option>${e}</option>`).join("")}
   <div class="plan" data-plan="DIARIO">
     <div class="plan-top">
       <span>DIÁRIO</span>
-      <span class="price">R$5</span>
+      <span class="price">R$20</span>
     </div>
     <div class="plan-info">
       Acesso 24h
