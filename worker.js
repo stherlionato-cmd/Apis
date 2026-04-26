@@ -73,7 +73,7 @@ astroteste133:{plano:"TESTE",credits:10,endpoints:["cpf","nome"]},
   digapony:{plano:"VITALICIO",credits:1000,endpoints:null},
   santanavip:{plano:"VITALICIO",credits:1000,endpoints:null},
   // 🧪 PLANO DE TESTE (3 BUSCAS)
-    santanateste:{ 
+    testefree:{ 
     plano:"TESTE",
     credits:5,
     endpoints:null
@@ -1063,7 +1063,7 @@ const TOKENS = {
   santanavip: "VITALICIO",
   digapony: "VITALICIO",
   name123: "VITALICIO",
-  santanateste: "TESTE",
+  testefree: "TESTE",
   brendavip: "VITALICIO",
   LA_MUERTE: "VITALICIO"
 };
