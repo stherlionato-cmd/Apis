@@ -1,4 +1,4 @@
-export default {
+pexport default {
 async fetch(request, env, ctx){
 
 const url = new URL(request.url)
@@ -68,6 +68,7 @@ LA_MUERTE:{plano:"VITALICIO",credits:500000,endpoints:null},
 brendavip:{plano:"VITALICIO",credits:500000,endpoints:null},
   douglasvip:{plano:"VITALICIO",credits:1000,endpoints:null},
   Zontra88:{plano:"VITALICIO",credits:1000,endpoints:null},
+astroteste133:{plano:"FREE",credits:10,endpoints:["cpf","nome"]},
   astropro:{plano:"VITALICIO",credits:1000,endpoints:null},
   digapony:{plano:"VITALICIO",credits:1000,endpoints:null},
   santanavip:{plano:"VITALICIO",credits:1000,endpoints:null},
