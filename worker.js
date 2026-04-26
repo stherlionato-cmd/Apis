@@ -68,12 +68,11 @@ LA_MUERTE:{plano:"VITALICIO",credits:500000,endpoints:null},
 brendavip:{plano:"VITALICIO",credits:500000,endpoints:null},
   douglasvip:{plano:"VITALICIO",credits:1000,endpoints:null},
   Zontra88:{plano:"VITALICIO",credits:1000,endpoints:null},
-astroteste133:{plano:"TESTE",credits:10,endpoints:["cpf","nome"]},
   astropro:{plano:"VITALICIO",credits:1000,endpoints:null},
   digapony:{plano:"VITALICIO",credits:1000,endpoints:null},
   santanavip:{plano:"VITALICIO",credits:1000,endpoints:null},
   // 🧪 PLANO DE TESTE (3 BUSCAS)
-    testefree:{ 
+    testeastro:{ 
     plano:"TESTE",
     credits:5,
     endpoints:null
@@ -1058,12 +1057,11 @@ const TOKENS = {
   Zontra88: "VITALICIO",
   fxckbuscas: "VITALICIO",
   douglasvip: "VITALICIO",
-  astroteste133: "TESTE",
   astropro: "VITALICIO",
   santanavip: "VITALICIO",
   digapony: "VITALICIO",
   name123: "VITALICIO",
-  testefree: "TESTE",
+  testeastro: "TESTE",
   brendavip: "VITALICIO",
   LA_MUERTE: "VITALICIO"
 };
