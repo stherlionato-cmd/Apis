@@ -489,13 +489,21 @@ pre{
 }
 
 .modal-box{
- width:100%;
+ width:92%;
  max-width:380px;
+
  background:#020617;
  border-radius:18px;
  padding:20px;
+
  transform:scale(.9);
  transition:.3s;
+
+ position:relative;
+ overflow:hidden;
+
+ max-height:90vh;
+ overflow-y:auto;
 }
 
 .modal.show .modal-box{
@@ -655,7 +663,8 @@ button:hover::after{
 /* CARD BASE */
 .plan{
  position:relative;
- padding:12px 14px;
+padding:14px;
+ min-height:auto;
  border-radius:14px;
  border:1px solid rgba(255,255,255,.06);
  background:linear-gradient(145deg,rgba(255,255,255,.04),rgba(255,255,255,.01));
@@ -699,22 +708,17 @@ button:hover::after{
 /* BADGE */
 .badge-plan{
  position:absolute;
- top:10px;
- right:10px;
 
- background:linear-gradient(135deg,#3b82f6,#2563eb);
- color:#fff;
+ top:8px;
+ right:8px;
 
- font-size:10px;
- font-weight:600;
- padding:4px 10px;
- border-radius:999px;
+ font-size:9px;
+ padding:4px 8px;
 
- box-shadow:
-   0 4px 12px rgba(59,130,246,.3),
-   inset 0 1px 0 rgba(255,255,255,.2);
+ max-width:110px;
+ text-align:center;
 
- letter-spacing:.3px;
+ z-index:2;
 }
 
 .plan.featured{
@@ -1024,6 +1028,53 @@ button:hover::after{
       #22c55e,
       #16a34a
     );
+}
+
+.plan-top{
+ display:flex;
+ justify-content:space-between;
+ gap:10px;
+ align-items:flex-start;
+}
+
+.plan-top span{
+ word-break:break-word;
+}
+
+@media(max-width:480px){
+
+  .modal-box{
+    width:94%;
+    padding:16px;
+  }
+
+  .plan-top{
+    flex-direction:column;
+    gap:4px;
+  }
+
+  .price{
+    font-size:20px;
+  }
+
+  .badge-plan{
+    position:static;
+    display:inline-block;
+    margin-bottom:8px;
+  }
+
+  .telegram-box{
+    padding:12px;
+  }
+
+  .pix-title{
+    font-size:14px;
+  }
+
+  .pix-key{
+    font-size:11px;
+  }
+
 }
 
 `
@@ -1809,13 +1860,21 @@ pre{
 }
 
 .modal-box{
- width:100%;
+ width:92%;
  max-width:380px;
+
  background:#020617;
  border-radius:18px;
  padding:20px;
+
  transform:scale(.9);
  transition:.3s;
+
+ position:relative;
+ overflow:hidden;
+
+ max-height:90vh;
+ overflow-y:auto;
 }
 
 .modal.show .modal-box{
