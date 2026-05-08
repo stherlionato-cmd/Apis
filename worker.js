@@ -2,7 +2,7 @@ export default {
 async fetch(request, env, ctx){
 
 const url = new URL(request.url)
-let endpoint = url.pathname.split("/").filter(Boolean)[0] || ""
+let endpoint = url.pathname.replace("/","")
 
 // 🔥 ALIAS
 const ALIAS = {
@@ -38,10 +38,6 @@ if(endpoint === ""){
   return home(request)
 }
 
-if(endpoint === "view"){
-  return viewPage(url)
-}
-
 if(!ENDPOINTS[endpoint]){
   return jsonErro("ENDPOINT_404","Endpoint não encontrado")
 }
@@ -63,16 +59,13 @@ const TOKENS = {
   bocadass:{plano:"VITALICIO",credits:-1,endpoints:null},
   astrofree:{plano:"FREE",credits:100,endpoints:["cpf","nome"]},
   fxckbuscas:{plano:"VITALICIO",credits:500000,endpoints:null},
-  name123:{plano:"VITALICIO",credits:500000,endpoints:null},
-LA_MUERTE:{plano:"VITALICIO",credits:500000,endpoints:null},
-brendavip:{plano:"VITALICIO",credits:500000,endpoints:null},
   douglasvip:{plano:"VITALICIO",credits:1000,endpoints:null},
   Zontra88:{plano:"VITALICIO",credits:1000,endpoints:null},
   astropro:{plano:"VITALICIO",credits:1000,endpoints:null},
   digapony:{plano:"VITALICIO",credits:1000,endpoints:null},
   santanavip:{plano:"VITALICIO",credits:1000,endpoints:null},
   // 🧪 PLANO DE TESTE (3 BUSCAS)
-    testeastro:{ 
+    santanateste:{ 
     plano:"TESTE",
     credits:5,
     endpoints:null
@@ -87,169 +80,31 @@ const ENDPOINTS = {
     url: "https://obitostore.shop/api/consulta/placa2",
     param: "placa"
   },
-cpf: {
-  query: "cpf",
-  url: BASE_SARA + "cpf",
-  param: "cpf",
-  tipo: "sara"
-},
+
+  cpf: {
+    query: "cpf",
+    url: "https://obitostore.shop/api/consulta/cpf",
+    param: "cpf"
+  },
+
   telefone: {
     query: "telefone",
     url: "https://obitostore.shop/api/consulta/telefone",
     param: "telefone"
   },
+
   cnpj: {
     query: "query",
     url: "https://obitostore.shop/api/consulta/cnpj",
     param: "query"
   },
 
-nome: {
-  query: "nome",
-  url: BASE_SARA + "nome",
-  param: "nome",
-  tipo: "sara"
-},
+  nome: {
+    query: "nome",
+    url: "https://obitostore.shop/api/consulta/nome3",
+    param: "nome"
+  },
 
-telefone_full: {
-  query: "telefone",
-  url: BASE_SARA + "telefone-full",
-  param: "phone",
-  tipo: "sara"
-},
-
-telefone_cpf: {
-  query: "cpf",
-  url: BASE_SARA + "telefone-cpf",
-  param: "cpf",
-  tipo: "sara"
-},
-
-ddd: {
-  query: "ddd",
-  url: BASE_SARA + "ddd",
-  param: "ddd",
-  tipo: "sara"
-},
-
-operadora: {
-  query: "telefone",
-  url: BASE_SARA + "operadora",
-  param: "telefone",
-  tipo: "sara"
-},
-
-rg: {
-  query: "rg",
-  url: BASE_SARA + "rg",
-  param: "rg",
-  tipo: "sara"
-},
-
-titulo: {
-  query: "titulo",
-  url: BASE_SARA + "titulo",
-  param: "titulo",
-  tipo: "sara"
-},
-
-pis: {
-  query: "pis",
-  url: BASE_SARA + "pis",
-  param: "pis",
-  tipo: "sara"
-},
-
-nis: {
-  query: "nis",
-  url: BASE_SARA + "nis",
-  param: "nis",
-  tipo: "sara"
-},
-
-parentes: {
-  query: "cpf",
-  url: BASE_SARA + "parentes",
-  param: "cpf",
-  tipo: "sara"
-},
-
-vizinhos: {
-  query: "cpf",
-  url: BASE_SARA + "vizinhos",
-  param: "cpf",
-  tipo: "sara"
-},
-
-estado: {
-  query: "uf",
-  url: BASE_SARA + "estado",
-  param: "uf",
-  tipo: "sara"
-},
-
-email: {
-  query: "email",
-  url: BASE_SARA + "email",
-  param: "email",
-  tipo: "sara"
-},
-
-score: {
-  query: "cpf",
-  url: BASE_SARA + "score",
-  param: "cpf",
-  tipo: "sara"
-},
-
-renda: {
-  query: "valor",
-  url: BASE_SARA + "renda",
-  param: "valor",
-  tipo: "sara"
-},
-
-cbo: {
-  query: "cbo",
-  url: BASE_SARA + "cbo",
-  param: "cbo",
-  tipo: "sara"
-},
-
-bin: {
-  query: "bin",
-  url: BASE_SARA + "bin",
-  param: "bin",
-  tipo: "sara"
-},
-
-foto_sp: {
-  query: "cpf",
-  url: BASE_SARA + "foto-sp",
-  param: "cpf",
-  tipo: "sara"
-},
-
-foto_ro: {
-  query: "cpf",
-  url: BASE_SARA + "foto-ro",
-  param: "cpf",
-  tipo: "sara"
-},
-
-foto_ma: {
-  query: "cpf",
-  url: BASE_SARA + "foto-ma",
-  param: "cpf",
-  tipo: "sara"
-},
-
-foto_all: {
-  query: "cpf",
-  url: BASE_SARA + "foto-all",
-  param: "cpf",
-  tipo: "sara"
-},
   cep: {
     query: "cep",
     url: "https://obitostore.shop/api/consulta/cep",
@@ -292,7 +147,7 @@ if(!valor){
 
 try{
 
-const apikey = config.tipo === "sara" ? "artigo%23171_b" : "Teste";
+const apikey = config.tipo === "sara" ? "bigmouthh" : "bigmouthh";
 
 const apiURL = config.url + "?" +
   config.param + "=" + encodeURIComponent(valor) +
@@ -331,12 +186,12 @@ function formatarResultado(dados){
   let resultado = dados.resultado;
 
   if(typeof resultado === "string"){
-    resultado = resultado
-      .replace(/©.*HydraCore/gi,"")
-      .replace(/══════════════════════════/g,"")
-      .replace(/\r/g,"")
-      .replace(/\n{2,}/g,"\n\n")
-      .trim();
+resultado = resultado
+  .replace(/©.*?(HydraCore|Karen Search).*/gi,"")
+  .replace(/══════════════════════════/g,"")
+  .replace(/\r/g,"")
+  .replace(/\n{2,}/g,"\n\n")
+  .trim();
 
     // Separar seções pelo título
     const seções = resultado.split(/\n\n(?=[A-ZÀ-Ú ]{3,}:)/g).map(sec => {
@@ -902,6 +757,275 @@ button:hover::after{
 .plan[data-plan="VITALICIO"] .plan-top span:first-child{
  color:#a855f7;
 }
+
+/* ================= PIX PREMIUM ================= */
+
+.pix-box{
+  margin-top:18px;
+  display:none;
+
+  padding:18px;
+  border-radius:18px;
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(255,255,255,.04),
+      rgba(255,255,255,.01)
+    );
+
+  border:1px solid rgba(59,130,246,.18);
+
+  animation:pixFade .5s ease;
+
+  box-shadow:
+    0 10px 40px rgba(0,0,0,.45),
+    inset 0 1px 0 rgba(255,255,255,.05);
+
+  position:relative;
+  overflow:hidden;
+}
+
+/* glow */
+.pix-box::before{
+  content:"";
+  position:absolute;
+  inset:0;
+
+  background:
+    linear-gradient(
+      120deg,
+      transparent,
+      rgba(59,130,246,.12),
+      transparent
+    );
+
+  transform:translateX(-100%);
+  animation:shine 4s linear infinite;
+}
+
+@keyframes shine{
+  to{
+    transform:translateX(100%);
+  }
+}
+
+@keyframes pixFade{
+  from{
+    opacity:0;
+    transform:translateY(15px) scale(.98);
+  }
+  to{
+    opacity:1;
+    transform:translateY(0) scale(1);
+  }
+}
+
+.pix-header{
+  display:flex;
+  align-items:center;
+  gap:14px;
+}
+
+.pix-icon{
+  width:54px;
+  height:54px;
+  border-radius:16px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  background:
+    linear-gradient(
+      135deg,
+      #3b82f6,
+      #2563eb
+    );
+
+  font-size:24px;
+
+  box-shadow:
+    0 10px 30px rgba(59,130,246,.3);
+
+  animation:pulse 2s infinite;
+}
+
+@keyframes pulse{
+  0%{
+    transform:scale(1);
+  }
+  50%{
+    transform:scale(1.05);
+  }
+  100%{
+    transform:scale(1);
+  }
+}
+
+.pix-title{
+  font-size:15px;
+  font-weight:700;
+}
+
+.pix-sub{
+  font-size:12px;
+  opacity:.65;
+  margin-top:2px;
+}
+
+.pix-info{
+  margin-top:18px;
+}
+
+.pix-label{
+  font-size:12px;
+  opacity:.7;
+  margin-bottom:8px;
+}
+
+.pix-key{
+  background:#0b1228;
+  border:1px solid rgba(255,255,255,.05);
+
+  padding:14px;
+  border-radius:12px;
+
+  font-size:12px;
+  word-break:break-all;
+
+  transition:.25s;
+}
+
+.pix-key:hover{
+  transform:scale(1.01);
+  border-color:rgba(59,130,246,.35);
+}
+
+.pix-valor{
+  margin-top:14px;
+
+  font-size:16px;
+  font-weight:800;
+
+  color:#22c55e;
+
+  animation:valorGlow 2s infinite;
+}
+
+@keyframes valorGlow{
+  0%{
+    text-shadow:0 0 0 rgba(34,197,94,0);
+  }
+  50%{
+    text-shadow:0 0 12px rgba(34,197,94,.5);
+  }
+  100%{
+    text-shadow:0 0 0 rgba(34,197,94,0);
+  }
+}
+
+.pix-alert{
+  margin-top:16px;
+
+  padding:14px;
+  border-radius:12px;
+
+  background:
+    rgba(250,204,21,.08);
+
+  border:
+    1px solid rgba(250,204,21,.15);
+
+  font-size:12px;
+  line-height:1.6;
+
+  color:#fde68a;
+}
+
+.telegram-box{
+  margin-top:16px;
+
+  display:flex;
+  align-items:center;
+  gap:14px;
+
+  text-decoration:none;
+  color:#fff;
+
+  padding:14px;
+  border-radius:14px;
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(59,130,246,.12),
+      rgba(59,130,246,.03)
+    );
+
+  border:1px solid rgba(59,130,246,.2);
+
+  transition:.25s;
+}
+
+.telegram-box:hover{
+  transform:translateY(-2px) scale(1.01);
+
+  box-shadow:
+    0 10px 25px rgba(59,130,246,.15);
+}
+
+.telegram-icon{
+  width:48px;
+  height:48px;
+  border-radius:14px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  background:#3b82f6;
+
+  font-size:22px;
+}
+
+.telegram-title{
+  font-size:14px;
+  font-weight:700;
+}
+
+.telegram-user{
+  margin-top:2px;
+  font-size:12px;
+  opacity:.7;
+}
+
+.pix-buttons{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+
+  margin-top:18px;
+}
+
+.pix-copy{
+  background:
+    linear-gradient(
+      90deg,
+      #3b82f6,
+      #2563eb
+    );
+}
+
+.pix-send{
+  background:
+    linear-gradient(
+      90deg,
+      #22c55e,
+      #16a34a
+    );
+}
+
 `
 }
 
@@ -939,10 +1063,9 @@ return new Response(`
 <!-- MODAL MANUTENÇÃO -->
 <div class="modal" id="maintenanceModal">
   <div class="modal-box">
-    <h2 style="font-size:16px;margin-bottom:10px;">⚠️ Sistema em Manutenção</h2>
+    <h2 style="font-size:16px;margin-bottom:10px;">⚠️ Manutenção Finalizada!</h2>
     <p style="font-size:14px;opacity:.8;line-height:1.5;">
-      O sistema está passando por atualizações e estará disponível novamente às <b>07:30</b>.<br>
-      Estamos trabalhando o mais rápido possível, <b>3 pessoas</b> estão dedicadas para isso.
+      Aproveite as consultas.
     </p>
     <button onclick="fecharMaintenanceModal()" style="margin-top:15px;">Fechar</button>
   </div>
@@ -1002,7 +1125,23 @@ ${Object.keys(ENDPOINTS).map(e=>`<option>${e}</option>`).join("")}
 <div class="modal" id="modal">
   <div class="modal-box">
 
-    <h2 style="font-size:16px;margin-bottom:10px;">🔐 Acesso</h2>
+<h2 style="font-size:16px;margin-bottom:10px;">
+🚀 CONSULTAS ILIMITADAS
+</h2>
+
+<p style="
+font-size:13px;
+opacity:.75;
+line-height:1.6;
+margin-bottom:15px;
+">
+✅ CPF, Telefone, Placa. etc...<br>
+✅ Endereços completos<br>
+✅ Score e renda<br>
+✅ Veículos e laudos<br>
+✅ Parentes e vínculos<br>
+✅ Muito mais...
+</p>
 
     <input id="tokenInput" placeholder="Digite seu token">
 
@@ -1014,35 +1153,116 @@ ${Object.keys(ENDPOINTS).map(e=>`<option>${e}</option>`).join("")}
 
 <div class="plans">
 
-  <div class="plan" data-plan="DIARIO">
+  <div class="plan" onclick="selecionarPlano('diario','14,90', this)"
     <div class="plan-top">
-      <span>DIÁRIO</span>
-      <span class="price">R$20</span>
+      <span>📅 DIÁRIO</span>
+      <span class="price">R$14,90</span>
     </div>
+
     <div class="plan-info">
-      Acesso 24h
+      Acesso ilimitado por 24h
     </div>
   </div>
 
-  <div class="plan featured" data-plan="PRO">
+  <div class="plan" onclick="selecionarPlano('semanal','24,90', this)"
     <div class="plan-top">
-      <span>PRO</span>
-      <span class="price">R$30/mês</span>
+      <span>📆 SEMANAL</span>
+      <span class="price">R$24,90</span>
     </div>
+
     <div class="plan-info">
-      1000 consultas
+      Consultas ilimitadas por 7 dias
     </div>
   </div>
 
-<div class="plan" data-plan="VITALICIO">
-  <div class="plan-top">
-    <span>VITALÍCIO</span>
-    <span class="price">R$50 único</span>
+  <div class="plan featured" onclick="selecionarPlano('vitalicio','20,90', this)"
+      <div class="badge-plan">🔥 MAIS VENDIDO</div>
+
+    <div class="plan-top">
+      <span>👑 VITALÍCIO</span>
+      <span class="price">R$20,90</span>
+    </div>
+
+    <div class="plan-info">
+      Acesso permanente + ilimitado
+    </div>
   </div>
-  <div class="plan-info">
-    Ilimitado
-  </div>
+
 </div>
+
+<!-- BOX PIX -->
+<div id="pixBox" class="pix-box">
+
+  <div class="pix-header">
+    <div class="pix-icon">💳</div>
+
+    <div>
+      <div class="pix-title">
+        Pagamento via PIX
+      </div>
+
+      <div class="pix-sub">
+        Liberação rápida após envio do comprovante
+      </div>
+    </div>
+  </div>
+
+  <div class="pix-info">
+
+    <div class="pix-label">
+      🔑 Chave PIX
+    </div>
+
+    <div id="pixKey" class="pix-key">
+      f0d0f3b1-8776-4f06-a254-b6ea3686f71a
+    </div>
+
+    <div id="pixValor" class="pix-valor">
+      💰 Valor: R$ 0,00
+    </div>
+
+  </div>
+
+  <div class="pix-alert">
+    ⏳ Após o pagamento, envie o comprovante no Telegram.
+    <br>
+    Seu acesso será liberado em alguns minutos.
+  </div>
+
+  <a
+    href="https://t.me/puxardados5"
+    target="_blank"
+    class="telegram-box"
+  >
+    <div class="telegram-icon">
+      ✈️
+    </div>
+
+    <div>
+      <div class="telegram-title">
+        Enviar comprovante
+      </div>
+
+      <div class="telegram-user">
+        Telegram: @puxardados5
+      </div>
+    </div>
+  </a>
+
+  <div class="pix-buttons">
+
+    <button onclick="copiarPix()" class="pix-copy">
+      📋 Copiar Chave PIX
+    </button>
+
+    <button
+      onclick="window.open('https://t.me/puxardados5')"
+      class="pix-send"
+    >
+      📄 Enviar Comprovante
+    </button>
+
+  </div>
 
 </div>
 
@@ -1052,281 +1272,9 @@ ${Object.keys(ENDPOINTS).map(e=>`<option>${e}</option>`).join("")}
 /* ===== TOKENS ===== */
 const TOKENS = {
   omaigd: "VITALICIO",
-  italoedu7: "VITALICIO",
-  IFNastro: "VITALICIO",
-  Zontra88: "VITALICIO",
-  fxckbuscas: "VITALICIO",
-  douglasvip: "VITALICIO",
-  astropro: "VITALICIO",
-  santanavip: "VITALICIO",
   digapony: "VITALICIO",
-  name123: "VITALICIO",
-  testeastro: "TESTE",
-  brendavip: "VITALICIO",
-  LA_MUERTE: "VITALICIO"
+  santanateste: "TESTE"
 };
-
-function viewPage(url){
-
-  const data = url.searchParams.get("data");
-
-  if(!data){
-    return new Response("Sem dados",{status:400});
-  }
-
-  const decoded = JSON.parse(atob(data));
-
-  const { titulo, dados } = decoded;
-
-  function renderSecoes(){
-    let html = "";
-
-    for(const secao in dados){
-
-      html += `
-      <div class="card">
-        <div class="secao-title">${secao.toUpperCase()}</div>
-      `;
-
-      for(const campo in dados[secao]){
-        html += `
-        <div class="item">
-          <span class="label">${campo}</span>
-          <span class="value">${dados[secao][campo] || "NÃO ENCONTRADO"}</span>
-        </div>
-        `;
-      }
-
-      html += `</div>`;
-    }
-
-    return html;
-  }
-
-  return new Response(`
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
-<title>${titulo}</title>
-
-<style>
-body{
- margin:0;
- font-family:'Inter',sans-serif;
- background: radial-gradient(circle at 20% 20%, #0a0f2a, #02030a);
- color:#e2e8f0;
- overflow-x:hidden;
-}
-
-/* PARTICULAS */
-canvas{
- position:fixed;
- inset:0;
- z-index:0;
-}
-
-/* CONTAINER */
-.container{
- position:relative;
- z-index:2;
- max-width:420px;
- margin:30px auto;
- padding:20px;
-}
-
-/* HEADER */
-.header{
- text-align:center;
- margin-bottom:20px;
-}
-
-.header h1{
- font-size:20px;
- font-weight:800;
-}
-
-/* CARD */
-.card{
- margin-top:12px;
- padding:14px;
- border-radius:16px;
- background:rgba(255,255,255,0.03);
- border:1px solid rgba(255,255,255,0.08);
- backdrop-filter:blur(14px);
- transition:.3s;
-}
-
-.card:hover{
- transform:translateY(-3px);
- border-color:rgba(59,130,246,.5);
-}
-
-/* SEÇÃO */
-.secao-title{
- font-size:12px;
- font-weight:700;
- margin-bottom:8px;
- color:#3b82f6;
-}
-
-/* ITEM */
-.item{
- display:flex;
- justify-content:space-between;
- margin-bottom:6px;
- font-size:13px;
-}
-
-.label{
- opacity:.6;
-}
-
-.value{
- font-weight:600;
-}
-
-/* BOTÕES */
-.actions{
- margin-top:20px;
- display:flex;
- gap:10px;
-}
-
-button{
- flex:1;
- padding:10px;
- border-radius:10px;
- border:none;
- background:linear-gradient(90deg,#3b82f6,#2563eb);
- color:#fff;
- font-weight:600;
- cursor:pointer;
-}
-
-/* TOAST */
-#toast{
- position:fixed;
- bottom:20px;
- left:50%;
- transform:translateX(-50%);
- background:#111;
- padding:10px 20px;
- border-radius:10px;
- opacity:0;
- transition:.3s;
-}
-
-#toast.show{
- opacity:1;
-}
-</style>
-</head>
-
-<body>
-
-<canvas id="bg"></canvas>
-
-<div class="container">
-
-<div class="header">
-  <h1>🔍 ${titulo}</h1>
-</div>
-
-${renderSecoes()}
-
-<div class="actions">
-  <button onclick="copiar()">📋 Copiar</button>
-  <button onclick="compartilhar()">📤 Compartilhar</button>
-</div>
-
-</div>
-
-<div id="toast">Copiado!</div>
-
-<script>
-const dados = ${JSON.stringify(dados)};
-
-/* COPIAR */
-function copiar(){
-  let texto = "";
-
-  for(const s in dados){
-    texto += s.toUpperCase() + "\\n";
-    for(const c in dados[s]){
-      texto += c + ": " + dados[s][c] + "\\n";
-    }
-    texto += "\\n";
-  }
-
-  navigator.clipboard.writeText(texto);
-
-  const t = document.getElementById("toast");
-  t.classList.add("show");
-  setTimeout(()=>t.classList.remove("show"),2000);
-}
-
-/* COMPARTILHAR */
-function compartilhar(){
-  if(navigator.share){
-    navigator.share({
-      title: "Consulta",
-      text: "Olha isso aqui",
-      url: window.location.href
-    });
-  }
-}
-
-/* PARTICULAS */
-const canvas = document.getElementById("bg");
-const ctx = canvas.getContext("2d");
-let particles = [];
-
-function resize(){
-  canvas.width = innerWidth;
-  canvas.height = innerHeight;
-}
-
-function create(){
-  particles = [];
-  for(let i=0;i<60;i++){
-    particles.push({
-      x: Math.random()*canvas.width,
-      y: Math.random()*canvas.height,
-      r: Math.random()*1.5,
-      speed: Math.random()*0.5
-    });
-  }
-}
-
-function draw(){
-  ctx.clearRect(0,0,canvas.width,canvas.height);
-  particles.forEach(p=>{
-    p.y += p.speed;
-    if(p.y > canvas.height){
-      p.y = 0;
-      p.x = Math.random()*canvas.width;
-    }
-    ctx.beginPath();
-    ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
-    ctx.fillStyle="rgba(255,255,255,0.6)";
-    ctx.fill();
-  });
-  requestAnimationFrame(draw);
-}
-
-resize();
-create();
-draw();
-window.addEventListener("resize", resize);
-</script>
-
-</body>
-</html>
-`,{
-    headers:{ "Content-Type":"text/html" }
-  })
-}
 
 /* ===== MODAIS ===== */
 function abrirModal(){
@@ -1339,67 +1287,6 @@ function fecharModal(){
 
 function fecharMaintenanceModal(){
   document.getElementById("maintenanceModal").classList.remove("show");
-}
-
-function viewPage(url){
-
-  const data = url.searchParams.get("data");
-
-  if(!data){
-    return new Response("Sem dados",{status:400});
-  }
-
-  const decoded = JSON.parse(atob(data));
-
-  const { nome, cpf, telefone, cidade, uf } = decoded;
-
-  return new Response(`
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
-<title>Consulta</title>
-
-<style>
-body {
-  margin:0;
-  background:#050505;
-  color:#fff;
-  font-family:-apple-system;
-}
-
-.card {
-  width:350px;
-  margin:10% auto;
-  padding:25px;
-  border-radius:18px;
-  background:rgba(255,255,255,0.03);
-  backdrop-filter: blur(20px);
-  border:1px solid rgba(255,255,255,0.08);
-}
-
-.line {margin-bottom:10px;}
-.label {color:#888;font-size:11px;}
-</style>
-</head>
-
-<body>
-
-<div class="card">
-<h2>🔍 Consulta</h2>
-
-<div class="line"><span class="label">Nome</span><br>${nome}</div>
-<div class="line"><span class="label">CPF</span><br>${cpf}</div>
-<div class="line"><span class="label">Telefone</span><br>${telefone}</div>
-<div class="line"><span class="label">Local</span><br>${cidade} - ${uf}</div>
-
-</div>
-
-</body>
-</html>
-`,{
-    headers: { "Content-Type":"text/html" }
-  })
 }
 
 /* ===== BADGE ===== */
@@ -1451,6 +1338,35 @@ function salvarTokenModal(){
   salvarToken(token);
   efeitoPremium(token);
   fecharModal();
+}
+
+const CHAVE_PIX = "f0d0f3b1-8776-4f06-a254-b6ea3686f71a";
+
+function selecionarPlano(plano, valor, el){
+
+  document.querySelectorAll(".plan").forEach(p=>{
+    p.classList.remove("selected");
+  });
+
+  el.classList.add("selected");
+
+  const box = document.getElementById("pixBox");
+
+  document.getElementById("pixValor").innerHTML =
+    "💰 Valor: R$ " + valor;
+
+  box.style.display = "block";
+
+  mostrarToast(
+    "Plano " + plano.toUpperCase() + " selecionado 🚀"
+  );
+}
+
+function copiarPix(){
+
+  navigator.clipboard.writeText(CHAVE_PIX);
+
+  mostrarToast("Chave PIX copiada ✅");
 }
 
 /* ===== TOAST ===== */
@@ -1587,6 +1503,54 @@ function resizeCanvas(){
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
 }
+
+async function verificarPagamento(url){
+
+  const payment_id = url.searchParams.get("payment_id")
+
+  if(!payment_id){
+    return jsonErro("REQ_001","payment_id obrigatório")
+  }
+
+const api = "https://promstpagamentos.discloud.app/verify_payment?payment_id=" + payment_id
+
+  try{
+    const res = await fetch(api)
+    const json = await res.json()
+
+    // 🔥 SE PAGAMENTO CONFIRMADO
+    if(json.status_pagamento === "CONCLUIDA"){
+const novoToken = "user_" + Math.random().toString(36).slice(2,10)
+
+TOKENS[novoToken] = {
+  plano:"PRO",
+  credits:1000,
+  endpoints:null
+}
+      return new Response(JSON.stringify({
+        status:true,
+        pago:true,
+        liberar_token:true,
+        dados: json
+      },null,2),{
+        headers:{ "Content-Type":"application/json" }
+      })
+    }
+
+    return new Response(JSON.stringify({
+      status:true,
+      pago:false,
+      dados: json
+    },null,2),{
+      headers:{ "Content-Type":"application/json" }
+    })
+
+  }catch(e){
+    return jsonErro("PAY_002","Erro ao verificar pagamento")
+  }
+}
+
+
 
 function createParticles(qtd=60){
   particles = [];
